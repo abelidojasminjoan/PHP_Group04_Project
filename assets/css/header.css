@@ -1,0 +1,659 @@
+/* =========================================
+   PUREVIA HEADER
+========================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@400;500&display=swap');
+
+
+/* =========================================
+   BASIC RESET
+========================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'DM Sans', sans-serif;
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.site-header {
+    width: 100%;
+    background: #f8f6f0;
+}
+
+
+/* =========================================
+   ANNOUNCEMENT BAR
+========================================= */
+
+.announcement-bar {
+    width: 100%;
+    min-height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 7px 20px;
+
+    background: #31382c;
+    color: #f8f6f0;
+
+    text-align: center;
+}
+
+.announcement-bar p {
+    margin: 0;
+
+    font-size: 9px;
+    font-weight: 400;
+
+    letter-spacing: 0.4px;
+}
+
+
+/* =========================================
+   MAIN NAVBAR
+========================================= */
+
+.navbar {
+    width: 100%;
+    min-height: 78px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 65px;
+
+    background: #f8f6f0;
+
+    border-bottom: 1px solid #e7e4dc;
+}
+
+
+/* =========================================
+   LEFT SECTION
+========================================= */
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+
+    gap: 55px;
+}
+
+
+/* =========================================
+   PUREVIA BRAND
+========================================= */
+
+.brand {
+    display: flex;
+    align-items: center;
+
+    gap: 11px;
+
+    color: #292a25;
+
+    text-decoration: none;
+}
+
+
+/* Temporary leaf logo */
+
+.brand-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #69745d;
+
+    font-size: 20px;
+}
+
+
+/* PUREVIA text */
+
+.brand-name {
+    font-family: 'Playfair Display', serif;
+
+    font-size: 25px;
+    font-weight: 400;
+
+    letter-spacing: 1.5px;
+}
+
+
+/*
+If you use an actual image logo,
+this will control its size.
+*/
+
+.brand img {
+    width: 32px;
+    height: 32px;
+
+    object-fit: contain;
+}
+
+
+/* =========================================
+   MAIN NAVIGATION
+========================================= */
+
+.main-nav {
+    display: flex;
+    align-items: center;
+
+    gap: 35px;
+}
+
+.main-nav a {
+    position: relative;
+
+    padding: 29px 0;
+
+    color: #292a25;
+
+    text-decoration: none;
+
+    font-size: 12px;
+    font-weight: 400;
+
+    transition:
+        color 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.main-nav a:hover {
+    color: #69745d;
+}
+
+
+/* Active page */
+
+.main-nav a.active {
+    color: #69745d;
+}
+
+
+/* Underline active page */
+
+.main-nav a.active::after {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 20px;
+
+    height: 1px;
+
+    background: #69745d;
+}
+
+
+/* =========================================
+   RIGHT SECTION
+========================================= */
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+
+    gap: 25px;
+}
+
+
+/* =========================================
+   ICON BUTTONS
+========================================= */
+
+.nav-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #292a25;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    transition:
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.nav-icon:hover {
+    color: #69745d;
+    transform: translateY(-1px);
+}
+
+/* =========================================
+   GUEST ACCOUNT BUTTON
+========================================= */
+
+.guest-account-icon {
+    border: none;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+
+    font: inherit;
+    color: #292a25;
+
+    cursor: pointer;
+
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.guest-account-icon:focus {
+    outline: none;
+}
+
+.guest-account-icon:focus-visible {
+    outline: 2px solid #69745d;
+    outline-offset: 4px;
+    border-radius: 50%;
+}
+
+
+
+/* =========================================
+   ACCOUNT
+========================================= */
+
+.account-link {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    color: #292a25;
+
+    text-decoration: none;
+}
+
+.account-avatar {
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #69745d;
+    color: #ffffff;
+
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.account-name {
+    font-size: 11px;
+}
+
+.account-link:hover .account-name {
+    color: #69745d;
+}
+
+
+/* =========================================
+   SHOPPING BAG
+========================================= */
+
+.bag-link {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    color: #292a25;
+
+    text-decoration: none;
+
+    font-size: 11px;
+}
+
+.bag-link i {
+    font-size: 15px;
+}
+
+.bag-link:hover {
+    color: #69745d;
+}
+
+.bag-count {
+    color: #6d6d68;
+}
+
+
+/* =========================================
+   LOGIN / REGISTER
+========================================= */
+
+.login-link,
+.register-link {
+    color: #292a25;
+
+    text-decoration: none;
+
+    font-size: 12px;
+}
+
+.login-link:hover {
+    color: #69745d;
+}
+
+.register-link {
+    padding: 9px 17px;
+
+    border: 1px solid #69745d;
+    border-radius: 20px;
+
+    color: #69745d;
+}
+
+.register-link:hover {
+    background: #69745d;
+    color: #ffffff;
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 900px) {
+
+    .navbar {
+        padding: 0 30px;
+    }
+
+    .navbar-left {
+        gap: 30px;
+    }
+
+    .main-nav {
+        gap: 20px;
+    }
+
+    .navbar-right {
+        gap: 16px;
+    }
+
+    .account-name {
+        display: none;
+    }
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 650px) {
+
+    .announcement-bar p {
+        font-size: 7px;
+    }
+
+    .navbar {
+        min-height: 65px;
+
+        padding: 0 20px;
+    }
+
+    .brand-name {
+        font-size: 21px;
+    }
+
+    .navbar-left {
+        gap: 20px;
+    }
+
+    .main-nav {
+        display: none;
+    }
+
+    .navbar-right {
+        gap: 15px;
+    }
+
+    .account-name {
+        display: none;
+    }
+
+    .bag-link span {
+        display: none;
+    }
+
+}
+
+/* =========================================
+   ACCOUNT
+========================================= */
+
+.account-dropdown {
+    position: relative;
+}
+
+
+/* ACCOUNT BUTTON */
+
+.account-link {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 0;
+
+    border: none;
+    background: transparent;
+
+    color: #292a25;
+
+    text-decoration: none;
+
+    font-family: 'DM Sans', sans-serif;
+
+    cursor: pointer;
+}
+
+
+/* AVATAR */
+
+.account-avatar {
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: #69745d;
+    color: #ffffff;
+
+    font-size: 11px;
+    font-weight: 500;
+}
+
+
+/* USER NAME */
+
+.account-name {
+    max-width: 90px;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    font-size: 11px;
+
+    transition: color 0.2s ease;
+}
+
+
+.account-link:hover .account-name {
+    color: #69745d;
+}
+
+
+/* =========================================
+   ACCOUNT DROPDOWN MENU
+========================================= */
+
+.account-dropdown-menu {
+    position: absolute;
+
+    top: calc(100% + 16px);
+    right: 0;
+
+    width: 155px;
+
+    padding: 6px 0;
+
+    border: 1px solid #ebe7de;
+    border-radius: 5px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 8px 25px rgba(32, 36, 29, 0.12);
+
+    opacity: 0;
+    visibility: hidden;
+
+    transform: translateY(-5px);
+
+    transition:
+        opacity 0.18s ease,
+        transform 0.18s ease,
+        visibility 0.18s ease;
+
+    z-index: 1000;
+}
+
+
+/* SHOW DROPDOWN */
+
+.account-dropdown.active .account-dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+
+    transform: translateY(0);
+}
+
+
+/* SMALL POINTER */
+
+.account-dropdown-menu::before {
+    content: "";
+
+    position: absolute;
+
+    top: -6px;
+    right: 24px;
+
+    width: 10px;
+    height: 10px;
+
+    border-top: 1px solid #ebe7de;
+    border-left: 1px solid #ebe7de;
+
+    background: #ffffff;
+
+    transform: rotate(45deg);
+}
+
+
+/* MENU ITEM */
+
+.account-dropdown-item {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 11px 13px;
+
+    color: #292a25;
+
+    text-decoration: none;
+
+    font-size: 11px;
+    font-weight: 400;
+
+    transition:
+        background 0.18s ease,
+        color 0.18s ease;
+}
+
+
+.account-dropdown-item i {
+    width: 14px;
+
+    text-align: center;
+
+    color: #60645b;
+
+    font-size: 11px;
+}
+
+
+.account-dropdown-item:hover {
+    background: #f8f6f0;
+    color: #69745d;
+}
+
+
+/* DIVIDER */
+
+.account-dropdown-divider {
+    height: 1px;
+
+    margin: 4px 0;
+
+    background: #ece9e1;
+}
+
+
+/* SIGN OUT */
+
+.account-dropdown-logout {
+    color: #d54242;
+}
+
+
+.account-dropdown-logout i {
+    color: #d54242;
+}
+
+
+.account-dropdown-logout:hover {
+    background: #fff4f4;
+    color: #c73333;
+}

@@ -1,0 +1,852 @@
+<?php
+
+/* =========================================================
+   PUREVIA
+   SHARED ADMIN + STAFF SIDEBAR
+========================================================= */
+
+
+/* =========================================================
+   SESSION
+========================================================= */
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+
+/* =========================================================
+   LOAD CONFIG FILES
+========================================================= */
+
+/*
+|--------------------------------------------------------------------------
+| IMPORTANT
+|--------------------------------------------------------------------------
+| This assumes sidemenu.php is inside:
+|
+| purevia_website/includes/sidemenu.php
+|
+| If your sidemenu.php is somewhere else, adjust these paths.
+*/
+
+require_once __DIR__ . '/../config/app.php';
+require_once __DIR__ . '/../config/db.php';
+
+
+/* =========================================================
+   CHECK LOGIN
+========================================================= */
+
+if (empty($_SESSION['user_id'])) {
+
+    header('Location: ' . BASE_URL . '/index.php');
+    exit;
+}
+
+
+$userId = (int) $_SESSION['user_id'];
+
+
+/* =========================================================
+   GET CURRENT USER FROM DATABASE
+========================================================= */
+
+$sql = "
+    SELECT
+        u.id,
+        u.role_id,
+        u.first_name,
+        u.last_name,
+        u.email,
+        u.status,
+        r.role_name
+
+    FROM users AS u
+
+    INNER JOIN roles AS r
+        ON r.id = u.role_id
+
+    WHERE u.id = ?
+
+    LIMIT 1
+";
+
+
+$stmt = $conn->prepare($sql);
+
+
+if (!$stmt) {
+
+    error_log(
+        'Sidebar prepare failed: ' .
+        $conn->error
+    );
+
+    header('Location: ' . BASE_URL . '/index.php');
+    exit;
+}
+
+
+$stmt->bind_param(
+    'i',
+    $userId
+);
+
+
+$stmt->execute();
+
+
+$result = $stmt->get_result();
+
+
+$currentUser = $result->fetch_assoc();
+
+
+$stmt->close();
+
+
+/* =========================================================
+   USER DOES NOT EXIST
+========================================================= */
+
+if (!$currentUser) {
+
+    $_SESSION = [];
+
+    session_destroy();
+
+    header('Location: ' . BASE_URL . '/index.php');
+    exit;
+}
+
+
+/* =========================================================
+   ACCOUNT MUST BE ACTIVE
+========================================================= */
+
+if (
+    strtolower($currentUser['status']) !== 'active'
+) {
+
+    $_SESSION = [];
+
+    session_destroy();
+
+    header('Location: ' . BASE_URL . '/index.php');
+    exit;
+}
+
+
+/* =========================================================
+   CURRENT ROLE
+========================================================= */
+
+$currentRole = strtolower(
+    trim($currentUser['role_name'])
+);
+
+
+$isAdmin = ($currentRole === 'admin');
+
+$isStaff = ($currentRole === 'staff');
+
+
+/* =========================================================
+   ONLY ADMIN / STAFF
+========================================================= */
+
+if (!$isAdmin && !$isStaff) {
+
+    header('Location: ' . BASE_URL . '/index.php');
+    exit;
+}
+
+
+/* =========================================================
+   CURRENT DATABASE INFORMATION
+========================================================= */
+
+$sidebarFirstName =
+    trim($currentUser['first_name'] ?? '');
+
+$sidebarLastName =
+    trim($currentUser['last_name'] ?? '');
+
+$sidebarEmail =
+    trim($currentUser['email'] ?? '');
+
+
+$sidebarFullName = trim(
+    $sidebarFirstName . ' ' . $sidebarLastName
+);
+
+
+/* Fallback if name is empty */
+
+if ($sidebarFullName === '') {
+    $sidebarFullName = 'PureVia User';
+}
+
+
+/* Avatar initial */
+
+$sidebarInitial = strtoupper(
+    substr(
+        $sidebarFirstName !== ''
+            ? $sidebarFirstName
+            : $sidebarFullName,
+        0,
+        1
+    )
+);
+
+
+/* =========================================================
+   REFRESH SESSION FROM DATABASE
+========================================================= */
+
+/*
+|--------------------------------------------------------------------------
+| The database is the source of truth.
+|--------------------------------------------------------------------------
+| These session values are refreshed so the rest of the website
+| receives the latest account information.
+*/
+
+$_SESSION['user_id'] =
+    (int) $currentUser['id'];
+
+$_SESSION['role_id'] =
+    (int) $currentUser['role_id'];
+
+$_SESSION['role'] =
+    $currentRole;
+
+$_SESSION['first_name'] =
+    $sidebarFirstName;
+
+$_SESSION['last_name'] =
+    $sidebarLastName;
+
+$_SESSION['name'] =
+    $sidebarFirstName;
+
+$_SESSION['email'] =
+    $sidebarEmail;
+
+
+/* =========================================================
+   PANEL INFORMATION
+========================================================= */
+
+if ($isAdmin) {
+
+    $panelName = 'Admin Panel';
+
+    $dashboardUrl =
+        BASE_URL . '/admin/dashboard.php';
+
+} else {
+
+    $panelName = 'Staff Panel';
+
+    $dashboardUrl =
+        BASE_URL . '/staff/dashboard.php';
+}
+
+
+/* =========================================================
+   PAGE PATHS
+========================================================= */
+
+/*
+|--------------------------------------------------------------------------
+| Admin pages
+|--------------------------------------------------------------------------
+*/
+
+$adminBase =
+    BASE_URL . '/admin';
+
+
+/*
+|--------------------------------------------------------------------------
+| Staff pages
+|--------------------------------------------------------------------------
+*/
+
+$staffBase =
+    BASE_URL . '/staff';
+
+
+/* =========================================================
+   CURRENT PAGE
+========================================================= */
+
+$currentPath =
+    $_SERVER['PHP_SELF'] ?? '';
+
+
+/* =========================================================
+   ACTIVE LINK FUNCTION
+========================================================= */
+
+if (!function_exists('sidebarActive')) {
+
+    function sidebarActive(string $path): string
+    {
+        global $currentPath;
+
+        return strpos(
+            $currentPath,
+            $path
+        ) !== false
+            ? 'active'
+            : '';
+    }
+}
+
+
+/* =========================================================
+   CREATE ROLE-SPECIFIC LINKS
+========================================================= */
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN
+|--------------------------------------------------------------------------
+*/
+
+if ($isAdmin) {
+
+    $productsUrl =
+        $adminBase . '/products/products.php';
+
+    $inventoryUrl =
+        $adminBase . '/inventory/inventory.php';
+
+    $ordersUrl =
+        $adminBase . '/orders/orders.php';
+
+    $paymentsUrl =
+        $adminBase . '/payments/payments.php';
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| STAFF
+|--------------------------------------------------------------------------
+*/
+
+else {
+
+    $productsUrl =
+        $staffBase . '/products/products.php';
+
+    $inventoryUrl =
+        $staffBase . '/inventory/inventory.php';
+
+    $ordersUrl =
+        $staffBase . '/orders/orders.php';
+
+    $paymentsUrl =
+        $staffBase . '/payments/payments.php';
+}
+
+?>
+
+
+<!-- =========================================================
+     MOBILE BUTTON
+========================================================= -->
+
+<button
+    type="button"
+    class="sidebar-mobile-toggle"
+    id="sidebarMobileToggle"
+    aria-label="Open menu"
+    aria-controls="adminSidebar"
+    aria-expanded="false"
+>
+    <i class="fa-solid fa-bars"></i>
+</button>
+
+
+<!-- =========================================================
+     MOBILE OVERLAY
+========================================================= -->
+
+<div
+    class="sidebar-overlay"
+    id="sidebarOverlay"
+></div>
+
+
+<!-- =========================================================
+     SIDEBAR
+========================================================= -->
+
+<aside
+    class="admin-sidebar"
+    id="adminSidebar"
+>
+
+
+    <!-- =====================================================
+         BRAND
+    ====================================================== -->
+
+    <div class="sidebar-brand">
+
+        <a
+            href="<?= htmlspecialchars($dashboardUrl) ?>"
+            class="sidebar-logo"
+        >
+
+            <span class="sidebar-logo-icon">
+                <i class="fa-solid fa-leaf"></i>
+            </span>
+
+            <span>PureVia</span>
+
+        </a>
+
+
+        <p class="sidebar-subtitle">
+            <?= htmlspecialchars($panelName) ?>
+        </p>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         NAVIGATION
+    ====================================================== -->
+
+    <nav class="sidebar-navigation">
+
+
+        <!-- =================================================
+             OVERVIEW
+        ================================================== -->
+
+        <div class="sidebar-section">
+
+
+            <!-- DASHBOARD -->
+
+            <a
+                href="<?= htmlspecialchars($dashboardUrl) ?>"
+                class="sidebar-link
+                <?= sidebarActive('/dashboard.php') ?>"
+            >
+
+                <span class="sidebar-link-left">
+
+                    <span class="sidebar-menu-icon">
+                        📊
+                    </span>
+
+                    <span>Dashboard</span>
+
+                </span>
+
+            </a>
+
+
+
+            <!-- =================================================
+                 USERS
+                 ADMIN ONLY
+            ================================================== -->
+
+            <?php if ($isAdmin): ?>
+
+                <a
+                    href="<?= $adminBase ?>/users/users.php"
+                    class="sidebar-link
+                    <?= sidebarActive('/users/') ?>"
+                >
+
+                    <span class="sidebar-link-left">
+
+                        <span class="sidebar-menu-icon">
+                            👥
+                        </span>
+
+                        <span>Users</span>
+
+                    </span>
+
+                </a>
+
+            <?php endif; ?>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             CATALOG
+        ================================================== -->
+
+        <div class="sidebar-section">
+
+            <p class="sidebar-section-title">
+                CATALOG
+            </p>
+
+
+            <!-- PRODUCTS -->
+
+            <a
+                href="<?= htmlspecialchars($productsUrl) ?>"
+                class="sidebar-link
+                <?= sidebarActive('/products/') ?>"
+            >
+
+                <span class="sidebar-link-left">
+
+                    <span class="sidebar-menu-icon">
+                        🧴
+                    </span>
+
+                    <span>Products</span>
+
+                </span>
+
+            </a>
+
+
+
+            <!-- =================================================
+                 ADMIN-ONLY CATALOG MANAGEMENT
+            ================================================== -->
+
+            <?php if ($isAdmin): ?>
+
+
+                <!-- CATEGORIES -->
+
+                <a
+                    href="<?= $adminBase ?>/categories/categories.php"
+                    class="sidebar-link
+                    <?= sidebarActive('/categories/') ?>"
+                >
+
+                    <span class="sidebar-link-left">
+
+                        <span class="sidebar-menu-icon">
+                            📁
+                        </span>
+
+                        <span>Categories</span>
+
+                    </span>
+
+                </a>
+
+
+
+                <!-- INGREDIENTS -->
+
+                <a
+                    href="<?= $adminBase ?>/ingredients/ingredients.php"
+                    class="sidebar-link
+                    <?= sidebarActive('/ingredients/') ?>"
+                >
+
+                    <span class="sidebar-link-left">
+
+                        <span class="sidebar-menu-icon">
+                            ⚗️
+                        </span>
+
+                        <span>Ingredients</span>
+
+                    </span>
+
+                </a>
+
+
+
+                <!-- SKIN CONCERNS -->
+
+                <a
+                    href="<?= $adminBase ?>/concerns/concerns.php"
+                    class="sidebar-link
+                    <?= sidebarActive('/concerns/') ?>"
+                >
+
+                    <span class="sidebar-link-left">
+
+                        <span class="sidebar-menu-icon">
+                            ✨
+                        </span>
+
+                        <span>Skin Concerns</span>
+
+                    </span>
+
+                </a>
+
+
+            <?php endif; ?>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             OPERATIONS
+        ================================================== -->
+
+        <div class="sidebar-section">
+
+            <p class="sidebar-section-title">
+                OPERATIONS
+            </p>
+
+
+            <!-- INVENTORY -->
+
+            <a
+                href="<?= htmlspecialchars($inventoryUrl) ?>"
+                class="sidebar-link
+                <?= sidebarActive('/inventory/') ?>"
+            >
+
+                <span class="sidebar-link-left">
+
+                    <span class="sidebar-menu-icon">
+                        📦
+                    </span>
+
+                    <span>Inventory</span>
+
+                </span>
+
+            </a>
+
+
+
+            <!-- ORDERS -->
+
+            <a
+                href="<?= htmlspecialchars($ordersUrl) ?>"
+                class="sidebar-link
+                <?= sidebarActive('/orders/') ?>"
+            >
+
+                <span class="sidebar-link-left">
+
+                    <span class="sidebar-menu-icon">
+                        🛒
+                    </span>
+
+                    <span>Orders</span>
+
+                </span>
+
+            </a>
+
+
+
+            <!-- PAYMENTS -->
+
+            <a
+                href="<?= htmlspecialchars($paymentsUrl) ?>"
+                class="sidebar-link
+                <?= sidebarActive('/payments/') ?>"
+            >
+
+                <span class="sidebar-link-left">
+
+                    <span class="sidebar-menu-icon">
+                        💳
+                    </span>
+
+                    <span>Payments</span>
+
+                </span>
+
+            </a>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             SECURITY
+             ADMIN ONLY
+        ================================================== -->
+
+        <?php if ($isAdmin): ?>
+
+            <div class="sidebar-section">
+
+                <p class="sidebar-section-title">
+                    SECURITY
+                </p>
+
+
+                <!-- SECURITY SETTINGS -->
+
+                <a
+                    href="<?= $adminBase ?>/security/settings.php"
+                    class="sidebar-link
+                    <?= sidebarActive('/security/settings.php') ?>"
+                >
+
+                    <span class="sidebar-link-left">
+
+                        <span class="sidebar-menu-icon">
+                            🔐
+                        </span>
+
+                        <span>Security Settings</span>
+
+                    </span>
+
+                </a>
+
+
+
+                <!-- LOGIN ATTEMPTS -->
+
+                <a
+                    href="<?= $adminBase ?>/security/login_attempts.php"
+                    class="sidebar-link
+                    <?= sidebarActive('/security/login_attempts.php') ?>"
+                >
+
+                    <span class="sidebar-link-left">
+
+                        <span class="sidebar-menu-icon">
+                            🔑
+                        </span>
+
+                        <span>Login Attempts</span>
+
+                    </span>
+
+                </a>
+
+
+
+                <!-- AUDIT LOGS -->
+
+                <a
+                    href="<?= $adminBase ?>/security/audit_logs.php"
+                    class="sidebar-link
+                    <?= sidebarActive('/security/audit_logs.php') ?>"
+                >
+
+                    <span class="sidebar-link-left">
+
+                        <span class="sidebar-menu-icon">
+                            📋
+                        </span>
+
+                        <span>Audit Logs</span>
+
+                    </span>
+
+                </a>
+
+
+            </div>
+
+        <?php endif; ?>
+
+
+    </nav>
+
+
+
+    <!-- =====================================================
+         ACCOUNT
+    ====================================================== -->
+
+    <div class="sidebar-account">
+
+
+        <div class="sidebar-profile">
+
+
+            <!-- AVATAR -->
+
+            <div class="sidebar-avatar">
+
+                <?= htmlspecialchars($sidebarInitial) ?>
+
+            </div>
+
+
+
+            <!-- DATABASE USER INFORMATION -->
+
+            <div class="sidebar-user-information">
+
+
+                <p class="sidebar-user-name">
+
+                    <?= htmlspecialchars($sidebarFullName) ?>
+
+                </p>
+
+
+                <p class="sidebar-user-email">
+
+                    <?= htmlspecialchars($sidebarEmail) ?>
+
+                </p>
+
+
+                <span
+                    class="sidebar-role-badge
+                    <?= $isAdmin
+                        ? 'sidebar-role-admin'
+                        : 'sidebar-role-staff' ?>"
+                >
+
+                    <?= htmlspecialchars(
+                        ucfirst($currentRole)
+                    ) ?>
+
+                </span>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             SIGN OUT
+        ================================================== -->
+
+        <a
+            href="<?= BASE_URL ?>/actions/auth/logout.php"
+            class="sidebar-logout"
+        >
+
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+
+            <span>Sign Out</span>
+
+        </a>
+
+
+    </div>
+
+
+</aside>

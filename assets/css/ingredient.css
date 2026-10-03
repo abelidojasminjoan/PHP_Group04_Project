@@ -1,0 +1,818 @@
+/* =========================================================
+   PUREVIA ADMIN INGREDIENTS
+========================================================= */
+
+
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+:root {
+    --ingredients-bg: #f8f5ef;
+    --ingredients-card: #ffffff;
+
+    --ingredients-border: #ddd5ca;
+
+    --ingredients-text: #171912;
+    --ingredients-muted: #8a786d;
+
+    --purevia-green: #53634b;
+    --purevia-green-dark: #43523d;
+
+    --success: #159b54;
+    --danger: #c95349;
+
+    --card-radius: 15px;
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+
+    background: var(--ingredients-bg);
+    color: var(--ingredients-text);
+
+    font-family: 'DM Sans', Arial, sans-serif;
+}
+
+
+/* =========================================================
+   ADMIN LAYOUT
+========================================================= */
+
+.admin-layout {
+    min-height: 100vh;
+
+    background: var(--ingredients-bg);
+}
+
+
+/* =========================================================
+   TOP BAR
+========================================================= */
+
+.admin-topbar {
+    width: 100%;
+    height: 64px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 30px;
+
+    background: #fbfaf7;
+
+    border-bottom: 1px solid #e8e5de;
+}
+
+.admin-topbar-title {
+    margin: 0;
+
+    color: #5f665a;
+
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.ingredients-main {
+    width: 100%;
+
+    padding: 30px 28px 50px;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.ingredients-page-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 25px;
+
+    margin-bottom: 30px;
+}
+
+
+/* =========================================================
+   HEADING
+========================================================= */
+
+.ingredients-heading h1 {
+    margin: 0 0 5px;
+
+    color: #11130f;
+
+    font-family: 'Playfair Display', Georgia, serif;
+
+    font-size: 34px;
+    font-weight: 600;
+
+    line-height: 1.2;
+}
+
+.ingredients-heading p {
+    margin: 0;
+
+    color: var(--ingredients-muted);
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   ADD INGREDIENT
+========================================================= */
+
+.add-ingredient-button {
+    min-height: 48px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    padding: 0 20px;
+
+    border-radius: 12px;
+
+    background: var(--purevia-green);
+
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.add-ingredient-button:hover {
+    background: var(--purevia-green-dark);
+
+    transform: translateY(-1px);
+}
+
+.add-ingredient-button i {
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.ingredients-card {
+    width: 100%;
+
+    overflow: hidden;
+
+    background: var(--ingredients-card);
+
+    border: 1px solid var(--ingredients-border);
+
+    border-radius: var(--card-radius);
+}
+
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+.ingredients-toolbar {
+    min-height: 86px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 20px;
+
+    border-bottom: 1px solid var(--ingredients-border);
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.ingredients-search {
+    width: 400px;
+    max-width: 100%;
+
+    height: 47px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 0 16px;
+
+    background: #f4f1eb;
+
+    border: 1px solid transparent;
+
+    border-radius: 10px;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.ingredients-search:focus-within {
+    background: #ffffff;
+
+    border-color: #9ca792;
+}
+
+.ingredients-search i {
+    flex-shrink: 0;
+
+    color: #8c9188;
+
+    font-size: 14px;
+}
+
+.ingredients-search input {
+    width: 100%;
+
+    padding: 0;
+
+    outline: none;
+    border: none;
+
+    background: transparent;
+
+    color: #22241e;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 14px;
+}
+
+.ingredients-search input::placeholder {
+    color: #9b9188;
+}
+
+.ingredients-search input::-webkit-search-cancel-button {
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   FILTER
+========================================================= */
+
+.ingredient-filter-dropdown {
+    position: relative;
+
+    width: 180px;
+    height: 47px;
+
+    flex: 0 0 180px;
+
+    display: flex;
+
+    align-items: center;
+
+    background: #f4f1eb;
+
+    border: 1px solid #ded9d0;
+
+    border-radius: 10px;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.ingredient-filter-dropdown:hover {
+    background: #ecefe9;
+
+    border-color: #cdd4c8;
+}
+
+.ingredient-filter-dropdown:focus-within {
+    background: #ffffff;
+
+    border-color: var(--purevia-green);
+}
+
+
+/* FILTER ICON */
+
+.ingredient-filter-icon {
+    position: absolute;
+
+    left: 15px;
+
+    z-index: 1;
+
+    color: #69745d;
+
+    font-size: 13px;
+
+    pointer-events: none;
+}
+
+
+/* FILTER SELECT */
+
+.ingredient-filter-select {
+    width: 100%;
+    height: 100%;
+
+    padding: 0 38px 0 40px;
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    outline: none;
+    border: none;
+
+    background: transparent;
+
+    color: #4e5549;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    cursor: pointer;
+}
+
+.ingredient-filter-select option {
+    background: #ffffff;
+
+    color: #272820;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+}
+
+
+/* FILTER ARROW */
+
+.ingredient-filter-arrow {
+    position: absolute;
+
+    right: 15px;
+
+    color: #7f8179;
+
+    font-size: 11px;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   TABLE WRAPPER
+========================================================= */
+
+.ingredients-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.ingredients-table {
+    width: 100%;
+
+    min-width: 900px;
+
+    border-collapse: collapse;
+}
+
+
+/* =========================================================
+   TABLE HEADER
+========================================================= */
+
+.ingredients-table th {
+    padding: 17px 24px;
+
+    color: #85776d;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    letter-spacing: 1.3px;
+
+    text-align: left;
+
+    white-space: nowrap;
+
+    border-bottom: 1px solid var(--ingredients-border);
+}
+
+
+/* COLUMN WIDTHS */
+
+.ingredients-table th:nth-child(1) {
+    width: 17%;
+}
+
+.ingredients-table th:nth-child(2) {
+    width: 31%;
+}
+
+.ingredients-table th:nth-child(3) {
+    width: 21%;
+}
+
+.ingredients-table th:nth-child(4) {
+    width: 14%;
+}
+
+.ingredients-table th:nth-child(5) {
+    width: 17%;
+}
+
+
+/* =========================================================
+   TABLE BODY
+========================================================= */
+
+.ingredients-table td {
+    padding: 18px 24px;
+
+    vertical-align: middle;
+
+    color: #1a1c17;
+
+    font-size: 14px;
+
+    border-bottom: 1px solid var(--ingredients-border);
+}
+
+.ingredients-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.ingredient-row {
+    transition: background 0.2s ease;
+}
+
+.ingredient-row:hover {
+    background: #faf8f4;
+}
+
+
+/* =========================================================
+   INGREDIENT NAME
+========================================================= */
+
+.ingredient-name {
+    color: #11130f;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.ingredient-description {
+    max-width: 350px;
+
+    display: inline-block;
+
+    color: #887b71;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   COMMON IN
+========================================================= */
+
+.ingredient-common {
+    color: #887b71;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.ingredient-status {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 76px;
+
+    padding: 7px 13px;
+
+    border-radius: 30px;
+
+    font-family: monospace;
+
+    font-size: 11px;
+    font-weight: 500;
+
+    letter-spacing: 0.8px;
+
+    white-space: nowrap;
+}
+
+.status-active {
+    background: #e3f5eb;
+
+    color: #139b54;
+}
+
+.status-inactive {
+    background: #f0ece6;
+
+    color: #8d7c6e;
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.ingredient-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+
+/* =========================================================
+   ACTION BUTTON
+========================================================= */
+
+.ingredient-action-button {
+    width: 38px;
+    height: 38px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    padding: 0;
+
+    border: 1px solid transparent;
+
+    border-radius: 9px;
+
+    background: transparent;
+
+    font-family: inherit;
+
+    font-size: 15px;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.ingredient-action-button i {
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   EDIT
+========================================================= */
+
+.edit-ingredient-button {
+    color: #65735b;
+}
+
+.edit-ingredient-button:hover {
+    background: #e8ede9;
+
+    border-color: #d6ddd3;
+
+    color: #3e5841;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   DELETE
+========================================================= */
+
+.delete-ingredient-button {
+    color: #c95349;
+}
+
+.delete-ingredient-button:hover {
+    background: #f8e7e5;
+
+    border-color: #efd0cd;
+
+    color: #c23b32;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   NO RESULTS
+========================================================= */
+
+.no-ingredients-row td {
+    padding: 60px 20px !important;
+
+    border-bottom: none !important;
+}
+
+.no-ingredients-message {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 12px;
+
+    color: #968b81;
+}
+
+.no-ingredients-message i {
+    font-size: 25px;
+}
+
+.no-ingredients-message p {
+    margin: 0;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   RESPONSIVE - TABLET
+========================================================= */
+
+@media (max-width: 1000px) {
+
+    .ingredients-toolbar {
+        align-items: flex-start;
+
+        flex-wrap: wrap;
+    }
+
+    .ingredients-search {
+        width: 100%;
+        max-width: none;
+
+        flex: 1 1 100%;
+    }
+
+    .ingredient-filter-dropdown {
+        flex: 1;
+
+        width: auto;
+
+        min-width: 180px;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE - SMALL TABLET
+========================================================= */
+
+@media (max-width: 800px) {
+
+    .admin-topbar {
+        padding-left: 75px;
+    }
+
+    .ingredients-main {
+        padding:
+            28px
+            22px
+            40px;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE - MOBILE
+========================================================= */
+
+@media (max-width: 550px) {
+
+    .admin-topbar {
+        height: 65px;
+
+        padding-left: 70px;
+        padding-right: 18px;
+    }
+
+    .ingredients-main {
+        padding:
+            24px
+            15px
+            35px;
+    }
+
+    .ingredients-page-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        margin-bottom: 22px;
+    }
+
+    .ingredients-heading h1 {
+        font-size: 29px;
+    }
+
+    .add-ingredient-button {
+        width: 100%;
+    }
+
+    .ingredients-toolbar {
+        flex-direction: column;
+
+        align-items: stretch;
+
+        gap: 12px;
+
+        padding: 15px;
+    }
+
+    .ingredients-search,
+    .ingredient-filter-dropdown {
+        width: 100%;
+
+        max-width: none;
+        min-width: 0;
+
+        flex: none;
+    }
+
+    .ingredients-table th,
+    .ingredients-table td {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+}

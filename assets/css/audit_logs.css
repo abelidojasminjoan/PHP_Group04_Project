@@ -1,0 +1,979 @@
+/* =========================================================
+   PUREVIA ADMIN - AUDIT LOGS
+========================================================= */
+
+:root {
+
+    --audit-bg: #f8f5ef;
+
+    --audit-card: #ffffff;
+
+    --audit-border: #ddd5ca;
+
+    --audit-text: #171912;
+
+    --audit-muted: #8a786d;
+
+    --purevia-green: #53634b;
+
+    --purevia-green-dark: #43523d;
+
+    --toolbar-bg: #f4f1eb;
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+
+    min-height: 100vh;
+
+    background: var(--audit-bg);
+
+    color: var(--audit-text);
+
+    font-family:
+        'DM Sans',
+        Arial,
+        sans-serif;
+}
+
+
+/* =========================================================
+   ADMIN LAYOUT
+========================================================= */
+
+.admin-layout {
+
+    min-height: 100vh;
+
+    background: var(--audit-bg);
+}
+
+
+/* =========================================================
+   TOP BAR
+========================================================= */
+
+.admin-topbar {
+
+    width: 100%;
+
+    height: 64px;
+
+    display: flex;
+
+    align-items: center;
+
+    padding: 0 30px;
+
+    background: #fbfaf7;
+
+    border-bottom:
+        1px solid #e8e5de;
+}
+
+
+.admin-topbar-title {
+
+    margin: 0;
+
+    color: #5f665a;
+
+    font-size: 14px;
+
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.audit-main {
+
+    width: 100%;
+
+    padding:
+        30px
+        28px
+        50px;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.audit-page-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 28px;
+}
+
+
+.audit-heading h1 {
+
+    margin:
+        0
+        0
+        5px;
+
+    color: #11130f;
+
+    font-family:
+        'Playfair Display',
+        Georgia,
+        serif;
+
+    font-size: 34px;
+
+    font-weight: 600;
+
+    line-height: 1.2;
+}
+
+
+.audit-heading p {
+
+    margin: 0;
+
+    color: var(--audit-muted);
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   READ ONLY NOTICE
+========================================================= */
+
+.audit-readonly-notice {
+
+    width: 100%;
+
+    min-height: 56px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 15px;
+
+    padding:
+        14px
+        20px;
+
+    background: #eeeae2;
+
+    color: #897a70;
+
+    border-radius: 11px;
+
+    font-size: 14px;
+}
+
+
+.audit-readonly-notice i {
+
+    color: #c49b5b;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.audit-card {
+
+    width: 100%;
+
+    overflow: hidden;
+
+    background: var(--audit-card);
+
+    border:
+        1px solid
+        var(--audit-border);
+
+    border-radius: 15px;
+}
+
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+.audit-toolbar {
+
+    min-height: 86px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 20px;
+
+    border-bottom:
+        1px solid
+        var(--audit-border);
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.audit-search {
+
+    width: 400px;
+
+    max-width: 100%;
+
+    height: 47px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding:
+        0
+        16px;
+
+    background: var(--toolbar-bg);
+
+    border:
+        1px solid
+        transparent;
+
+    border-radius: 10px;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+
+.audit-search:focus-within {
+
+    background: #ffffff;
+
+    border-color: #9ca792;
+}
+
+
+.audit-search > i {
+
+    flex-shrink: 0;
+
+    color: #8c9188;
+
+    font-size: 14px;
+}
+
+
+.audit-search input {
+
+    width: 100%;
+
+    padding: 0;
+
+    outline: none;
+
+    border: none;
+
+    background: transparent;
+
+    color: #22241e;
+
+    font-family:
+        'DM Sans',
+        Arial,
+        sans-serif;
+
+    font-size: 14px;
+}
+
+
+.audit-search input::placeholder {
+
+    color: #9b9188;
+}
+
+
+.audit-search input::-webkit-search-cancel-button {
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   FILTER DROPDOWN
+========================================================= */
+
+.audit-filter-dropdown {
+
+    position: relative;
+
+    width: 180px;
+
+    height: 47px;
+
+    flex:
+        0
+        0
+        180px;
+
+    display: flex;
+
+    align-items: center;
+
+    background: var(--toolbar-bg);
+
+    border:
+        1px solid
+        #ded9d0;
+
+    border-radius: 10px;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+
+.audit-filter-dropdown:hover {
+
+    background: #ecefe9;
+
+    border-color: #cdd4c8;
+}
+
+
+.audit-filter-dropdown:focus-within {
+
+    background: #ffffff;
+
+    border-color: var(--purevia-green);
+}
+
+
+/* =========================================================
+   FILTER ICON
+========================================================= */
+
+.audit-filter-icon {
+
+    position: absolute;
+
+    left: 15px;
+
+    z-index: 1;
+
+    color: #69745d;
+
+    font-size: 13px;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   FILTER SELECT
+========================================================= */
+
+.audit-filter-select {
+
+    width: 100%;
+
+    height: 100%;
+
+    padding:
+        0
+        38px
+        0
+        40px;
+
+    appearance: none;
+
+    -webkit-appearance: none;
+
+    outline: none;
+
+    border: none;
+
+    background: transparent;
+
+    color: #4e5549;
+
+    font-family:
+        'DM Sans',
+        Arial,
+        sans-serif;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    cursor: pointer;
+}
+
+
+.audit-filter-select option {
+
+    background: #ffffff;
+
+    color: #272820;
+}
+
+
+/* =========================================================
+   FILTER ARROW
+========================================================= */
+
+.audit-filter-arrow {
+
+    position: absolute;
+
+    right: 15px;
+
+    color: #7f8179;
+
+    font-size: 11px;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   TABLE WRAPPER
+========================================================= */
+
+.audit-table-wrapper {
+
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.audit-table {
+
+    width: 100%;
+
+    min-width: 1050px;
+
+    border-collapse: collapse;
+}
+
+
+/* =========================================================
+   TABLE HEADER
+========================================================= */
+
+.audit-table th {
+
+    padding:
+        17px
+        15px;
+
+    color: #85776d;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    letter-spacing: 1.3px;
+
+    text-align: left;
+
+    white-space: nowrap;
+
+    border-bottom:
+        1px solid
+        var(--audit-border);
+}
+
+
+/* =========================================================
+   COLUMN WIDTHS
+========================================================= */
+
+.audit-table th:nth-child(1) {
+    width: 12%;
+}
+
+.audit-table th:nth-child(2) {
+    width: 12%;
+}
+
+.audit-table th:nth-child(3) {
+    width: 16%;
+}
+
+.audit-table th:nth-child(4) {
+    width: 19%;
+}
+
+.audit-table th:nth-child(5) {
+    width: 41%;
+}
+
+
+/* =========================================================
+   TABLE BODY
+========================================================= */
+
+.audit-table td {
+
+    padding:
+        18px
+        15px;
+
+    vertical-align: middle;
+
+    color: #1a1c17;
+
+    font-size: 14px;
+
+    border-bottom:
+        1px solid
+        var(--audit-border);
+}
+
+
+.audit-table tbody tr:last-child td {
+
+    border-bottom: none;
+}
+
+
+.audit-row {
+
+    transition:
+        background 0.2s ease;
+}
+
+
+.audit-row:hover {
+
+    background: #faf8f4;
+}
+
+
+/* =========================================================
+   ACTION BADGE
+========================================================= */
+
+.audit-action-badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-width: 72px;
+
+    min-height: 28px;
+
+    padding:
+        5px
+        12px;
+
+    border-radius: 999px;
+
+    background: #ece9e4;
+
+    color: #776d65;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    letter-spacing: 0.7px;
+
+    line-height: 1;
+
+    white-space: nowrap;
+}
+
+
+/* UPDATE */
+
+.audit-action-update {
+
+    background: #e3eef5;
+
+    color: #277db4;
+}
+
+
+/* CREATE */
+
+.audit-action-create {
+
+    background: #e1f3e9;
+
+    color: #15945b;
+}
+
+
+/* LOGIN */
+
+.audit-action-login {
+
+    background: #eee9df;
+
+    color: #9a7850;
+}
+
+
+/* LOGOUT */
+
+.audit-action-logout {
+
+    background: #eee9df;
+
+    color: #89705a;
+}
+
+
+/* DELETE */
+
+.audit-action-delete {
+
+    background: #f8e1e1;
+
+    color: #d84b4b;
+}
+
+
+/* VERIFY */
+
+.audit-action-verify {
+
+    background: #e1f3e9;
+
+    color: #15945b;
+}
+
+
+/* REJECT */
+
+.audit-action-reject {
+
+    background: #f8e1e1;
+
+    color: #d84b4b;
+}
+
+
+/* PASSWORD RESET */
+
+.audit-action-password_reset,
+.audit-action-password-reset {
+
+    background: #eee7f5;
+
+    color: #8057a6;
+}
+
+
+/* STATUS CHANGE */
+
+.audit-action-status_change,
+.audit-action-status-change {
+
+    background: #f8ead8;
+
+    color: #d47720;
+}
+
+
+/* =========================================================
+   MODULE
+========================================================= */
+
+.audit-module {
+
+    color: #11130f;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   USER
+========================================================= */
+
+.audit-user {
+
+    color: #20221d;
+
+    font-family:
+        'Courier New',
+        monospace;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   DATE
+========================================================= */
+
+.audit-date {
+
+    color: #8b7c72;
+
+    font-family:
+        'Courier New',
+        monospace;
+
+    font-size: 13px;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   DETAILS
+========================================================= */
+
+.audit-details {
+
+    color: #22241e;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   NO RESULTS
+========================================================= */
+
+.no-audit-row td {
+
+    padding:
+        60px
+        20px
+        !important;
+
+    border-bottom:
+        none
+        !important;
+}
+
+
+.no-audit-message {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    color: #968b81;
+
+    text-align: center;
+}
+
+
+.no-audit-message i {
+
+    font-size: 25px;
+}
+
+
+.no-audit-message p {
+
+    margin: 0;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   RESPONSIVE - TABLET
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .audit-toolbar {
+
+        align-items: flex-start;
+
+        flex-wrap: wrap;
+    }
+
+
+    .audit-search {
+
+        width: 100%;
+
+        max-width: none;
+
+        flex:
+            1
+            1
+            100%;
+    }
+
+
+    .audit-filter-dropdown {
+
+        flex: 1;
+
+        width: auto;
+
+        min-width: 180px;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE - SMALL TABLET
+========================================================= */
+
+@media (max-width: 800px) {
+
+    .admin-topbar {
+
+        padding-left: 75px;
+    }
+
+
+    .audit-main {
+
+        padding:
+            28px
+            22px
+            40px;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE - MOBILE
+========================================================= */
+
+@media (max-width: 550px) {
+
+    .admin-topbar {
+
+        height: 65px;
+
+        padding-left: 70px;
+
+        padding-right: 18px;
+    }
+
+
+    .audit-main {
+
+        padding:
+            24px
+            15px
+            35px;
+    }
+
+
+    .audit-page-header {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        margin-bottom: 22px;
+    }
+
+
+    .audit-heading h1 {
+
+        font-size: 29px;
+    }
+
+
+    .audit-readonly-notice {
+
+        align-items: flex-start;
+
+        padding:
+            14px
+            16px;
+
+        line-height: 1.5;
+    }
+
+
+    .audit-toolbar {
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+        gap: 12px;
+
+        padding: 15px;
+    }
+
+
+    .audit-search,
+    .audit-filter-dropdown {
+
+        width: 100%;
+
+        max-width: none;
+
+        min-width: 0;
+
+        flex: none;
+    }
+
+
+    .audit-table th,
+    .audit-table td {
+
+        padding-left: 15px;
+
+        padding-right: 15px;
+    }
+}

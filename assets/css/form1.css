@@ -1,0 +1,896 @@
+/* =========================================================
+   PUREVIA LOGIN MODAL
+========================================================= */
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.login-modal {
+    position: fixed;
+    inset: 0;
+
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 30px;
+
+    visibility: hidden;
+    opacity: 0;
+
+    transition:
+        opacity 0.25s ease,
+        visibility 0.25s ease;
+}
+
+
+/* OPEN MODAL */
+
+.login-modal.active {
+    visibility: visible;
+    opacity: 1;
+}
+
+
+/* =========================================================
+   BACKGROUND OVERLAY
+========================================================= */
+
+.login-modal-overlay {
+    position: absolute;
+    inset: 0;
+
+    background: rgba(55, 66, 55, 0.72);
+
+    backdrop-filter: blur(1px);
+}
+
+
+/* =========================================================
+   LOGIN CARD
+========================================================= */
+
+.login-card {
+    position: relative;
+
+    z-index: 2;
+
+    width: 100%;
+    max-width: 520px;
+
+    padding: 62px 50px 48px;
+
+    border-radius: 20px;
+
+    background: #faf8f2;
+
+    color: #30332c;
+
+    box-shadow:
+        0 18px 55px rgba(0, 0, 0, 0.16);
+
+    transform: translateY(18px) scale(0.98);
+
+    transition:
+        transform 0.25s ease;
+}
+
+
+.login-modal.active .login-card {
+    transform: translateY(0) scale(1);
+}
+
+
+/* =========================================================
+   CLOSE BUTTON
+========================================================= */
+
+.close-button {
+    position: absolute;
+
+    top: 20px;
+    right: 23px;
+
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+
+    background: transparent;
+
+    color: #484c43;
+
+    font-size: 25px;
+
+    cursor: pointer;
+
+    transition:
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.close-button:hover {
+    color: #20251e;
+    transform: rotate(5deg);
+}
+
+
+/* =========================================================
+   LEAF
+========================================================= */
+
+.login-brand {
+    height: 58px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 7px;
+
+    color: #596454;
+
+    font-size: 48px;
+
+    transform: rotate(-20deg);
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.login-card h2 {
+    margin: 0 0 32px;
+
+    color: #30342d;
+
+    font-family: 'Playfair Display', Georgia, serif;
+
+    font-size: 29px;
+    font-weight: 500;
+
+    line-height: 1.1;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.login-form {
+    width: 100%;
+}
+
+
+.form-group {
+    width: 100%;
+
+    margin-bottom: 14px;
+}
+
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #373a34;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 16px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+.form-group input {
+    width: 100%;
+    height: 43px;
+
+    padding: 0 14px;
+
+    border: 1px solid #373a34;
+    border-radius: 7px;
+
+    outline: none;
+
+    background: #fbfaf6;
+
+    color: #30332c;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 14px;
+}
+
+
+.form-group input:focus {
+    border-color: #66725f;
+
+    box-shadow:
+        0 0 0 2px rgba(102, 114, 95, 0.13);
+}
+
+
+/* =========================================================
+   PASSWORD
+========================================================= */
+
+.password-wrapper {
+    position: relative;
+
+    width: 100%;
+}
+
+
+.password-wrapper input {
+    padding-right: 48px;
+}
+
+
+.password-toggle {
+    position: absolute;
+
+    top: 50%;
+    right: 9px;
+
+    transform: translateY(-50%);
+
+    width: 35px;
+    height: 35px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+
+    background: transparent;
+
+    color: #30332c;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   FORGOT PASSWORD
+========================================================= */
+
+.forgot-password {
+    display: inline-block;
+
+    margin-top: 6px;
+
+    color: #777a73;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 13px;
+
+    text-decoration: none;
+}
+
+
+.forgot-password:hover {
+    color: #3f493b;
+
+    text-decoration: underline;
+}
+
+
+/* =========================================================
+   LOGIN BUTTON
+========================================================= */
+
+.login-button {
+    display: block;
+
+    width: 265px;
+    height: 40px;
+
+    margin: 46px auto 21px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: #293126;
+
+    color: #ffffff;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.login-button:hover {
+    background: #3e4a39;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   REGISTER
+========================================================= */
+
+.register-text {
+    margin: 0;
+
+    color: #73756f;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 13px;
+
+    text-align: center;
+}
+
+
+.register-text a {
+    color: #373b34;
+
+    font-weight: 500;
+
+    text-decoration: none;
+}
+
+
+.register-text a:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.login-error {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    margin: -15px 0 20px;
+
+    padding: 10px 12px;
+
+    border: 1px solid #d7aaa3;
+    border-radius: 6px;
+
+    background: #f8e9e6;
+
+    color: #9d3c32;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   PREVENT BACKGROUND SCROLL
+========================================================= */
+
+body.login-modal-open {
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .login-modal {
+        padding: 15px;
+    }
+
+
+    .login-card {
+        max-width: 100%;
+
+        padding:
+            60px
+            25px
+            40px;
+
+        border-radius: 16px;
+    }
+
+
+    .login-card h2 {
+        font-size: 25px;
+    }
+
+
+    .login-button {
+        width: 100%;
+
+        margin-top: 40px;
+    }
+
+}
+
+/* =========================================================
+   PUREVIA REGISTER MODAL
+========================================================= */
+
+.register-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    visibility: hidden;
+    opacity: 0;
+
+    transition:
+        opacity 0.25s ease,
+        visibility 0.25s ease;
+}
+
+
+.register-modal.active {
+    visibility: visible;
+    opacity: 1;
+}
+
+
+/* =========================================================
+   OVERLAY
+========================================================= */
+
+.register-modal-overlay {
+    position: absolute;
+    inset: 0;
+
+    background: rgba(55, 66, 55, 0.72);
+
+    backdrop-filter: blur(1px);
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.register-modal-card {
+    position: relative;
+    z-index: 2;
+
+    width: 100%;
+    max-width: 520px;
+
+    padding: 42px 46px 26px;
+
+    border-radius: 20px;
+
+    background: #faf8f2;
+    color: #30332c;
+
+    box-shadow:
+        0 18px 55px rgba(0, 0, 0, 0.16);
+
+    transform: translateY(18px) scale(0.98);
+
+    transition: transform 0.25s ease;
+}
+
+
+.register-modal.active .register-modal-card {
+    transform: translateY(0) scale(1);
+}
+
+
+/* =========================================================
+   CLOSE
+========================================================= */
+
+.register-close-button {
+    position: absolute;
+
+    top: 15px;
+    right: 17px;
+
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    background: transparent;
+
+    color: #484c43;
+
+    font-size: 25px;
+
+    cursor: pointer;
+}
+
+
+.register-close-button:hover {
+    color: #20251e;
+}
+
+
+/* =========================================================
+   HEADING
+========================================================= */
+
+.register-eyebrow {
+    margin: 0 0 16px;
+
+    color: #30342d;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    text-align: center;
+}
+
+
+.register-modal-card h2 {
+    margin: 0 0 3px;
+
+    color: #30342d;
+
+    font-family: 'Playfair Display', Georgia, serif;
+
+    font-size: 27px;
+    font-weight: 400;
+
+    line-height: 1.1;
+
+    text-align: center;
+}
+
+
+.register-subtitle {
+    margin: 0 0 31px;
+
+    color: #777a73;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 11px;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.register-form {
+    width: 100%;
+}
+
+
+.register-name-row {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 15px;
+}
+
+
+.register-form-group {
+    width: 100%;
+
+    margin-bottom: 11px;
+}
+
+
+.register-form-group label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #373a34;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   INPUTS
+========================================================= */
+
+.register-form-group input {
+    width: 100%;
+    height: 36px;
+
+    padding: 0 12px;
+
+    border: 1px solid #373a34;
+    border-radius: 6px;
+
+    outline: none;
+
+    background: #fbfaf6;
+
+    color: #30332c;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 13px;
+}
+
+
+.register-form-group input:focus {
+    border-color: #66725f;
+
+    box-shadow:
+        0 0 0 2px rgba(102, 114, 95, 0.13);
+}
+
+
+/* =========================================================
+   PASSWORD
+========================================================= */
+
+.register-password-wrapper {
+    position: relative;
+
+    width: 100%;
+}
+
+
+.register-password-wrapper input {
+    padding-right: 43px;
+}
+
+
+.register-password-toggle {
+    position: absolute;
+
+    top: 50%;
+    right: 6px;
+
+    transform: translateY(-50%);
+
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+
+    background: transparent;
+
+    color: #30332c;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   TERMS
+========================================================= */
+
+.register-terms {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 7px;
+
+    margin: 3px 5px 10px;
+
+    color: #777a73;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 10px;
+    font-weight: 400;
+
+    line-height: 1.4;
+
+    cursor: pointer;
+}
+
+
+.register-terms input {
+    width: 14px;
+    height: 14px;
+
+    flex-shrink: 0;
+
+    margin-top: 0;
+
+    accent-color: #293126;
+}
+
+
+.register-terms a {
+    color: #555950;
+
+    text-decoration: none;
+}
+
+
+.register-terms a:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================================================
+   REGISTER BUTTON
+========================================================= */
+
+.register-submit-button {
+    display: block;
+
+    width: 270px;
+    height: 34px;
+
+    margin: 8px auto 10px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: #293126;
+
+    color: #ffffff;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.register-submit-button:hover {
+    background: #3e4a39;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   LOGIN TEXT
+========================================================= */
+
+.register-login-text {
+    margin: 0;
+
+    color: #73756f;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 11px;
+
+    text-align: center;
+}
+
+
+.register-login-text a {
+    color: #373b34;
+
+    font-weight: 500;
+
+    text-decoration: none;
+}
+
+
+.register-login-text a:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.register-error {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    margin: -17px 0 13px;
+
+    padding: 8px 10px;
+
+    border: 1px solid #d7aaa3;
+    border-radius: 6px;
+
+    background: #f8e9e6;
+
+    color: #9d3c32;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .register-modal {
+        padding: 15px;
+    }
+
+
+    .register-modal-card {
+        max-height: calc(100vh - 30px);
+
+        overflow-y: auto;
+
+        padding:
+            45px
+            25px
+            25px;
+
+        border-radius: 16px;
+    }
+
+
+    .register-name-row {
+        grid-template-columns: 1fr;
+
+        gap: 0;
+    }
+
+
+    .register-submit-button {
+        width: 100%;
+    }
+
+}

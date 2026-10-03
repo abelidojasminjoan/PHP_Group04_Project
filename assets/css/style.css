@@ -1,0 +1,984 @@
+/* =========================================
+   PUREVIA - MAIN WEBSITE CSS
+========================================= */
+
+
+/* =========================================
+   GOOGLE FONTS
+========================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@400;500&display=swap');
+
+
+/* =========================================
+   CSS VARIABLES
+========================================= */
+
+:root {
+
+    --purevia-dark: #20241d;
+    --purevia-green: #69745d;
+    --purevia-light-green: #aeb8a3;
+
+    --purevia-cream: #f8f6f0;
+    --purevia-white: #ffffff;
+
+    --text-dark: #292a25;
+    --text-light: #f5f4ef;
+}
+
+
+/* =========================================
+   RESET
+========================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+}
+
+
+html {
+    scroll-behavior: smooth;
+}
+
+
+body {
+    margin: 0;
+
+    background: var(--purevia-cream);
+
+    color: var(--text-dark);
+
+    font-family: 'DM Sans', Arial, sans-serif;
+}
+
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+
+a {
+    color: inherit;
+}
+
+
+/* =========================================
+   MAIN
+========================================= */
+
+main {
+    width: 100%;
+}
+
+
+/* =========================================
+   HERO SECTION
+========================================= */
+
+.hero {
+    position: relative;
+
+    width: 100%;
+
+    min-height: 680px;
+
+    display: flex;
+    align-items: stretch;
+
+    overflow: hidden;
+
+    background-image:
+        url('../images/hero/purevia-hero.jpg');
+
+    background-size: cover;
+
+    background-position: center;
+
+    background-repeat: no-repeat;
+
+    color: var(--text-light);
+}
+
+
+/* =========================================
+   DARK IMAGE OVERLAY
+========================================= */
+
+.hero-overlay {
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(17, 21, 16, 0.78) 0%,
+            rgba(17, 21, 16, 0.56) 42%,
+            rgba(17, 21, 16, 0.26) 70%,
+            rgba(17, 21, 16, 0.35) 100%
+        );
+
+    z-index: 1;
+}
+
+
+/* Slight bottom darkening */
+
+.hero::after {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    height: 250px;
+
+    background:
+        linear-gradient(
+            to top,
+            rgba(15, 18, 14, 0.65),
+            transparent
+        );
+
+    z-index: 1;
+
+    pointer-events: none;
+}
+
+
+/* =========================================
+   HERO CONTAINER
+========================================= */
+
+.hero-container {
+    position: relative;
+
+    z-index: 2;
+
+    width: 100%;
+
+    min-height: 680px;
+
+    display: flex;
+    flex-direction: column;
+
+    padding:
+        100px
+        70px
+        55px;
+}
+
+
+/* =========================================
+   HERO EYEBROW
+========================================= */
+
+.hero-eyebrow {
+    margin: 0 0 75px;
+
+    color: #c6d3ba;
+
+    font-size: 10px;
+    font-weight: 500;
+
+    letter-spacing: 0.6px;
+}
+
+
+/* =========================================
+   HERO TITLE
+========================================= */
+
+.hero-title {
+    max-width: 760px;
+
+    margin: 0;
+
+    color: #ffffff;
+
+    font-family: 'Playfair Display', Georgia, serif;
+
+    font-size: clamp(58px, 6.5vw, 95px);
+
+    font-weight: 400;
+
+    line-height: 0.98;
+
+    letter-spacing: -2px;
+}
+
+
+/* =========================================
+   BOTTOM CONTENT
+========================================= */
+
+.hero-bottom {
+    width: 100%;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-end;
+
+    gap: 80px;
+
+    margin-top: auto;
+}
+
+
+/* =========================================
+   HERO INFORMATION
+========================================= */
+
+.hero-info {
+    max-width: 700px;
+}
+
+
+.hero-description {
+    max-width: 690px;
+
+    margin: 0 0 25px;
+
+    color: rgba(255, 255, 255, 0.9);
+
+    font-size: 13px;
+    font-weight: 300;
+
+    line-height: 1.7;
+}
+
+
+/* =========================================
+   HERO BUTTON AREA
+========================================= */
+
+.hero-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 25px;
+}
+
+
+/* =========================================
+   PRIMARY BUTTON
+========================================= */
+
+.hero-primary-btn {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-height: 47px;
+
+    padding: 0 27px;
+
+    border: 1px solid #ffffff;
+
+    border-radius: 30px;
+
+    background: #ffffff;
+
+    color: #252820;
+
+    font-size: 10px;
+    font-weight: 600;
+
+    letter-spacing: 0.2px;
+
+    text-decoration: none;
+
+    transition:
+        background 0.25s ease,
+        color 0.25s ease,
+        transform 0.25s ease;
+}
+
+
+.hero-primary-btn:hover {
+    background: transparent;
+
+    color: #ffffff;
+
+    transform: translateY(-2px);
+}
+
+
+/* =========================================
+   SECONDARY LINK
+========================================= */
+
+.hero-secondary-btn {
+    position: relative;
+
+    padding: 5px 0;
+
+    color: #ffffff;
+
+    font-size: 10px;
+    font-weight: 400;
+
+    text-decoration: none;
+}
+
+
+/* Underline */
+
+.hero-secondary-btn::after {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    height: 1px;
+
+    background: rgba(255, 255, 255, 0.7);
+
+    transition: transform 0.25s ease;
+
+    transform-origin: left;
+}
+
+
+.hero-secondary-btn:hover::after {
+    transform: scaleX(0);
+}
+
+
+/* =========================================
+   BENEFITS
+========================================= */
+
+.hero-benefits {
+    min-width: 250px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 12px;
+
+    padding-bottom: 3px;
+}
+
+
+.hero-benefit {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    color: #ffffff;
+
+    font-size: 9px;
+    font-weight: 500;
+
+    letter-spacing: 0.2px;
+}
+
+
+.hero-benefit i {
+    color: #a9d29d;
+
+    font-size: 10px;
+}
+
+
+/* =========================================
+   LARGE DESKTOP
+========================================= */
+
+@media (min-width: 1500px) {
+
+    .hero {
+        min-height: 760px;
+    }
+
+    .hero-container {
+        min-height: 760px;
+
+        padding-left: 90px;
+        padding-right: 90px;
+    }
+
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 900px) {
+
+    .hero {
+        min-height: 620px;
+
+        background-position: 60% center;
+    }
+
+
+    .hero-container {
+        min-height: 620px;
+
+        padding:
+            75px
+            40px
+            45px;
+    }
+
+
+    .hero-eyebrow {
+        margin-bottom: 55px;
+    }
+
+
+    .hero-title {
+        font-size: clamp(50px, 9vw, 75px);
+    }
+
+
+    .hero-bottom {
+        gap: 50px;
+    }
+
+
+    .hero-description {
+        max-width: 500px;
+    }
+
+
+    .hero-benefits {
+        min-width: 190px;
+    }
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 650px) {
+
+    .hero {
+        min-height: 650px;
+
+        background-position: 62% center;
+    }
+
+
+    /* Stronger overlay on mobile */
+
+    .hero-overlay {
+        background:
+            linear-gradient(
+                90deg,
+                rgba(17, 21, 16, 0.82),
+                rgba(17, 21, 16, 0.42)
+            );
+    }
+
+
+    .hero-container {
+        min-height: 650px;
+
+        padding:
+            65px
+            22px
+            35px;
+    }
+
+
+    .hero-eyebrow {
+        margin-bottom: 45px;
+
+        font-size: 8px;
+    }
+
+
+    .hero-title {
+        font-size: clamp(46px, 14vw, 65px);
+
+        line-height: 1;
+
+        letter-spacing: -1px;
+    }
+
+
+    .hero-bottom {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 30px;
+    }
+
+
+    .hero-description {
+        max-width: 100%;
+
+        font-size: 11px;
+    }
+
+
+    .hero-benefits {
+        min-width: auto;
+
+        gap: 8px;
+    }
+
+}
+
+
+/* =========================================
+   VERY SMALL MOBILE
+========================================= */
+
+@media (max-width: 420px) {
+
+    .hero-actions {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 15px;
+    }
+
+
+    .hero-primary-btn {
+        min-height: 43px;
+
+        padding: 0 22px;
+    }
+
+}
+
+
+/* =========================================
+   BESTSELLERS SECTION
+========================================= */
+
+.bestsellers {
+    width: 100%;
+
+    background: #f8f6f0;
+
+    padding: 65px 0 75px;
+
+    color: #292a25;
+}
+
+
+.bestsellers-container {
+    width: 100%;
+
+    padding: 0 45px;
+}
+
+
+/* =========================================
+   SECTION HEADER
+========================================= */
+
+.bestsellers-header {
+    display: flex;
+
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 30px;
+
+    margin-bottom: 35px;
+}
+
+
+/* =========================================
+   EYEBROW
+========================================= */
+
+.section-eyebrow {
+    margin: 0 0 10px;
+
+    color: #69745d;
+
+    font-size: 8px;
+    font-weight: 600;
+
+    letter-spacing: 0.5px;
+}
+
+
+/* =========================================
+   SECTION TITLE
+========================================= */
+
+.bestsellers-heading h2 {
+    margin: 0;
+
+    color: #292a25;
+
+    font-family: 'Playfair Display', Georgia, serif;
+
+    font-size: clamp(30px, 3vw, 44px);
+
+    font-weight: 400;
+
+    line-height: 1.1;
+
+    letter-spacing: -0.5px;
+}
+
+
+/* =========================================
+   SHOP ALL
+========================================= */
+
+.shop-all-link {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 5px;
+
+    color: #292a25;
+
+    font-size: 9px;
+    font-weight: 500;
+
+    letter-spacing: 0.3px;
+
+    text-decoration: none;
+}
+
+
+.shop-all-link i {
+    font-size: 8px;
+
+    transition: transform 0.2s ease;
+}
+
+
+.shop-all-link:hover i {
+    transform: translate(2px, -2px);
+}
+
+
+/* =========================================
+   PRODUCT GRID
+========================================= */
+
+.product-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 18px;
+}
+
+
+/* =========================================
+   PRODUCT CARD
+========================================= */
+
+.product-card {
+    min-width: 0;
+}
+
+
+/* =========================================
+   PRODUCT IMAGE
+========================================= */
+
+.product-image-wrapper {
+    position: relative;
+
+    display: block;
+
+    width: 100%;
+
+    aspect-ratio: 1 / 1.03;
+
+    overflow: hidden;
+
+    background: #ebe7de;
+
+    text-decoration: none;
+}
+
+
+.product-image {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    transition: transform 0.5s ease;
+}
+
+
+.product-card:hover .product-image {
+    transform: scale(1.025);
+}
+
+
+/* =========================================
+   PRODUCT BADGE
+========================================= */
+
+.product-badge {
+    position: absolute;
+
+    top: 14px;
+    left: 14px;
+
+    padding: 6px 10px;
+
+    border-radius: 20px;
+
+    background: rgba(255, 255, 255, 0.93);
+
+    color: #35372f;
+
+    font-size: 7px;
+    font-weight: 500;
+
+    letter-spacing: 0.2px;
+}
+
+
+/* =========================================
+   PRODUCT INFORMATION
+========================================= */
+
+.product-details {
+    padding-top: 12px;
+}
+
+
+/* =========================================
+   RATING
+========================================= */
+
+.product-rating {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    margin-bottom: 7px;
+}
+
+
+.stars {
+    color: #a76542;
+
+    font-size: 8px;
+
+    letter-spacing: 1px;
+}
+
+
+.review-count {
+    color: #8a8983;
+
+    font-size: 7px;
+}
+
+
+/* =========================================
+   PRODUCT TITLE + PRICE
+========================================= */
+
+.product-title-row {
+    display: flex;
+
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 15px;
+}
+
+
+.product-name {
+    color: #292a25;
+
+    font-family: 'Playfair Display', Georgia, serif;
+
+    font-size: 15px;
+    font-weight: 400;
+
+    line-height: 1.3;
+
+    text-decoration: none;
+}
+
+
+.product-name:hover {
+    color: #69745d;
+}
+
+
+.product-price {
+    flex-shrink: 0;
+
+    padding-top: 3px;
+
+    color: #292a25;
+
+    font-size: 9px;
+    font-weight: 500;
+}
+
+
+/* =========================================
+   PRODUCT DESCRIPTION
+========================================= */
+
+.product-description {
+    margin: 5px 0 0;
+
+    color: #85847e;
+
+    font-size: 8px;
+    font-weight: 400;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================
+   BESTSELLERS - TABLET
+========================================= */
+
+@media (max-width: 900px) {
+
+    .bestsellers {
+        padding:
+            55px
+            0
+            65px;
+    }
+
+
+    .bestsellers-container {
+        padding: 0 30px;
+    }
+
+
+    .product-grid {
+        gap: 14px;
+    }
+
+
+    .product-name {
+        font-size: 14px;
+    }
+
+}
+
+
+/* =========================================
+   BESTSELLERS - MOBILE
+========================================= */
+
+@media (max-width: 650px) {
+
+    .bestsellers {
+        padding:
+            45px
+            0
+            55px;
+    }
+
+
+    .bestsellers-container {
+        padding: 0 20px;
+    }
+
+
+    .bestsellers-header {
+        align-items: flex-start;
+
+        margin-bottom: 25px;
+    }
+
+
+    .bestsellers-heading h2 {
+        max-width: 280px;
+
+        font-size: 29px;
+    }
+
+
+    .shop-all-link {
+        margin-top: 20px;
+    }
+
+
+    /* Horizontal product browsing */
+
+    .product-grid {
+        grid-template-columns:
+            repeat(3, minmax(250px, 78vw));
+
+        gap: 12px;
+
+        overflow-x: auto;
+
+        padding-bottom: 12px;
+
+        scroll-snap-type: x mandatory;
+
+        scrollbar-width: thin;
+    }
+
+
+    .product-card {
+        scroll-snap-align: start;
+    }
+
+}
+
+
+/* =========================================
+   VERY SMALL MOBILE
+========================================= */
+
+@media (max-width: 420px) {
+
+    .bestsellers-header {
+        flex-direction: column;
+
+        gap: 12px;
+    }
+
+
+    .shop-all-link {
+        margin-top: 0;
+    }
+
+
+    .product-grid {
+        grid-template-columns:
+            repeat(3, minmax(240px, 85vw));
+    }
+
+}

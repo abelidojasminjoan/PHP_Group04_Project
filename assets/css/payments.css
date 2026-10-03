@@ -1,0 +1,897 @@
+/* =========================================================
+   PUREVIA ADMIN PAYMENTS
+========================================================= */
+
+
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+:root {
+    --payments-bg: #f8f5ef;
+    --payments-card: #ffffff;
+    --payments-border: #ddd5ca;
+
+    --payments-text: #171912;
+    --payments-muted: #8a786d;
+
+    --purevia-green: #53634b;
+    --purevia-green-dark: #43523d;
+
+    --verified-bg: #e1f3e9;
+    --verified-text: #15945b;
+
+    --pending-bg: #f8ead8;
+    --pending-text: #e67e22;
+
+    --rejected-bg: #f8e1e1;
+    --rejected-text: #d84b4b;
+
+    --card-radius: 15px;
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+
+    background: var(--payments-bg);
+    color: var(--payments-text);
+
+    font-family: 'DM Sans', Arial, sans-serif;
+}
+
+
+/* =========================================================
+   ADMIN LAYOUT
+========================================================= */
+
+.admin-layout {
+    min-height: 100vh;
+
+    background: var(--payments-bg);
+}
+
+
+/* =========================================================
+   TOP BAR
+========================================================= */
+
+.admin-topbar {
+    width: 100%;
+    height: 64px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 30px;
+
+    background: #fbfaf7;
+
+    border-bottom: 1px solid #e8e5de;
+}
+
+.admin-topbar-title {
+    margin: 0;
+
+    color: #5f665a;
+
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.payments-main {
+    width: 100%;
+
+    padding: 30px 28px 50px;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.payments-page-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 25px;
+
+    margin-bottom: 30px;
+}
+
+
+/* =========================================================
+   HEADING
+========================================================= */
+
+.payments-heading h1 {
+    margin: 0 0 5px;
+
+    color: #11130f;
+
+    font-family: 'Playfair Display', Georgia, serif;
+
+    font-size: 34px;
+    font-weight: 600;
+
+    line-height: 1.2;
+}
+
+.payments-heading p {
+    margin: 0;
+
+    color: var(--payments-muted);
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.payments-card {
+    width: 100%;
+
+    overflow: hidden;
+
+    background: var(--payments-card);
+
+    border: 1px solid var(--payments-border);
+
+    border-radius: var(--card-radius);
+}
+
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+.payments-toolbar {
+    min-height: 86px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 20px;
+
+    border-bottom: 1px solid var(--payments-border);
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.payments-search {
+    width: 400px;
+    max-width: 100%;
+
+    height: 47px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 0 16px;
+
+    background: #f4f1eb;
+
+    border: 1px solid transparent;
+
+    border-radius: 10px;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.payments-search:focus-within {
+    background: #ffffff;
+
+    border-color: #9ca792;
+}
+
+.payments-search i {
+    flex-shrink: 0;
+
+    color: #8c9188;
+
+    font-size: 14px;
+}
+
+.payments-search input {
+    width: 100%;
+
+    padding: 0;
+
+    outline: none;
+    border: none;
+
+    background: transparent;
+
+    color: #22241e;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 14px;
+}
+
+.payments-search input::placeholder {
+    color: #9b9188;
+}
+
+.payments-search input::-webkit-search-cancel-button {
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   FILTER DROPDOWN
+========================================================= */
+
+.payments-filter-dropdown {
+    position: relative;
+
+    width: 180px;
+    height: 47px;
+
+    flex: 0 0 180px;
+
+    display: flex;
+
+    align-items: center;
+
+    background: #f4f1eb;
+
+    border: 1px solid #ded9d0;
+
+    border-radius: 10px;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.payments-filter-dropdown:hover {
+    background: #ecefe9;
+
+    border-color: #cdd4c8;
+}
+
+.payments-filter-dropdown:focus-within {
+    background: #ffffff;
+
+    border-color: var(--purevia-green);
+}
+
+
+/* =========================================================
+   FILTER ICON
+========================================================= */
+
+.payments-filter-icon {
+    position: absolute;
+
+    left: 15px;
+
+    z-index: 1;
+
+    color: #69745d;
+
+    font-size: 13px;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   FILTER SELECT
+========================================================= */
+
+.payments-filter-select {
+    width: 100%;
+    height: 100%;
+
+    padding: 0 38px 0 40px;
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    outline: none;
+    border: none;
+
+    background: transparent;
+
+    color: #4e5549;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    cursor: pointer;
+}
+
+.payments-filter-no-icon {
+    padding-left: 18px;
+}
+
+.payments-filter-select option {
+    background: #ffffff;
+
+    color: #272820;
+}
+
+
+/* =========================================================
+   FILTER ARROW
+========================================================= */
+
+.payments-filter-arrow {
+    position: absolute;
+
+    right: 15px;
+
+    color: #7f8179;
+
+    font-size: 11px;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   TABLE WRAPPER
+========================================================= */
+
+.payments-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.payments-table {
+    width: 100%;
+
+    min-width: 1150px;
+
+    border-collapse: collapse;
+}
+
+
+/* =========================================================
+   TABLE HEADER
+========================================================= */
+
+.payments-table th {
+    padding: 17px 15px;
+
+    color: #85776d;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    letter-spacing: 1.3px;
+
+    text-align: left;
+
+    white-space: nowrap;
+
+    border-bottom: 1px solid var(--payments-border);
+}
+
+
+/* =========================================================
+   COLUMN WIDTHS
+========================================================= */
+
+.payments-table th:nth-child(1) {
+    width: 8%;
+}
+
+.payments-table th:nth-child(2) {
+    width: 12%;
+}
+
+.payments-table th:nth-child(3) {
+    width: 15%;
+}
+
+.payments-table th:nth-child(4) {
+    width: 10%;
+}
+
+.payments-table th:nth-child(5) {
+    width: 12%;
+}
+
+.payments-table th:nth-child(6) {
+    width: 13%;
+}
+
+.payments-table th:nth-child(7) {
+    width: 11%;
+}
+
+.payments-table th:nth-child(8) {
+    width: 10%;
+}
+
+.payments-table th:nth-child(9) {
+    width: 14%;
+}
+
+
+/* =========================================================
+   TABLE BODY
+========================================================= */
+
+.payments-table td {
+    padding: 18px 15px;
+
+    vertical-align: middle;
+
+    color: #1a1c17;
+
+    font-size: 14px;
+
+    border-bottom: 1px solid var(--payments-border);
+}
+
+.payments-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.payment-row {
+    transition: background 0.2s ease;
+}
+
+.payment-row:hover {
+    background: #faf8f4;
+}
+
+
+/* =========================================================
+   PAYMENT ID
+========================================================= */
+
+.payment-id {
+    color: #11130f;
+
+    font-family: monospace;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   ORDER NUMBER
+========================================================= */
+
+.payment-order {
+    color: #11130f;
+
+    font-family: monospace;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   CUSTOMER
+========================================================= */
+
+.payment-customer {
+    color: #11130f;
+
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   AMOUNT
+========================================================= */
+
+.payment-amount {
+    color: #36583e;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   METHOD
+========================================================= */
+
+.payment-method {
+    color: #887b71;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   REFERENCE
+========================================================= */
+
+.payment-reference {
+    color: #20221d;
+
+    font-family: monospace;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   DATE
+========================================================= */
+
+.payment-date {
+    color: #8b7c72;
+
+    font-size: 14px;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   STATUS BADGE
+========================================================= */
+
+.payment-status-badge {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 75px;
+    min-height: 27px;
+
+    padding: 5px 12px;
+
+    border-radius: 999px;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    letter-spacing: 0.7px;
+
+    line-height: 1;
+
+    white-space: nowrap;
+}
+
+
+/* VERIFIED / PAID */
+
+.payment-status-verified,
+.payment-status-paid {
+    background: var(--verified-bg);
+
+    color: var(--verified-text);
+}
+
+
+/* PENDING */
+
+.payment-status-pending {
+    background: var(--pending-bg);
+
+    color: var(--pending-text);
+}
+
+
+/* FAILED / REJECTED */
+
+.payment-status-failed,
+.payment-status-rejected {
+    background: var(--rejected-bg);
+
+    color: var(--rejected-text);
+}
+
+
+/* REFUNDED */
+
+.payment-status-refunded {
+    background: #ece9e4;
+
+    color: #776d65;
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.payment-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   ACTION BUTTON
+========================================================= */
+
+.payment-action-button {
+    min-width: 58px;
+    height: 32px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 12px;
+
+    border-radius: 8px;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+/* VERIFY */
+
+.payment-verify-button {
+    background: #ffffff;
+
+    color: #15945b;
+
+    border: 1px solid #36b56f;
+}
+
+.payment-verify-button:hover {
+    background: #e7f6ed;
+
+    border-color: #15945b;
+
+    transform: translateY(-1px);
+}
+
+
+/* REJECT */
+
+.payment-reject-button {
+    background: #c93a2d;
+
+    color: #ffffff;
+
+    border: 1px solid #c93a2d;
+}
+
+.payment-reject-button:hover {
+    background: #ad3026;
+
+    border-color: #ad3026;
+
+    transform: translateY(-1px);
+}
+
+
+/* DISABLED */
+
+.payment-action-button:disabled {
+    opacity: 0.55;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+
+/* NO ACTION */
+
+.payment-no-action {
+    color: #938a82;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   NO RESULTS
+========================================================= */
+
+.no-payments-row td {
+    padding: 60px 20px !important;
+
+    border-bottom: none !important;
+}
+
+.no-payments-message {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 12px;
+
+    color: #968b81;
+}
+
+.no-payments-message i {
+    font-size: 25px;
+}
+
+.no-payments-message p {
+    margin: 0;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   RESPONSIVE - TABLET
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .payments-toolbar {
+        align-items: flex-start;
+
+        flex-wrap: wrap;
+    }
+
+    .payments-search {
+        width: 100%;
+
+        max-width: none;
+
+        flex: 1 1 100%;
+    }
+
+    .payments-filter-dropdown {
+        flex: 1;
+
+        width: auto;
+
+        min-width: 180px;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE - SMALL TABLET
+========================================================= */
+
+@media (max-width: 800px) {
+
+    .admin-topbar {
+        padding-left: 75px;
+    }
+
+    .payments-main {
+        padding:
+            28px
+            22px
+            40px;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE - MOBILE
+========================================================= */
+
+@media (max-width: 550px) {
+
+    .admin-topbar {
+        height: 65px;
+
+        padding-left: 70px;
+        padding-right: 18px;
+    }
+
+    .payments-main {
+        padding:
+            24px
+            15px
+            35px;
+    }
+
+    .payments-page-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        margin-bottom: 22px;
+    }
+
+    .payments-heading h1 {
+        font-size: 29px;
+    }
+
+
+    /* TOOLBAR */
+
+    .payments-toolbar {
+        flex-direction: column;
+
+        align-items: stretch;
+
+        gap: 12px;
+
+        padding: 15px;
+    }
+
+    .payments-search,
+    .payments-filter-dropdown {
+        width: 100%;
+
+        max-width: none;
+        min-width: 0;
+
+        flex: none;
+    }
+
+
+    /* TABLE */
+
+    .payments-table th,
+    .payments-table td {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+}

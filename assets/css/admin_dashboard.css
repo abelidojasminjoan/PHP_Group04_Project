@@ -1,0 +1,1032 @@
+/* =========================================================
+   PUREVIA ADMIN DASHBOARD
+========================================================= */
+
+
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+:root {
+
+    --admin-bg: #f8f5ef;
+    --admin-card: #ffffff;
+
+    --admin-border: #ddd5ca;
+
+    --admin-text: #171912;
+    --admin-muted: #8a786d;
+
+    --purevia-green: #53634b;
+
+    --success: #19a85b;
+    --warning: #ef7816;
+    --danger: #c33b31;
+    --blue: #2580b7;
+
+    --card-radius: 15px;
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+
+    min-height: 100vh;
+
+    background: var(--admin-bg);
+    color: var(--admin-text);
+
+    font-family: 'DM Sans', Arial, sans-serif;
+}
+
+
+/* =========================================================
+   ADMIN LAYOUT
+========================================================= */
+
+.admin-layout {
+
+    min-height: 100vh;
+
+    background: var(--admin-bg);
+}
+
+
+/* =========================================================
+   TOP BAR
+========================================================= */
+
+.admin-topbar {
+
+    width: 100%;
+    height: 64px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 30px;
+
+    background: #fbfaf7;
+
+    border-bottom: 1px solid #e8e5de;
+}
+
+
+.admin-topbar-title {
+
+    margin: 0;
+
+    color: #5f665a;
+
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.admin-main {
+
+    width: 100%;
+
+    padding: 30px 28px 50px;
+}
+
+
+/* =========================================================
+   DASHBOARD HEADER
+========================================================= */
+
+.dashboard-header {
+
+    margin-bottom: 42px;
+}
+
+
+.dashboard-header h1 {
+
+    margin: 0 0 10px;
+
+    color: #11130f;
+
+    font-family: 'Playfair Display', Georgia, serif;
+
+    font-size: 34px;
+    font-weight: 600;
+
+    line-height: 1.2;
+}
+
+
+.dashboard-header p {
+
+    margin: 0;
+
+    color: #8a786d;
+
+    font-size: 15px;
+    font-weight: 400;
+}
+
+
+/* =========================================================
+   STATISTICS GRID
+========================================================= */
+
+.dashboard-stats {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 20px;
+
+    margin-bottom: 38px;
+}
+
+
+/* =========================================================
+   STAT CARD
+========================================================= */
+
+.stat-card {
+
+    min-width: 0;
+    min-height: 200px;
+
+    padding: 25px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    background: #ffffff;
+
+    border: 1px solid var(--admin-border);
+    border-radius: var(--card-radius);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.stat-card:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 7px 20px
+        rgba(49, 45, 39, 0.06);
+}
+
+
+/* =========================================================
+   STAT HEADER
+========================================================= */
+
+.stat-card-header {
+
+    display: flex;
+
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+
+.stat-emoji {
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-height: 40px;
+
+    font-size: 28px;
+    line-height: 1;
+}
+
+
+.stat-dot {
+
+    width: 10px;
+    height: 10px;
+
+    flex-shrink: 0;
+
+    margin-top: 3px;
+
+    border-radius: 50%;
+}
+
+
+/* =========================================================
+   STAT CONTENT
+========================================================= */
+
+.stat-card-content {
+
+    margin-top: 25px;
+}
+
+
+.stat-number {
+
+    margin: 0 0 16px;
+
+    font-family: 'Playfair Display', Georgia, serif;
+
+    font-size: 34px;
+    font-weight: 500;
+
+    line-height: 1;
+}
+
+
+.stat-label {
+
+    margin: 0;
+
+    color: #8a786d;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   STAT COLORS
+========================================================= */
+
+
+/* CUSTOMERS */
+
+.stat-customers .stat-number {
+    color: #345d43;
+}
+
+.stat-customers .stat-dot {
+    background: #3e7651;
+}
+
+
+/* PRODUCTS */
+
+.stat-products .stat-number {
+    color: #ba8750;
+}
+
+.stat-products .stat-dot {
+    background: #bd9365;
+}
+
+
+/* ORDERS */
+
+.stat-orders .stat-number {
+    color: #247caf;
+}
+
+.stat-orders .stat-dot {
+    background: #2e83b4;
+}
+
+
+/* REVENUE */
+
+.stat-revenue .stat-number {
+    color: #19a85b;
+}
+
+.stat-revenue .stat-dot {
+    background: #20ad61;
+}
+
+
+/* LOW STOCK */
+
+.stat-low-stock .stat-number {
+    color: #ef7816;
+}
+
+.stat-low-stock .stat-dot {
+    background: #ef7816;
+}
+
+
+/* PAYMENTS */
+
+.stat-payments .stat-number {
+    color: #bf342a;
+}
+
+.stat-payments .stat-dot {
+    background: #c43c32;
+}
+
+
+/* =========================================================
+   GENERAL DASHBOARD SECTION
+========================================================= */
+
+.dashboard-section {
+
+    width: 100%;
+
+    margin-bottom: 38px;
+
+    overflow: hidden;
+
+    background: #ffffff;
+
+    border: 1px solid var(--admin-border);
+    border-radius: var(--card-radius);
+}
+
+
+/* =========================================================
+   SECTION HEADER
+========================================================= */
+
+.section-header {
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 35px 30px 22px;
+}
+
+
+.section-header h2 {
+
+    margin: 0;
+
+    color: #11130f;
+
+    font-family: 'Playfair Display', Georgia, serif;
+
+    font-size: 23px;
+    font-weight: 600;
+}
+
+
+.view-all-link {
+
+    color: #11130f;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    text-decoration: none;
+}
+
+
+.view-all-link:hover {
+
+    color: var(--purevia-green);
+
+    text-decoration: underline;
+}
+
+
+/* =========================================================
+   RECENT ORDERS TABLE
+========================================================= */
+
+.table-wrapper {
+
+    width: 100%;
+
+    padding: 0 30px 28px;
+
+    overflow-x: auto;
+}
+
+
+.recent-orders-table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    min-width: 800px;
+}
+
+
+.recent-orders-table th {
+
+    padding: 17px 15px;
+
+    color: #8a786d;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    letter-spacing: 1.5px;
+
+    text-align: left;
+
+    border-bottom: 1px solid #ddd5ca;
+}
+
+
+.recent-orders-table td {
+
+    padding: 17px 15px;
+
+    color: #11130f;
+
+    font-size: 14px;
+
+    border-bottom: 1px solid #ddd5ca;
+}
+
+
+.recent-orders-table tbody tr:last-child td {
+
+    border-bottom: none;
+}
+
+
+.recent-orders-table tbody tr {
+
+    transition: background 0.2s ease;
+}
+
+
+.recent-orders-table tbody tr:hover {
+
+    background: #faf9f6;
+}
+
+
+/* =========================================================
+   ORDER TABLE TEXT
+========================================================= */
+
+.order-id {
+
+    font-family: monospace;
+
+    font-size: 13px !important;
+}
+
+
+.order-date {
+
+    color: #8a786d !important;
+}
+
+
+.order-total {
+
+    color: #345d43 !important;
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   STATUS BADGES
+========================================================= */
+
+.status-badge,
+.payment-badge {
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 7px 13px;
+
+    border-radius: 30px;
+
+    font-family: monospace;
+
+    font-size: 11px;
+    font-weight: 500;
+
+    letter-spacing: 1px;
+}
+
+
+/* PENDING */
+
+.status-pending {
+
+    background: #fff0e4;
+    color: #ef7816;
+}
+
+
+/* PROCESSING */
+
+.status-processing {
+
+    background: #e5f0f8;
+    color: #2878ad;
+}
+
+
+/* SHIPPED */
+
+.status-shipped {
+
+    background: #f5eee8;
+    color: #bd7849;
+}
+
+
+/* DELIVERED */
+
+.status-delivered {
+
+    background: #e3f5eb;
+    color: #139b54;
+}
+
+
+/* CANCELLED */
+
+.status-cancelled {
+
+    background: #f9e5e4;
+    color: #c43c32;
+}
+
+
+/* =========================================================
+   PAYMENT STATUS
+========================================================= */
+
+.payment-verified {
+
+    background: #e3f5eb;
+    color: #139b54;
+}
+
+
+.payment-pending {
+
+    background: #fff0e4;
+    color: #ef7816;
+}
+
+
+.payment-failed {
+
+    background: #f9e5e4;
+    color: #c43c32;
+}
+
+
+/* =========================================================
+   LOW STOCK
+========================================================= */
+
+.low-stock-section {
+
+    border-left:
+        3px solid
+        #ef7816;
+}
+
+
+.low-stock-heading {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 30px 30px 18px;
+
+    color: #ef7816;
+}
+
+
+.low-stock-heading i {
+
+    font-size: 17px;
+}
+
+
+.low-stock-heading h2 {
+
+    margin: 0;
+
+    font-family: 'Playfair Display', Georgia, serif;
+
+    font-size: 21px;
+    font-weight: 600;
+}
+
+
+.low-stock-list {
+
+    padding:
+        0
+        30px
+        28px;
+}
+
+
+.low-stock-row {
+
+    min-height: 55px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 25px;
+
+    border-bottom:
+        1px solid
+        #ddd5ca;
+}
+
+
+.low-stock-product-name {
+
+    margin: 0;
+
+    color: #11130f;
+
+    font-size: 14px;
+}
+
+
+.low-stock-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 35px;
+}
+
+
+.stock-units {
+
+    color: #ef7816;
+
+    font-family: monospace;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+.restock-link {
+
+    color: #11130f;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    text-decoration: none;
+}
+
+
+.restock-link:hover {
+
+    color: #ef7816;
+}
+
+
+/* =========================================================
+   ORDER STATUS OVERVIEW
+========================================================= */
+
+.order-overview-section {
+
+    width: 100%;
+
+    padding: 28px 25px;
+
+    background: #ffffff;
+
+    border: 1px solid var(--admin-border);
+    border-radius: var(--card-radius);
+}
+
+
+.order-overview-section h2 {
+
+    margin: 0 0 24px;
+
+    color: #11130f;
+
+    font-size: 18px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   ORDER STATUS GRID
+========================================================= */
+
+.order-status-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    gap: 15px;
+}
+
+
+/* =========================================================
+   ORDER STATUS CARD
+========================================================= */
+
+.order-overview-card {
+
+    min-height: 105px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    padding: 20px;
+
+    border-radius: 15px;
+}
+
+
+.order-overview-card strong {
+
+    display: block;
+
+    margin-bottom: 10px;
+
+    font-family: 'Playfair Display', Georgia, serif;
+
+    font-size: 29px;
+    font-weight: 600;
+}
+
+
+.order-overview-card span {
+
+    font-size: 13px;
+}
+
+
+/* PENDING */
+
+.order-overview-card.pending {
+
+    background: #fff6dc;
+    color: #bb8300;
+}
+
+
+/* PROCESSING */
+
+.order-overview-card.processing {
+
+    background: #eaf2fb;
+    color: #347ab7;
+}
+
+
+/* SHIPPED */
+
+.order-overview-card.shipped {
+
+    background: #efeffd;
+    color: #6265c7;
+}
+
+
+/* DELIVERED */
+
+.order-overview-card.delivered {
+
+    background: #e7f6ed;
+    color: #168a4d;
+}
+
+
+/* CANCELLED */
+
+.order-overview-card.cancelled {
+
+    background: #fae9e9;
+    color: #bd4141;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .dashboard-stats {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    .order-status-grid {
+
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 800px) {
+
+    .admin-topbar {
+
+        padding-left: 75px;
+    }
+
+
+    .admin-main {
+
+        padding:
+            28px
+            22px
+            40px;
+    }
+
+
+    .dashboard-header {
+
+        margin-bottom: 30px;
+    }
+
+
+    .dashboard-stats {
+
+        gap: 15px;
+    }
+
+
+    .stat-card {
+
+        min-height: 175px;
+
+        padding: 20px;
+    }
+
+
+    .order-status-grid {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 550px) {
+
+    .admin-topbar {
+
+        height: 65px;
+
+        padding-left: 70px;
+        padding-right: 18px;
+    }
+
+
+    .admin-main {
+
+        padding:
+            24px
+            15px
+            35px;
+    }
+
+
+    .dashboard-header h1 {
+
+        font-size: 29px;
+    }
+
+
+    .dashboard-header p {
+
+        font-size: 13px;
+    }
+
+
+    .dashboard-stats {
+
+        grid-template-columns: 1fr;
+    }
+
+
+    .stat-card {
+
+        min-height: 160px;
+    }
+
+
+    .section-header {
+
+        padding:
+            25px
+            20px
+            18px;
+    }
+
+
+    .section-header h2 {
+
+        font-size: 20px;
+    }
+
+
+    .table-wrapper {
+
+        padding:
+            0
+            20px
+            20px;
+    }
+
+
+    .low-stock-heading {
+
+        padding:
+            25px
+            20px
+            15px;
+    }
+
+
+    .low-stock-list {
+
+        padding:
+            0
+            20px
+            22px;
+    }
+
+
+    .low-stock-row {
+
+        align-items: flex-start;
+        flex-direction: column;
+
+        padding: 15px 0;
+
+        gap: 12px;
+    }
+
+
+    .low-stock-actions {
+
+        width: 100%;
+
+        justify-content: space-between;
+    }
+
+
+    .order-status-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+}

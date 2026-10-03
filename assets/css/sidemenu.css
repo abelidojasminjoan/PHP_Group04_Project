@@ -1,0 +1,834 @@
+/* =========================================================
+   PUREVIA
+   ADMIN + STAFF SIDEBAR
+========================================================= */
+
+
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+:root {
+
+    --sidebar-width: 255px;
+
+    --sidebar-bg: #fbfaf7;
+
+    --sidebar-border: #e8e5de;
+
+    --sidebar-text: #272820;
+
+    --sidebar-muted: #8b8178;
+
+    --sidebar-green: #53634b;
+
+    --sidebar-green-dark: #3f5140;
+
+    --sidebar-active: #e8ede9;
+
+    --sidebar-danger: #a65a55;
+
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.admin-sidebar {
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+    bottom: 0;
+
+    z-index: 1000;
+
+    width: var(--sidebar-width);
+
+    display: flex;
+
+    flex-direction: column;
+
+    background: var(--sidebar-bg);
+
+    border-right:
+        1px solid var(--sidebar-border);
+
+    font-family:
+        'DM Sans',
+        Arial,
+        sans-serif;
+
+}
+
+
+/* =========================================================
+   BRAND
+========================================================= */
+
+.sidebar-brand {
+
+    flex-shrink: 0;
+
+    padding:
+        25px
+        22px
+        20px;
+
+    border-bottom:
+        1px solid
+        var(--sidebar-border);
+
+}
+
+
+.sidebar-logo {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    color: #25271f;
+
+    font-family:
+        'Playfair Display',
+        Georgia,
+        serif;
+
+    font-size: 23px;
+
+    font-weight: 500;
+
+    line-height: 1.2;
+
+    text-decoration: none;
+
+}
+
+
+.sidebar-logo:hover {
+
+    color: #25271f;
+
+    text-decoration: none;
+
+}
+
+
+.sidebar-logo-icon {
+
+    width: 18px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    color: #65735b;
+
+    font-size: 17px;
+
+}
+
+
+.sidebar-subtitle {
+
+    margin:
+        5px
+        0
+        0
+        28px;
+
+    color: #968c82;
+
+    font-size: 11px;
+
+    font-weight: 400;
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.sidebar-navigation {
+
+    flex: 1;
+
+    min-height: 0;
+
+    padding:
+        12px
+        5px
+        25px;
+
+    overflow-x: hidden;
+
+    overflow-y: auto;
+
+    scrollbar-width: thin;
+
+    scrollbar-color:
+        #cfcac1
+        transparent;
+
+}
+
+
+/* CHROME / EDGE SCROLLBAR */
+
+.sidebar-navigation::-webkit-scrollbar {
+
+    width: 5px;
+
+}
+
+
+.sidebar-navigation::-webkit-scrollbar-track {
+
+    background: transparent;
+
+}
+
+
+.sidebar-navigation::-webkit-scrollbar-thumb {
+
+    background: #cfcac1;
+
+    border-radius: 20px;
+
+}
+
+
+/* =========================================================
+   SIDEBAR SECTION
+========================================================= */
+
+.sidebar-section {
+
+    margin-bottom: 18px;
+
+}
+
+
+.sidebar-section:last-child {
+
+    margin-bottom: 5px;
+
+}
+
+
+.sidebar-section-title {
+
+    margin: 0;
+
+    padding:
+        8px
+        17px;
+
+    color: #887d73;
+
+    font-size: 10px;
+
+    font-weight: 500;
+
+    letter-spacing: 2px;
+
+    line-height: 1;
+
+    text-transform: uppercase;
+
+}
+
+
+/* =========================================================
+   SIDEBAR LINK
+========================================================= */
+
+.sidebar-link {
+
+    width: 100%;
+
+    min-height: 45px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    box-sizing: border-box;
+
+    margin: 1px 0;
+
+    padding:
+        0
+        17px;
+
+    border-radius: 10px;
+
+    color: var(--sidebar-text);
+
+    font-size: 15px;
+
+    font-weight: 500;
+
+    line-height: 1.2;
+
+    text-decoration: none;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+
+}
+
+
+.sidebar-link:hover {
+
+    background: #f0f1ed;
+
+    color: var(--sidebar-green);
+
+    text-decoration: none;
+
+}
+
+
+/* =========================================================
+   ACTIVE PAGE
+========================================================= */
+
+.sidebar-link.active {
+
+    background:
+        var(--sidebar-active);
+
+    color: #3e5841;
+
+    font-weight: 600;
+
+}
+
+
+/* =========================================================
+   LINK LEFT CONTENT
+========================================================= */
+
+.sidebar-link-left {
+
+    min-width: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+}
+
+
+/* =========================================================
+   MENU ICON
+========================================================= */
+
+.sidebar-menu-icon {
+
+    width: 21px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    font-size: 15px;
+
+    line-height: 1;
+
+}
+
+
+/* =========================================================
+   ACCOUNT AREA
+========================================================= */
+
+.sidebar-account {
+
+    flex-shrink: 0;
+
+    padding:
+        16px
+        18px
+        18px;
+
+    background:
+        var(--sidebar-bg);
+
+    border-top:
+        1px solid
+        var(--sidebar-border);
+
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+.sidebar-profile {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 11px;
+
+    margin-bottom: 13px;
+
+}
+
+
+/* =========================================================
+   AVATAR
+========================================================= */
+
+.sidebar-avatar {
+
+    width: 38px;
+
+    height: 38px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #69745d;
+
+    color: #ffffff;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    text-transform: uppercase;
+
+}
+
+
+/* =========================================================
+   USER INFORMATION
+========================================================= */
+
+.sidebar-user-information {
+
+    min-width: 0;
+
+    flex: 1;
+
+}
+
+
+.sidebar-user-name {
+
+    max-width: 160px;
+
+    margin:
+        0
+        0
+        2px;
+
+    overflow: hidden;
+
+    color: #292a25;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    line-height: 1.3;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+}
+
+
+.sidebar-user-email {
+
+    max-width: 160px;
+
+    margin:
+        0
+        0
+        5px;
+
+    overflow: hidden;
+
+    color: #948b82;
+
+    font-size: 9.5px;
+
+    font-weight: 400;
+
+    line-height: 1.3;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+}
+
+
+/* =========================================================
+   ROLE BADGE
+========================================================= */
+
+.sidebar-role-badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height: 18px;
+
+    padding:
+        2px
+        8px;
+
+    border-radius: 20px;
+
+    font-size: 8px;
+
+    font-weight: 600;
+
+    line-height: 1;
+
+    letter-spacing: 0.6px;
+
+    text-transform: uppercase;
+
+}
+
+
+/* ADMIN */
+
+.sidebar-role-admin {
+
+    background: #f3e8d9;
+
+    color: #9a5b27;
+
+}
+
+
+/* STAFF */
+
+.sidebar-role-staff {
+
+    background: #e2edf7;
+
+    color: #39729e;
+
+}
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+.sidebar-logout {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 11px;
+
+    padding:
+        8px
+        5px;
+
+    border-radius: 7px;
+
+    color:
+        var(--sidebar-danger);
+
+    font-size: 12px;
+
+    font-weight: 500;
+
+    text-decoration: none;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+
+}
+
+
+.sidebar-logout:hover {
+
+    background: #f8eeee;
+
+    color: #813f3b;
+
+    text-decoration: none;
+
+}
+
+
+.sidebar-logout i {
+
+    width: 16px;
+
+    text-align: center;
+
+}
+
+
+/* =========================================================
+   MOBILE TOGGLE
+========================================================= */
+
+.sidebar-mobile-toggle {
+
+    position: fixed;
+
+    top: 15px;
+
+    left: 15px;
+
+    z-index: 1100;
+
+    width: 42px;
+
+    height: 42px;
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 0;
+
+    border:
+        1px solid
+        #ddd9d0;
+
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #34372f;
+
+    font-size: 17px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+
+}
+
+
+.sidebar-mobile-toggle:hover {
+
+    background: #f2f2ee;
+
+    color: var(--sidebar-green);
+
+}
+
+
+/* =========================================================
+   MOBILE OVERLAY
+========================================================= */
+
+.sidebar-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 900;
+
+    display: none;
+
+    background:
+        rgba(
+            0,
+            0,
+            0,
+            0.45
+        );
+
+}
+
+
+/* =========================================================
+   PAGE CONTENT POSITION
+========================================================= */
+
+.admin-layout {
+
+    min-height: 100vh;
+
+    margin-left:
+        var(--sidebar-width);
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Optional class for Staff layouts
+|--------------------------------------------------------------------------
+| This lets you use either:
+|
+| <main class="admin-layout">
+|
+| or:
+|
+| <main class="staff-layout">
+*/
+
+.staff-layout {
+
+    min-height: 100vh;
+
+    margin-left:
+        var(--sidebar-width);
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .admin-sidebar {
+
+        transform:
+            translateX(-100%);
+
+        box-shadow: none;
+
+        transition:
+            transform 0.3s ease;
+
+    }
+
+
+    .admin-sidebar.sidebar-open {
+
+        transform:
+            translateX(0);
+
+        box-shadow:
+            5px
+            0
+            25px
+            rgba(
+                0,
+                0,
+                0,
+                0.08
+            );
+
+    }
+
+
+    .sidebar-mobile-toggle {
+
+        display: flex;
+
+    }
+
+
+    .sidebar-overlay.active {
+
+        display: block;
+
+    }
+
+
+    .admin-layout,
+    .staff-layout {
+
+        margin-left: 0;
+
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 420px) {
+
+    :root {
+
+        --sidebar-width: 245px;
+
+    }
+
+
+    .sidebar-link {
+
+        font-size: 14px;
+
+    }
+
+
+    .sidebar-brand {
+
+        padding-left: 18px;
+
+        padding-right: 18px;
+
+    }
+
+
+    .sidebar-account {
+
+        padding-left: 15px;
+
+        padding-right: 15px;
+
+    }
+
+
+    .sidebar-user-name,
+    .sidebar-user-email {
+
+        max-width: 145px;
+
+    }
+
+}

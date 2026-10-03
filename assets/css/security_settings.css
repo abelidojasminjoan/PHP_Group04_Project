@@ -1,0 +1,943 @@
+/* =========================================================
+   PUREVIA ADMIN - SECURITY SETTINGS
+========================================================= */
+
+
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+:root {
+    --security-bg: #f8f5ef;
+    --security-card: #ffffff;
+
+    --security-border: #ddd5ca;
+
+    --security-text: #171912;
+    --security-muted: #8a786d;
+
+    --security-green: #53634b;
+    --security-green-dark: #43523d;
+
+    --security-input-bg: #ffffff;
+    --security-toolbar-bg: #f4f1eb;
+
+    --security-success-bg: #e1f3e9;
+    --security-success-text: #15945b;
+
+    --security-warning-bg: #f8ead8;
+    --security-warning-text: #d98220;
+
+    --security-danger-bg: #f8e1e1;
+    --security-danger-text: #c94b4b;
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+
+    background: var(--security-bg);
+
+    color: var(--security-text);
+
+    font-family: 'DM Sans', Arial, sans-serif;
+}
+
+
+/* =========================================================
+   ADMIN LAYOUT
+========================================================= */
+
+.admin-layout {
+    min-height: 100vh;
+
+    background: var(--security-bg);
+}
+
+
+/* =========================================================
+   TOP BAR
+========================================================= */
+
+.admin-topbar {
+    width: 100%;
+    height: 64px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 30px;
+
+    background: #fbfaf7;
+
+    border-bottom: 1px solid #e8e5de;
+}
+
+.admin-topbar-title {
+    margin: 0;
+
+    color: #5f665a;
+
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.security-main {
+    width: 100%;
+
+    padding: 30px 28px 60px;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.security-page-header {
+    margin-bottom: 30px;
+}
+
+.security-page-header h1 {
+    margin: 0 0 5px;
+
+    color: #11130f;
+
+    font-family: 'Playfair Display', Georgia, serif;
+
+    font-size: 34px;
+    font-weight: 600;
+
+    line-height: 1.2;
+}
+
+.security-page-header p {
+    margin: 0;
+
+    color: var(--security-muted);
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+.security-message {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+
+    padding: 13px 16px;
+
+    border-radius: 9px;
+
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.security-message-success {
+    background: var(--security-success-bg);
+
+    color: var(--security-success-text);
+}
+
+.security-message-error {
+    background: var(--security-danger-bg);
+
+    color: var(--security-danger-text);
+}
+
+
+/* =========================================================
+   SETTINGS GRID
+========================================================= */
+
+.security-settings-grid {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 30px;
+
+    margin-bottom: 38px;
+}
+
+
+/* =========================================================
+   SETTINGS CARD
+========================================================= */
+
+.security-settings-card {
+    width: 100%;
+
+    padding: 27px 30px 28px;
+
+    background: var(--security-card);
+
+    border: 1px solid var(--security-border);
+
+    border-radius: 15px;
+}
+
+.security-settings-card h2 {
+    margin: 0 0 10px;
+
+    color: #11130f;
+
+    font-family: 'Playfair Display', Georgia, serif;
+
+    font-size: 20px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   SETTING ROW
+========================================================= */
+
+.security-setting-row {
+    min-height: 72px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    border-bottom: 1px solid var(--security-border);
+}
+
+.security-setting-row label {
+    color: #88796f;
+
+    font-size: 14px;
+    font-weight: 400;
+}
+
+
+/* =========================================================
+   INPUTS
+========================================================= */
+
+.security-setting-row input,
+.security-setting-row select {
+    width: 150px;
+    height: 38px;
+
+    flex: 0 0 150px;
+
+    padding: 0 12px;
+
+    outline: none;
+
+    background: var(--security-input-bg);
+
+    border: 1px solid #ddd5ca;
+
+    border-radius: 10px;
+
+    color: #171912;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 13px;
+
+    text-align: right;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.security-setting-row select {
+    cursor: pointer;
+}
+
+.security-setting-row input:focus,
+.security-setting-row select:focus {
+    border-color: #87947e;
+
+    box-shadow:
+        0 0 0 3px rgba(83, 99, 75, 0.08);
+}
+
+
+/* =========================================================
+   SAVE BUTTON
+========================================================= */
+
+.security-save-button {
+    min-width: 170px;
+    height: 48px;
+
+    margin-top: 22px;
+
+    padding: 0 20px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: #386b4e;
+
+    color: #ffffff;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.security-save-button:hover {
+    background: #2f5b42;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   LOCKED ACCOUNTS SECTION
+========================================================= */
+
+.locked-accounts-section {
+    width: 100%;
+}
+
+
+/* =========================================================
+   LOCKED ACCOUNTS HEADING
+========================================================= */
+
+.locked-accounts-heading {
+    margin-bottom: 18px;
+}
+
+.locked-accounts-heading h2 {
+    margin: 0 0 5px;
+
+    color: #11130f;
+
+    font-family: 'Playfair Display', Georgia, serif;
+
+    font-size: 25px;
+    font-weight: 600;
+}
+
+.locked-accounts-heading p {
+    margin: 0;
+
+    color: var(--security-muted);
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   LOCKED ACCOUNTS CARD
+========================================================= */
+
+.locked-accounts-card {
+    width: 100%;
+
+    overflow: hidden;
+
+    background: #ffffff;
+
+    border: 1px solid var(--security-border);
+
+    border-radius: 15px;
+}
+
+
+/* =========================================================
+   LOCKED TOOLBAR
+========================================================= */
+
+.locked-toolbar {
+    min-height: 86px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 20px;
+
+    border-bottom: 1px solid var(--security-border);
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.locked-search {
+    width: 400px;
+    max-width: 100%;
+
+    height: 47px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 0 16px;
+
+    background: var(--security-toolbar-bg);
+
+    border: 1px solid transparent;
+
+    border-radius: 10px;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.locked-search:focus-within {
+    background: #ffffff;
+
+    border-color: #9ca792;
+}
+
+.locked-search > i {
+    flex-shrink: 0;
+
+    color: #8c9188;
+
+    font-size: 14px;
+}
+
+.locked-search input {
+    width: 100%;
+
+    padding: 0;
+
+    outline: none;
+    border: none;
+
+    background: transparent;
+
+    color: #22241e;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 14px;
+}
+
+.locked-search input::placeholder {
+    color: #9b9188;
+}
+
+
+/* =========================================================
+   FILTER
+========================================================= */
+
+.locked-filter {
+    position: relative;
+
+    width: 180px;
+    height: 47px;
+
+    flex: 0 0 180px;
+
+    display: flex;
+
+    align-items: center;
+
+    background: var(--security-toolbar-bg);
+
+    border: 1px solid #ded9d0;
+
+    border-radius: 10px;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.locked-filter:hover {
+    background: #ecefe9;
+}
+
+.locked-filter:focus-within {
+    background: #ffffff;
+
+    border-color: var(--security-green);
+}
+
+
+/* FILTER ICON */
+
+.locked-filter > i:first-child {
+    position: absolute;
+
+    left: 15px;
+
+    z-index: 1;
+
+    color: #69745d;
+
+    font-size: 13px;
+
+    pointer-events: none;
+}
+
+
+/* FILTER SELECT */
+
+.locked-filter select {
+    width: 100%;
+    height: 100%;
+
+    padding: 0 38px 0 40px;
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    outline: none;
+    border: none;
+
+    background: transparent;
+
+    color: #4e5549;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    cursor: pointer;
+}
+
+
+/* FILTER ARROW */
+
+.locked-filter > i:last-child {
+    position: absolute;
+
+    right: 15px;
+
+    color: #7f8179;
+
+    font-size: 11px;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   TABLE WRAPPER
+========================================================= */
+
+.locked-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.locked-table {
+    width: 100%;
+
+    min-width: 950px;
+
+    border-collapse: collapse;
+}
+
+
+/* =========================================================
+   TABLE HEADER
+========================================================= */
+
+.locked-table th {
+    padding: 17px 20px;
+
+    color: #85776d;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    letter-spacing: 1.3px;
+
+    text-align: left;
+
+    white-space: nowrap;
+
+    border-bottom: 1px solid var(--security-border);
+}
+
+
+/* =========================================================
+   COLUMN WIDTH
+========================================================= */
+
+.locked-table th:nth-child(1) {
+    width: 21%;
+}
+
+.locked-table th:nth-child(2) {
+    width: 24%;
+}
+
+.locked-table th:nth-child(3) {
+    width: 15%;
+}
+
+.locked-table th:nth-child(4) {
+    width: 17%;
+}
+
+.locked-table th:nth-child(5) {
+    width: 11%;
+}
+
+.locked-table th:nth-child(6) {
+    width: 15%;
+}
+
+
+/* =========================================================
+   TABLE BODY
+========================================================= */
+
+.locked-table td {
+    padding: 18px 20px;
+
+    vertical-align: middle;
+
+    color: #1a1c17;
+
+    font-size: 14px;
+
+    border-bottom: 1px solid var(--security-border);
+}
+
+.locked-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.locked-account-row {
+    transition: background 0.2s ease;
+}
+
+.locked-account-row:hover {
+    background: #faf8f4;
+}
+
+
+/* =========================================================
+   USER
+========================================================= */
+
+.locked-user {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+.locked-avatar {
+    width: 38px;
+    height: 38px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: #e7eee5;
+
+    border-radius: 50%;
+
+    color: #53634b;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.locked-user strong {
+    color: #11130f;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.locked-email,
+.locked-until {
+    color: #897b71;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.locked-status {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 78px;
+    min-height: 27px;
+
+    padding: 5px 12px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    letter-spacing: 0.6px;
+
+    line-height: 1;
+}
+
+
+/* LOCKED */
+
+.locked-status-locked {
+    background: #f8e1e1;
+
+    color: #c94b4b;
+}
+
+
+/* TEMPORARY */
+
+.locked-status-temporary {
+    background: #f8ead8;
+
+    color: #d98220;
+}
+
+
+/* =========================================================
+   UNLOCK BUTTON
+========================================================= */
+
+.unlock-form {
+    margin: 0;
+}
+
+.unlock-account-button {
+    min-width: 145px;
+    height: 40px;
+
+    padding: 0 16px;
+
+    background: #ffffff;
+
+    color: #15945b;
+
+    border: 1px solid #36b56f;
+
+    border-radius: 9px;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.unlock-account-button:hover {
+    background: #e7f6ed;
+
+    color: #107b4b;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   NO LOCKED ACCOUNTS
+========================================================= */
+
+.no-locked-accounts td {
+    padding: 55px 20px !important;
+
+    text-align: center;
+
+    color: #968b81;
+
+    border-bottom: none !important;
+}
+
+.no-locked-accounts i {
+    margin-bottom: 10px;
+
+    font-size: 24px;
+}
+
+.no-locked-accounts p {
+    margin: 0;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   RESPONSIVE - TABLET
+========================================================= */
+
+@media (max-width: 1050px) {
+
+    .security-settings-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .locked-toolbar {
+        flex-wrap: wrap;
+
+        align-items: flex-start;
+    }
+
+    .locked-search {
+        width: 100%;
+
+        flex: 1 1 100%;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE - SMALL TABLET
+========================================================= */
+
+@media (max-width: 800px) {
+
+    .admin-topbar {
+        padding-left: 75px;
+    }
+
+    .security-main {
+        padding: 28px 22px 45px;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE - MOBILE
+========================================================= */
+
+@media (max-width: 550px) {
+
+    .admin-topbar {
+        height: 65px;
+
+        padding-left: 70px;
+        padding-right: 18px;
+    }
+
+    .security-main {
+        padding: 24px 15px 35px;
+    }
+
+    .security-page-header h1 {
+        font-size: 29px;
+    }
+
+    .security-settings-card {
+        padding: 22px 18px;
+    }
+
+    .security-setting-row {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 8px;
+
+        padding: 14px 0;
+    }
+
+    .security-setting-row input,
+    .security-setting-row select {
+        width: 100%;
+
+        flex: none;
+
+        text-align: left;
+    }
+
+    .security-save-button {
+        width: 100%;
+    }
+
+    .locked-toolbar {
+        flex-direction: column;
+
+        align-items: stretch;
+
+        gap: 12px;
+
+        padding: 15px;
+    }
+
+    .locked-search,
+    .locked-filter {
+        width: 100%;
+
+        max-width: none;
+
+        min-width: 0;
+
+        flex: none;
+    }
+
+}

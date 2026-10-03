@@ -1,0 +1,815 @@
+/* =========================================================
+   PUREVIA ADMIN SKIN CONCERNS
+========================================================= */
+
+
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+:root {
+    --concerns-bg: #f8f5ef;
+    --concerns-card: #ffffff;
+
+    --concerns-border: #ddd5ca;
+
+    --concerns-text: #171912;
+    --concerns-muted: #8a786d;
+
+    --purevia-green: #53634b;
+    --purevia-green-dark: #43523d;
+
+    --success: #159b54;
+    --danger: #c95349;
+
+    --card-radius: 15px;
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+
+    background: var(--concerns-bg);
+    color: var(--concerns-text);
+
+    font-family: 'DM Sans', Arial, sans-serif;
+}
+
+
+/* =========================================================
+   ADMIN LAYOUT
+========================================================= */
+
+.admin-layout {
+    min-height: 100vh;
+
+    background: var(--concerns-bg);
+}
+
+
+/* =========================================================
+   TOP BAR
+========================================================= */
+
+.admin-topbar {
+    width: 100%;
+    height: 64px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 30px;
+
+    background: #fbfaf7;
+
+    border-bottom: 1px solid #e8e5de;
+}
+
+.admin-topbar-title {
+    margin: 0;
+
+    color: #5f665a;
+
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.skin-concerns-main {
+    width: 100%;
+
+    padding: 30px 28px 50px;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.skin-concerns-page-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 25px;
+
+    margin-bottom: 30px;
+}
+
+
+/* =========================================================
+   HEADING
+========================================================= */
+
+.skin-concerns-heading h1 {
+    margin: 0 0 5px;
+
+    color: #11130f;
+
+    font-family: 'Playfair Display', Georgia, serif;
+
+    font-size: 34px;
+    font-weight: 600;
+
+    line-height: 1.2;
+}
+
+.skin-concerns-heading p {
+    margin: 0;
+
+    color: var(--concerns-muted);
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   ADD CONCERN
+========================================================= */
+
+.add-concern-button {
+    min-height: 48px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    padding: 0 20px;
+
+    border-radius: 12px;
+
+    background: var(--purevia-green);
+
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.add-concern-button:hover {
+    background: var(--purevia-green-dark);
+
+    transform: translateY(-1px);
+}
+
+.add-concern-button i {
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.skin-concerns-card {
+    width: 100%;
+
+    overflow: hidden;
+
+    background: var(--concerns-card);
+
+    border: 1px solid var(--concerns-border);
+
+    border-radius: var(--card-radius);
+}
+
+
+/* =========================================================
+   SEARCH + FILTER TOOLBAR
+========================================================= */
+
+.skin-concerns-toolbar {
+    min-height: 86px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 20px;
+
+    border-bottom: 1px solid var(--concerns-border);
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.skin-concerns-search {
+    width: 400px;
+    max-width: 100%;
+
+    height: 47px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 0 16px;
+
+    background: #f4f1eb;
+
+    border: 1px solid transparent;
+
+    border-radius: 10px;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.skin-concerns-search:focus-within {
+    background: #ffffff;
+
+    border-color: #9ca792;
+}
+
+.skin-concerns-search i {
+    flex-shrink: 0;
+
+    color: #8c9188;
+
+    font-size: 14px;
+}
+
+.skin-concerns-search input {
+    width: 100%;
+
+    padding: 0;
+
+    outline: none;
+    border: none;
+
+    background: transparent;
+
+    color: #22241e;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 14px;
+}
+
+.skin-concerns-search input::placeholder {
+    color: #9b9188;
+}
+
+.skin-concerns-search input::-webkit-search-cancel-button {
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   FILTER DROPDOWN
+========================================================= */
+
+.skin-concern-filter-dropdown {
+    position: relative;
+
+    width: 180px;
+    height: 47px;
+
+    flex: 0 0 180px;
+
+    display: flex;
+
+    align-items: center;
+
+    background: #f4f1eb;
+
+    border: 1px solid #ded9d0;
+
+    border-radius: 10px;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.skin-concern-filter-dropdown:hover {
+    background: #ecefe9;
+
+    border-color: #cdd4c8;
+}
+
+.skin-concern-filter-dropdown:focus-within {
+    background: #ffffff;
+
+    border-color: var(--purevia-green);
+}
+
+
+/* FILTER ICON */
+
+.skin-concern-filter-icon {
+    position: absolute;
+
+    left: 15px;
+
+    z-index: 1;
+
+    color: #69745d;
+
+    font-size: 13px;
+
+    pointer-events: none;
+}
+
+
+/* FILTER SELECT */
+
+.skin-concern-filter-select {
+    width: 100%;
+    height: 100%;
+
+    padding: 0 38px 0 40px;
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    outline: none;
+    border: none;
+
+    background: transparent;
+
+    color: #4e5549;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    cursor: pointer;
+}
+
+.skin-concern-filter-select option {
+    background: #ffffff;
+
+    color: #272820;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+}
+
+
+/* FILTER ARROW */
+
+.skin-concern-filter-arrow {
+    position: absolute;
+
+    right: 15px;
+
+    color: #7f8179;
+
+    font-size: 11px;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   TABLE WRAPPER
+========================================================= */
+
+.skin-concerns-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.skin-concerns-table {
+    width: 100%;
+
+    min-width: 800px;
+
+    border-collapse: collapse;
+}
+
+
+/* =========================================================
+   TABLE HEADER
+========================================================= */
+
+.skin-concerns-table th {
+    padding: 17px 24px;
+
+    color: #85776d;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    letter-spacing: 1.3px;
+
+    text-align: left;
+
+    white-space: nowrap;
+
+    border-bottom: 1px solid var(--concerns-border);
+}
+
+
+/* =========================================================
+   COLUMN WIDTHS
+========================================================= */
+
+.skin-concerns-table th:nth-child(1) {
+    width: 20%;
+}
+
+.skin-concerns-table th:nth-child(2) {
+    width: 46%;
+}
+
+.skin-concerns-table th:nth-child(3) {
+    width: 16%;
+}
+
+.skin-concerns-table th:nth-child(4) {
+    width: 18%;
+}
+
+
+/* =========================================================
+   TABLE BODY
+========================================================= */
+
+.skin-concerns-table td {
+    padding: 18px 24px;
+
+    vertical-align: middle;
+
+    color: #1a1c17;
+
+    font-size: 14px;
+
+    border-bottom: 1px solid var(--concerns-border);
+}
+
+.skin-concerns-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.skin-concern-row {
+    transition: background 0.2s ease;
+}
+
+.skin-concern-row:hover {
+    background: #faf8f4;
+}
+
+
+/* =========================================================
+   NAME
+========================================================= */
+
+.skin-concern-name {
+    color: #11130f;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.skin-concern-description {
+    max-width: 500px;
+
+    display: inline-block;
+
+    color: #887b71;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.skin-concern-status {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 76px;
+
+    padding: 7px 13px;
+
+    border-radius: 30px;
+
+    font-family: monospace;
+
+    font-size: 11px;
+    font-weight: 500;
+
+    letter-spacing: 0.8px;
+
+    white-space: nowrap;
+}
+
+
+/* ACTIVE */
+
+.status-active {
+    background: #e3f5eb;
+
+    color: #139b54;
+}
+
+
+/* INACTIVE */
+
+.status-inactive {
+    background: #f0ece6;
+
+    color: #8d7c6e;
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.skin-concern-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+
+/* =========================================================
+   ACTION BUTTON
+========================================================= */
+
+.skin-concern-action-button {
+    width: 38px;
+    height: 38px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    padding: 0;
+
+    border: 1px solid transparent;
+
+    border-radius: 9px;
+
+    background: transparent;
+
+    font-family: inherit;
+
+    font-size: 15px;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.skin-concern-action-button i {
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   EDIT ICON
+========================================================= */
+
+.edit-concern-button {
+    color: #65735b;
+}
+
+.edit-concern-button:hover {
+    background: #e8ede9;
+
+    border-color: #d6ddd3;
+
+    color: #3e5841;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   DELETE ICON
+========================================================= */
+
+.delete-concern-button {
+    color: #c95349;
+}
+
+.delete-concern-button:hover {
+    background: #f8e7e5;
+
+    border-color: #efd0cd;
+
+    color: #c23b32;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   NO RESULTS
+========================================================= */
+
+.no-skin-concerns-row td {
+    padding: 60px 20px !important;
+
+    border-bottom: none !important;
+}
+
+.no-skin-concerns-message {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 12px;
+
+    color: #968b81;
+}
+
+.no-skin-concerns-message i {
+    font-size: 25px;
+}
+
+.no-skin-concerns-message p {
+    margin: 0;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   RESPONSIVE - TABLET
+========================================================= */
+
+@media (max-width: 1000px) {
+
+    .skin-concerns-toolbar {
+        align-items: flex-start;
+
+        flex-wrap: wrap;
+    }
+
+    .skin-concerns-search {
+        width: 100%;
+        max-width: none;
+
+        flex: 1 1 100%;
+    }
+
+    .skin-concern-filter-dropdown {
+        flex: 1;
+
+        width: auto;
+
+        min-width: 180px;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE - SMALL TABLET
+========================================================= */
+
+@media (max-width: 800px) {
+
+    .admin-topbar {
+        padding-left: 75px;
+    }
+
+    .skin-concerns-main {
+        padding:
+            28px
+            22px
+            40px;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE - MOBILE
+========================================================= */
+
+@media (max-width: 550px) {
+
+    .admin-topbar {
+        height: 65px;
+
+        padding-left: 70px;
+        padding-right: 18px;
+    }
+
+    .skin-concerns-main {
+        padding:
+            24px
+            15px
+            35px;
+    }
+
+    .skin-concerns-page-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        margin-bottom: 22px;
+    }
+
+    .skin-concerns-heading h1 {
+        font-size: 29px;
+    }
+
+    .add-concern-button {
+        width: 100%;
+    }
+
+
+    /* SEARCH / FILTER */
+
+    .skin-concerns-toolbar {
+        flex-direction: column;
+
+        align-items: stretch;
+
+        gap: 12px;
+
+        padding: 15px;
+    }
+
+    .skin-concerns-search,
+    .skin-concern-filter-dropdown {
+        width: 100%;
+
+        max-width: none;
+        min-width: 0;
+
+        flex: none;
+    }
+
+
+    /* TABLE */
+
+    .skin-concerns-table th,
+    .skin-concerns-table td {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+}

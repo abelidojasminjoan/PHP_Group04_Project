@@ -1,0 +1,683 @@
+/* =========================================================
+   PUREVIA ADMIN - LOGIN ATTEMPTS
+========================================================= */
+
+:root {
+    --login-bg: #f8f5ef;
+    --login-card: #ffffff;
+    --login-border: #ddd5ca;
+
+    --login-text: #171912;
+    --login-muted: #8a786d;
+
+    --purevia-green: #53634b;
+
+    --success-bg: #e1f3e9;
+    --success-text: #15945b;
+
+    --failed-bg: #f8e1e1;
+    --failed-text: #d33b32;
+
+    --toolbar-bg: #f4f1eb;
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+
+    background: var(--login-bg);
+
+    color: var(--login-text);
+
+    font-family: 'DM Sans', Arial, sans-serif;
+}
+
+
+/* =========================================================
+   ADMIN LAYOUT
+========================================================= */
+
+.admin-layout {
+    min-height: 100vh;
+
+    background: var(--login-bg);
+}
+
+
+/* =========================================================
+   TOP BAR
+========================================================= */
+
+.admin-topbar {
+    width: 100%;
+    height: 64px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 30px;
+
+    background: #fbfaf7;
+
+    border-bottom: 1px solid #e8e5de;
+}
+
+.admin-topbar-title {
+    margin: 0;
+
+    color: #5f665a;
+
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.login-attempts-main {
+    width: 100%;
+
+    padding: 30px 28px 50px;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.login-attempts-page-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 30px;
+}
+
+.login-attempts-heading h1 {
+    margin: 0 0 5px;
+
+    color: #11130f;
+
+    font-family: 'Playfair Display', Georgia, serif;
+
+    font-size: 34px;
+    font-weight: 600;
+
+    line-height: 1.2;
+}
+
+.login-attempts-heading p {
+    margin: 0;
+
+    color: var(--login-muted);
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.login-attempts-card {
+    width: 100%;
+
+    overflow: hidden;
+
+    background: var(--login-card);
+
+    border: 1px solid var(--login-border);
+
+    border-radius: 15px;
+}
+
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+.login-attempts-toolbar {
+    min-height: 86px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 20px;
+
+    border-bottom: 1px solid var(--login-border);
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.login-attempts-search {
+    width: 400px;
+    max-width: 100%;
+
+    height: 47px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 0 16px;
+
+    background: var(--toolbar-bg);
+
+    border: 1px solid transparent;
+
+    border-radius: 10px;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.login-attempts-search:focus-within {
+    background: #ffffff;
+
+    border-color: #9ca792;
+}
+
+.login-attempts-search > i {
+    flex-shrink: 0;
+
+    color: #8c9188;
+
+    font-size: 14px;
+}
+
+.login-attempts-search input {
+    width: 100%;
+
+    padding: 0;
+
+    outline: none;
+    border: none;
+
+    background: transparent;
+
+    color: #22241e;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 14px;
+}
+
+.login-attempts-search input::placeholder {
+    color: #9b9188;
+}
+
+
+/* =========================================================
+   FILTER
+========================================================= */
+
+.login-attempts-filter {
+    position: relative;
+
+    width: 180px;
+    height: 47px;
+
+    flex: 0 0 180px;
+
+    display: flex;
+
+    align-items: center;
+
+    background: var(--toolbar-bg);
+
+    border: 1px solid #ded9d0;
+
+    border-radius: 10px;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.login-attempts-filter:hover {
+    background: #ecefe9;
+}
+
+.login-attempts-filter:focus-within {
+    background: #ffffff;
+
+    border-color: var(--purevia-green);
+}
+
+
+/* FILTER ICON */
+
+.filter-leading-icon {
+    position: absolute;
+
+    left: 15px;
+
+    z-index: 1;
+
+    color: #69745d;
+
+    font-size: 13px;
+
+    pointer-events: none;
+}
+
+
+/* SELECT */
+
+.login-attempts-filter select {
+    width: 100%;
+    height: 100%;
+
+    padding: 0 38px 0 40px;
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    outline: none;
+    border: none;
+
+    background: transparent;
+
+    color: #4e5549;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    cursor: pointer;
+}
+
+.login-attempts-filter select option {
+    background: #ffffff;
+
+    color: #272820;
+}
+
+
+/* ARROW */
+
+.filter-arrow {
+    position: absolute;
+
+    right: 15px;
+
+    color: #7f8179;
+
+    font-size: 11px;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   TABLE WRAPPER
+========================================================= */
+
+.login-attempts-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.login-attempts-table {
+    width: 100%;
+
+    min-width: 1100px;
+
+    border-collapse: collapse;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.login-attempts-table th {
+    padding: 17px 15px;
+
+    color: #85776d;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    letter-spacing: 1.3px;
+
+    text-align: left;
+
+    white-space: nowrap;
+
+    border-bottom: 1px solid var(--login-border);
+}
+
+
+/* COLUMN WIDTHS */
+
+.login-attempts-table th:nth-child(1) {
+    width: 23%;
+}
+
+.login-attempts-table th:nth-child(2) {
+    width: 12%;
+}
+
+.login-attempts-table th:nth-child(3) {
+    width: 15%;
+}
+
+.login-attempts-table th:nth-child(4) {
+    width: 15%;
+}
+
+.login-attempts-table th:nth-child(5) {
+    width: 18%;
+}
+
+.login-attempts-table th:nth-child(6) {
+    width: 22%;
+}
+
+
+/* =========================================================
+   BODY
+========================================================= */
+
+.login-attempts-table td {
+    padding: 18px 15px;
+
+    vertical-align: middle;
+
+    color: #1a1c17;
+
+    font-size: 14px;
+
+    border-bottom: 1px solid var(--login-border);
+}
+
+.login-attempts-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.login-attempt-row {
+    transition: background 0.2s ease;
+}
+
+.login-attempt-row:hover {
+    background: #faf8f4;
+}
+
+
+/* =========================================================
+   EMAIL
+========================================================= */
+
+.login-attempt-email {
+    color: #11130f;
+
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   RESULT BADGE
+========================================================= */
+
+.login-result-badge {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 78px;
+    min-height: 28px;
+
+    padding: 5px 12px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    letter-spacing: 0.7px;
+
+    line-height: 1;
+}
+
+
+/* SUCCESS */
+
+.login-result-success {
+    background: var(--success-bg);
+
+    color: var(--success-text);
+}
+
+
+/* FAILED */
+
+.login-result-failed {
+    background: var(--failed-bg);
+
+    color: var(--failed-text);
+}
+
+
+/* =========================================================
+   IP ADDRESS
+========================================================= */
+
+.login-ip-address {
+    color: #20221d;
+
+    font-family:
+        'Courier New',
+        monospace;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   BROWSER
+========================================================= */
+
+.login-browser {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    color: #746d65;
+
+    white-space: nowrap;
+}
+
+.login-browser i {
+    color: #788373;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   DATE
+========================================================= */
+
+.login-attempt-date {
+    color: #8b7c72;
+
+    font-family:
+        'Courier New',
+        monospace;
+
+    font-size: 13px;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   REASON
+========================================================= */
+
+.login-reason-success {
+    color: #968b81;
+}
+
+.login-reason-failed {
+    color: #d33b32;
+}
+
+
+/* =========================================================
+   NO RESULTS
+========================================================= */
+
+.no-login-attempts-row td {
+    padding: 60px 20px !important;
+
+    border-bottom: none !important;
+}
+
+.no-login-attempts-message {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 12px;
+
+    color: #968b81;
+
+    text-align: center;
+}
+
+.no-login-attempts-message i {
+    font-size: 25px;
+}
+
+.no-login-attempts-message p {
+    margin: 0;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .login-attempts-toolbar {
+        flex-wrap: wrap;
+
+        align-items: flex-start;
+    }
+
+    .login-attempts-search {
+        width: 100%;
+
+        flex: 1 1 100%;
+    }
+
+    .login-attempts-filter {
+        flex: 1;
+
+        width: auto;
+
+        min-width: 180px;
+    }
+}
+
+
+@media (max-width: 800px) {
+
+    .admin-topbar {
+        padding-left: 75px;
+    }
+
+    .login-attempts-main {
+        padding: 28px 22px 40px;
+    }
+}
+
+
+@media (max-width: 550px) {
+
+    .admin-topbar {
+        height: 65px;
+
+        padding-left: 70px;
+        padding-right: 18px;
+    }
+
+    .login-attempts-main {
+        padding: 24px 15px 35px;
+    }
+
+    .login-attempts-heading h1 {
+        font-size: 29px;
+    }
+
+    .login-attempts-toolbar {
+        flex-direction: column;
+
+        align-items: stretch;
+
+        gap: 12px;
+
+        padding: 15px;
+    }
+
+    .login-attempts-search,
+    .login-attempts-filter {
+        width: 100%;
+
+        max-width: none;
+        min-width: 0;
+
+        flex: none;
+    }
+
+    .login-attempts-table th,
+    .login-attempts-table td {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+}
