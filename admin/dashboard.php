@@ -148,7 +148,7 @@ $orderStatusCounts = [
     >
 
     <title>
-        <?= htmlspecialchars($pageTitle) ?> | PureVia
+         PureVia
     </title>
 
 

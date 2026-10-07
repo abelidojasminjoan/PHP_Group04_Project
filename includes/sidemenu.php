@@ -429,48 +429,158 @@ else {
     <nav class="sidebar-navigation">
 
 
-        <!-- =================================================
-             OVERVIEW
-        ================================================== -->
-
-        <div class="sidebar-section">
-
-
-            <!-- DASHBOARD -->
-
-            <a
-                href="<?= htmlspecialchars($dashboardUrl) ?>"
-                class="sidebar-link
-                <?= sidebarActive('/dashboard.php') ?>"
-            >
-
-                <span class="sidebar-link-left">
-
-                    <span class="sidebar-menu-icon">
-                        📊
-                    </span>
-
-                    <span>Dashboard</span>
-
-                </span>
-
-            </a>
-
-
+        <?php if ($isStaff): ?>
 
             <!-- =================================================
-                 USERS
-                 ADMIN ONLY
+                STAFF MENU
+                NO CATALOG / OPERATIONS HEADINGS
             ================================================== -->
 
-            <?php if ($isAdmin): ?>
+            <div class="sidebar-section staff-sidebar-section">
+
+
+                <!-- DASHBOARD -->
+
+                <a
+                    href="<?= $dashboardUrl ?>"
+                    class="sidebar-link <?= sidebarActive('/staff/dashboard.php') ?>"
+                >
+                    <span class="sidebar-link-left">
+
+                        <span class="sidebar-menu-icon">
+                            📊
+                        </span>
+
+                        <span>Dashboard</span>
+
+                    </span>
+                </a>
+
+
+                <!-- PRODUCTS -->
+
+                <a
+                    href="<?= $productsUrl ?>"
+                    class="sidebar-link <?= sidebarActive('/staff/products/') ?>"
+                >
+                    <span class="sidebar-link-left">
+
+                        <span class="sidebar-menu-icon">
+                            🧴
+                        </span>
+
+                        <span>Products</span>
+
+                    </span>
+                </a>
+
+
+                <!-- INVENTORY -->
+
+                <a
+                    href="<?= $inventoryUrl ?>"
+                    class="sidebar-link <?= sidebarActive('/staff/inventory/') ?>"
+                >
+                    <span class="sidebar-link-left">
+
+                        <span class="sidebar-menu-icon">
+                            📦
+                        </span>
+
+                        <span>Inventory</span>
+
+                    </span>
+                </a>
+
+
+                <!-- ORDERS -->
+
+                <a
+                    href="<?= $ordersUrl ?>"
+                    class="sidebar-link <?= sidebarActive('/staff/orders/') ?>"
+                >
+                    <span class="sidebar-link-left">
+
+                        <span class="sidebar-menu-icon">
+                            🛒
+                        </span>
+
+                        <span>Orders</span>
+
+                    </span>
+                </a>
+
+
+                <!-- PAYMENTS -->
+
+                <a
+                    href="<?= $paymentsUrl ?>"
+                    class="sidebar-link <?= sidebarActive('/staff/payments/') ?>"
+                >
+                    <span class="sidebar-link-left">
+
+                        <span class="sidebar-menu-icon">
+                            💳
+                        </span>
+
+                        <span>Payments</span>
+
+                    </span>
+                </a>
+
+
+                <!-- SALES REPORT -->
+
+                <a
+                    href="<?= $staffBase ?>/reports/sales_report.php"
+                    class="sidebar-link <?= sidebarActive('/staff/reports/') ?>"
+                >
+                    <span class="sidebar-link-left">
+
+                        <span class="sidebar-menu-icon">
+                            📈
+                        </span>
+
+                        <span>Sales Report</span>
+
+                    </span>
+                </a>
+
+
+            </div>
+
+
+        <?php else: ?>
+
+            <!-- =================================================
+                ADMIN MENU
+            ================================================== -->
+
+
+            <!-- OVERVIEW -->
+
+            <div class="sidebar-section">
+
+                <a
+                    href="<?= $dashboardUrl ?>"
+                    class="sidebar-link <?= sidebarActive('/admin/dashboard.php') ?>"
+                >
+                    <span class="sidebar-link-left">
+
+                        <span class="sidebar-menu-icon">
+                            📊
+                        </span>
+
+                        <span>Dashboard</span>
+
+                    </span>
+                </a>
+
 
                 <a
                     href="<?= $adminBase ?>/users/users.php"
-                    class="sidebar-link
-                    <?= sidebarActive('/users/') ?>"
+                    class="sidebar-link <?= sidebarActive('/users/') ?>"
                 >
-
                     <span class="sidebar-link-left">
 
                         <span class="sidebar-menu-icon">
@@ -480,64 +590,44 @@ else {
                         <span>Users</span>
 
                     </span>
-
                 </a>
 
-            <?php endif; ?>
-
-
-        </div>
-
-
-
-        <!-- =================================================
-             CATALOG
-        ================================================== -->
-
-        <div class="sidebar-section">
-
-            <p class="sidebar-section-title">
-                CATALOG
-            </p>
-
-
-            <!-- PRODUCTS -->
-
-            <a
-                href="<?= htmlspecialchars($productsUrl) ?>"
-                class="sidebar-link
-                <?= sidebarActive('/products/') ?>"
-            >
-
-                <span class="sidebar-link-left">
-
-                    <span class="sidebar-menu-icon">
-                        🧴
-                    </span>
-
-                    <span>Products</span>
-
-                </span>
-
-            </a>
+            </div>
 
 
 
             <!-- =================================================
-                 ADMIN-ONLY CATALOG MANAGEMENT
+                CATALOG
+                ADMIN ONLY
             ================================================== -->
 
-            <?php if ($isAdmin): ?>
+            <div class="sidebar-section">
+
+                <p class="sidebar-section-title">
+                    CATALOG
+                </p>
 
 
-                <!-- CATEGORIES -->
+                <a
+                    href="<?= $productsUrl ?>"
+                    class="sidebar-link <?= sidebarActive('/products/') ?>"
+                >
+                    <span class="sidebar-link-left">
+
+                        <span class="sidebar-menu-icon">
+                            🧴
+                        </span>
+
+                        <span>Products</span>
+
+                    </span>
+                </a>
+
 
                 <a
                     href="<?= $adminBase ?>/categories/categories.php"
-                    class="sidebar-link
-                    <?= sidebarActive('/categories/') ?>"
+                    class="sidebar-link <?= sidebarActive('/categories/') ?>"
                 >
-
                     <span class="sidebar-link-left">
 
                         <span class="sidebar-menu-icon">
@@ -547,19 +637,13 @@ else {
                         <span>Categories</span>
 
                     </span>
-
                 </a>
 
 
-
-                <!-- INGREDIENTS -->
-
                 <a
                     href="<?= $adminBase ?>/ingredients/ingredients.php"
-                    class="sidebar-link
-                    <?= sidebarActive('/ingredients/') ?>"
+                    class="sidebar-link <?= sidebarActive('/ingredients/') ?>"
                 >
-
                     <span class="sidebar-link-left">
 
                         <span class="sidebar-menu-icon">
@@ -569,19 +653,13 @@ else {
                         <span>Ingredients</span>
 
                     </span>
-
                 </a>
 
 
-
-                <!-- SKIN CONCERNS -->
-
                 <a
                     href="<?= $adminBase ?>/concerns/concerns.php"
-                    class="sidebar-link
-                    <?= sidebarActive('/concerns/') ?>"
+                    class="sidebar-link <?= sidebarActive('/concerns/') ?>"
                 >
-
                     <span class="sidebar-link-left">
 
                         <span class="sidebar-menu-icon">
@@ -591,103 +669,95 @@ else {
                         <span>Skin Concerns</span>
 
                     </span>
+                </a>
 
+            </div>
+
+
+
+            <!-- =================================================
+                OPERATIONS
+                ADMIN ONLY
+            ================================================== -->
+
+            <div class="sidebar-section">
+
+                <p class="sidebar-section-title">
+                    OPERATIONS
+                </p>
+
+
+                <a
+                    href="<?= $inventoryUrl ?>"
+                    class="sidebar-link <?= sidebarActive('/inventory/') ?>"
+                >
+                    <span class="sidebar-link-left">
+
+                        <span class="sidebar-menu-icon">
+                            📦
+                        </span>
+
+                        <span>Inventory</span>
+
+                    </span>
                 </a>
 
 
-            <?php endif; ?>
+                <a
+                    href="<?= $ordersUrl ?>"
+                    class="sidebar-link <?= sidebarActive('/orders/') ?>"
+                >
+                    <span class="sidebar-link-left">
 
+                        <span class="sidebar-menu-icon">
+                            🛒
+                        </span>
 
-        </div>
+                        <span>Orders</span>
 
-
-
-        <!-- =================================================
-             OPERATIONS
-        ================================================== -->
-
-        <div class="sidebar-section">
-
-            <p class="sidebar-section-title">
-                OPERATIONS
-            </p>
-
-
-            <!-- INVENTORY -->
-
-            <a
-                href="<?= htmlspecialchars($inventoryUrl) ?>"
-                class="sidebar-link
-                <?= sidebarActive('/inventory/') ?>"
-            >
-
-                <span class="sidebar-link-left">
-
-                    <span class="sidebar-menu-icon">
-                        📦
                     </span>
-
-                    <span>Inventory</span>
-
-                </span>
-
-            </a>
+                </a>
 
 
+                <a
+                    href="<?= $paymentsUrl ?>"
+                    class="sidebar-link <?= sidebarActive('/payments/') ?>"
+                >
+                    <span class="sidebar-link-left">
 
-            <!-- ORDERS -->
+                        <span class="sidebar-menu-icon">
+                            💳
+                        </span>
 
-            <a
-                href="<?= htmlspecialchars($ordersUrl) ?>"
-                class="sidebar-link
-                <?= sidebarActive('/orders/') ?>"
-            >
+                        <span>Payments</span>
 
-                <span class="sidebar-link-left">
-
-                    <span class="sidebar-menu-icon">
-                        🛒
                     </span>
-
-                    <span>Orders</span>
-
-                </span>
-
-            </a>
+                </a>
 
 
+                <a
+                    href="<?= $adminBase ?>/reports/sales_report.php"
+                    class="sidebar-link <?= sidebarActive('/reports/') ?>"
+                >
+                    <span class="sidebar-link-left">
 
-            <!-- PAYMENTS -->
+                        <span class="sidebar-menu-icon">
+                            📈
+                        </span>
 
-            <a
-                href="<?= htmlspecialchars($paymentsUrl) ?>"
-                class="sidebar-link
-                <?= sidebarActive('/payments/') ?>"
-            >
+                        <span>Sales Report</span>
 
-                <span class="sidebar-link-left">
-
-                    <span class="sidebar-menu-icon">
-                        💳
                     </span>
+                </a>
 
-                    <span>Payments</span>
-
-                </span>
-
-            </a>
-
-
-        </div>
+            </div>
 
 
 
-        <!-- =================================================
-             SECURITY
-             ADMIN ONLY
-        ================================================== -->
-
-        <?php if ($isAdmin): ?>
+            <!-- =================================================
+                SECURITY
+                ADMIN ONLY
+            ================================================== -->
 
             <div class="sidebar-section">
 
@@ -696,14 +766,10 @@ else {
                 </p>
 
 
-                <!-- SECURITY SETTINGS -->
-
                 <a
                     href="<?= $adminBase ?>/security/settings.php"
-                    class="sidebar-link
-                    <?= sidebarActive('/security/settings.php') ?>"
+                    class="sidebar-link <?= sidebarActive('/security/settings.php') ?>"
                 >
-
                     <span class="sidebar-link-left">
 
                         <span class="sidebar-menu-icon">
@@ -713,19 +779,13 @@ else {
                         <span>Security Settings</span>
 
                     </span>
-
                 </a>
 
 
-
-                <!-- LOGIN ATTEMPTS -->
-
                 <a
                     href="<?= $adminBase ?>/security/login_attempts.php"
-                    class="sidebar-link
-                    <?= sidebarActive('/security/login_attempts.php') ?>"
+                    class="sidebar-link <?= sidebarActive('/security/login_attempts.php') ?>"
                 >
-
                     <span class="sidebar-link-left">
 
                         <span class="sidebar-menu-icon">
@@ -735,19 +795,13 @@ else {
                         <span>Login Attempts</span>
 
                     </span>
-
                 </a>
 
 
-
-                <!-- AUDIT LOGS -->
-
                 <a
                     href="<?= $adminBase ?>/security/audit_logs.php"
-                    class="sidebar-link
-                    <?= sidebarActive('/security/audit_logs.php') ?>"
+                    class="sidebar-link <?= sidebarActive('/security/audit_logs.php') ?>"
                 >
-
                     <span class="sidebar-link-left">
 
                         <span class="sidebar-menu-icon">
@@ -757,16 +811,16 @@ else {
                         <span>Audit Logs</span>
 
                     </span>
-
                 </a>
 
-
             </div>
+
 
         <?php endif; ?>
 
 
     </nav>
+
 
 
 

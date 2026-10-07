@@ -832,3 +832,15 @@
     }
 
 }
+
+/* =========================================================
+   STAFF SIDEBAR
+========================================================= */
+
+.staff-sidebar-section {
+    margin-top: 2px;
+}
+
+.staff-sidebar-section .sidebar-link {
+    margin-bottom: 3px;
+}
