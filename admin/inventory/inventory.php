@@ -425,9 +425,11 @@ sort($categories);
 
                                 <th>THRESHOLD</th>
 
+                                <th>STATUS</th>
+
                                 <th>LAST RESTOCKED</th>
 
-                                <th>ACTION</th>
+                                <th>ACTIONS</th>
 
                             </tr>
 
