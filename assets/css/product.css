@@ -898,3 +898,21 @@ body {
         padding-right: 15px;
     }
 }
+
+/* =========================================================
+   STAFF PRODUCT PRICE
+========================================================= */
+
+.staff-product-price {
+    color: #345d43;
+
+    font-family:
+        'Playfair Display',
+        Georgia,
+        serif;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
