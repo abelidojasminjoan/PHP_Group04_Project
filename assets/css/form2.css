@@ -1,0 +1,856 @@
+/* =========================================================
+   PUREVIA REUSABLE FORMS / MODALS
+========================================================= */
+
+:root {
+    --form-green: #3f6b50;
+    --form-green-dark: #315640;
+
+    --form-text: #25251f;
+    --form-muted: #8d847a;
+
+    --form-border: #d9d0c4;
+    --form-background: #ffffff;
+
+    --form-danger: #c44b40;
+    --form-success: #228b57;
+}
+
+
+/* =========================================================
+   BUTTON RESET
+========================================================= */
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.form-modal {
+    position: fixed;
+    inset: 0;
+
+    z-index: 9999;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 22px;
+}
+
+.form-modal.is-open {
+    display: flex;
+}
+
+
+/* =========================================================
+   BACKDROP
+========================================================= */
+
+.form-modal-backdrop {
+    position: absolute;
+    inset: 0;
+
+    background: rgba(31, 31, 27, 0.43);
+
+    backdrop-filter: blur(2px);
+}
+
+
+/* =========================================================
+   DIALOG
+========================================================= */
+
+.form-modal-dialog {
+    position: relative;
+
+    z-index: 1;
+
+    width: 100%;
+    max-width: 650px;
+
+    max-height: calc(100vh - 45px);
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    background: var(--form-background);
+
+    border: 1px solid #ded8cf;
+    border-radius: 20px;
+
+    box-shadow:
+        0 20px 60px
+        rgba(25, 25, 20, 0.16);
+}
+
+.form-modal-large {
+    max-width: 850px;
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.purevia-form {
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.form-modal-header {
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 28px 30px 22px;
+
+    border-bottom:
+        1px solid var(--form-border);
+}
+
+.form-modal-header h2 {
+    margin: 0 0 5px;
+
+    color: var(--form-text);
+
+    font-family:
+        'Playfair Display',
+        Georgia,
+        serif;
+
+    font-size: 26px;
+    font-weight: 600;
+
+    line-height: 1.2;
+}
+
+.form-modal-header p {
+    margin: 0;
+
+    color: var(--form-muted);
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   CLOSE
+========================================================= */
+
+.form-modal-close {
+    width: 36px;
+    height: 36px;
+
+    flex-shrink: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+
+    background: transparent;
+
+    color: #8e887f;
+
+    font-size: 18px;
+
+    cursor: pointer;
+
+    border-radius: 50%;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.form-modal-close:hover {
+    background: #f3f0eb;
+
+    color: #31322d;
+}
+
+
+/* =========================================================
+   BODY
+========================================================= */
+
+.form-modal-body {
+    min-height: 0;
+
+    overflow-y: auto;
+
+    padding: 28px 30px 26px;
+
+    scrollbar-width: thin;
+
+    scrollbar-color:
+        #c7c0b6
+        transparent;
+}
+
+.form-modal-body::-webkit-scrollbar {
+    width: 7px;
+}
+
+.form-modal-body::-webkit-scrollbar-thumb {
+    background: #c7c0b6;
+
+    border-radius: 20px;
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.form-grid {
+    display: grid;
+
+    gap: 20px;
+
+    margin-bottom: 20px;
+}
+
+.form-grid-2 {
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+}
+
+
+/* =========================================================
+   GROUP
+========================================================= */
+
+.form-group {
+    width: 100%;
+
+    margin-bottom: 20px;
+}
+
+.form-grid .form-group {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #414039;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.form-required {
+    color: var(--form-danger);
+}
+
+
+/* =========================================================
+   INPUTS
+========================================================= */
+
+.form-control {
+    width: 100%;
+    height: 55px;
+
+    padding: 0 17px;
+
+    outline: none;
+
+    border:
+        1px solid var(--form-border);
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #282821;
+
+    font-family:
+        'DM Sans',
+        Arial,
+        sans-serif;
+
+    font-size: 14px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.form-control::placeholder {
+    color: #9a9187;
+}
+
+.form-control:hover {
+    border-color: #c8beb1;
+}
+
+.form-control:focus {
+    border-color: #788b71;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(83, 99, 75, 0.08);
+}
+
+
+/* =========================================================
+   TEXTAREA
+========================================================= */
+
+.form-textarea {
+    min-height: 84px;
+    height: auto;
+
+    padding-top: 14px;
+    padding-bottom: 14px;
+
+    resize: vertical;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   SELECT
+========================================================= */
+
+.form-select-wrapper {
+    position: relative;
+}
+
+.form-select {
+    appearance: none;
+    -webkit-appearance: none;
+
+    padding-right: 45px;
+
+    cursor: pointer;
+}
+
+.form-select-wrapper > i {
+    position: absolute;
+
+    top: 50%;
+    right: 17px;
+
+    transform: translateY(-50%);
+
+    color: #918b82;
+
+    font-size: 11px;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   FORM SECTION
+========================================================= */
+
+.form-section {
+    margin-top: 30px;
+
+    padding-top: 3px;
+}
+
+.form-section-header {
+    display: flex;
+
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 18px;
+}
+
+.form-section-header h3 {
+    margin: 0 0 4px;
+
+    color: #25251f;
+
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.form-section-header p {
+    margin: 0;
+
+    color: var(--form-muted);
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   OUTLINE BUTTON
+========================================================= */
+
+.form-outline-button {
+    min-height: 42px;
+
+    flex-shrink: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    padding: 0 16px;
+
+    border:
+        1px dashed var(--form-green);
+
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    color: var(--form-green);
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.form-outline-button:hover {
+    background: #f1f6f2;
+
+    border-color: var(--form-green-dark);
+}
+
+
+/* =========================================================
+   VARIANT HEADER
+========================================================= */
+
+.variant-header {
+    display: grid;
+
+    grid-template-columns:
+        1.4fr
+        1.7fr
+        0.75fr
+        0.65fr
+        28px;
+
+    gap: 10px;
+
+    padding: 0 5px 8px;
+
+    color: #92887e;
+
+    font-family: monospace;
+
+    font-size: 11px;
+
+    letter-spacing: 1px;
+}
+
+
+/* =========================================================
+   VARIANT ROW
+========================================================= */
+
+#variantRows {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+.variant-row {
+    display: grid;
+
+    grid-template-columns:
+        1.4fr
+        1.7fr
+        0.75fr
+        0.65fr
+        28px;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+.variant-row .form-control {
+    height: 44px;
+
+    padding-left: 13px;
+    padding-right: 13px;
+}
+
+
+/* =========================================================
+   PRICE
+========================================================= */
+
+.price-input {
+    position: relative;
+}
+
+.price-input > span {
+    position: absolute;
+
+    top: 50%;
+    left: 12px;
+
+    z-index: 1;
+
+    transform: translateY(-50%);
+
+    color: #8f877d;
+
+    font-size: 13px;
+}
+
+.price-input .form-control {
+    padding-left: 28px;
+}
+
+
+/* =========================================================
+   REMOVE VARIANT
+========================================================= */
+
+.variant-remove {
+    width: 28px;
+    height: 38px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+
+    background: transparent;
+
+    color: #d1c9c0;
+
+    font-size: 12px;
+
+    cursor: pointer;
+
+    transition: color 0.2s ease;
+}
+
+.variant-remove:hover:not(:disabled) {
+    color: var(--form-danger);
+}
+
+.variant-remove:disabled {
+    opacity: 0.5;
+
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   HELPER
+========================================================= */
+
+.form-helper {
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    margin: 12px 0 0;
+
+    color: var(--form-green);
+
+    font-family: monospace;
+
+    font-size: 11px;
+
+    letter-spacing: 0.4px;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.form-modal-footer {
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 14px;
+
+    padding: 19px 30px;
+
+    background: #ffffff;
+
+    border-top:
+        1px solid var(--form-border);
+}
+
+
+/* =========================================================
+   CANCEL
+========================================================= */
+
+.form-cancel-button {
+    min-height: 48px;
+
+    padding: 0 12px;
+
+    border: none;
+
+    background: transparent;
+
+    color: #292923;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   SUBMIT
+========================================================= */
+
+.form-submit-button {
+    min-width: 165px;
+    min-height: 52px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 25px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: var(--form-green);
+
+    color: #ffffff;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.form-submit-button:hover {
+    background: var(--form-green-dark);
+
+    transform: translateY(-1px);
+}
+
+.form-submit-button:disabled {
+    opacity: 0.65;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+
+/* =========================================================
+   ALERTS
+========================================================= */
+
+.form-alert {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+
+    padding: 13px 16px;
+
+    border-radius: 10px;
+
+    font-size: 13px;
+}
+
+.form-alert-success {
+    background: #e5f4ea;
+
+    border: 1px solid #cce7d5;
+
+    color: #267446;
+}
+
+.form-alert-error {
+    background: #fae9e7;
+
+    border: 1px solid #efd1cd;
+
+    color: #a9443b;
+}
+
+
+/* =========================================================
+   MODAL OPEN
+========================================================= */
+
+body.form-modal-open {
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 800px) {
+
+    .form-modal {
+        padding: 15px;
+    }
+
+    .form-modal-dialog {
+        max-height:
+            calc(100vh - 30px);
+    }
+
+    .form-modal-header,
+    .form-modal-body,
+    .form-modal-footer {
+        padding-left: 22px;
+        padding-right: 22px;
+    }
+
+    .form-grid-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .variant-header {
+        display: none;
+    }
+
+    .variant-row {
+        grid-template-columns:
+            1fr
+            1fr;
+    }
+
+    .variant-remove {
+        width: 100%;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 550px) {
+
+    .form-modal {
+        padding: 0;
+    }
+
+    .form-modal-dialog {
+        height: 100%;
+        max-height: 100vh;
+
+        border-radius: 0;
+    }
+
+    .form-modal-header {
+        padding:
+            22px
+            18px
+            18px;
+    }
+
+    .form-modal-body {
+        padding:
+            22px
+            18px;
+    }
+
+    .form-modal-footer {
+        padding:
+            15px
+            18px;
+    }
+
+    .form-modal-header h2 {
+        font-size: 23px;
+    }
+
+    .form-section-header {
+        flex-direction: column;
+    }
+
+    .form-outline-button {
+        width: 100%;
+    }
+
+    .variant-row {
+        grid-template-columns: 1fr;
+    }
+
+    .variant-remove {
+        justify-content: flex-end;
+    }
+
+    .form-cancel-button,
+    .form-submit-button {
+        flex: 1;
+    }
+
+}
