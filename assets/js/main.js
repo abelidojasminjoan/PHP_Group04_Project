@@ -102,3 +102,20 @@ if (
     );
 
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.size-option').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    const row = button.closest('.product-size-row');
+                    if (!row) return;
+
+                    row.querySelectorAll('.size-option').forEach(function (option) {
+                        option.classList.remove('selected');
+                        option.setAttribute('aria-pressed', 'false');
+                    });
+
+                    button.classList.add('selected');
+                    button.setAttribute('aria-pressed', 'true');
+                });
+            });
+        });
