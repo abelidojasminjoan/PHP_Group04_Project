@@ -142,65 +142,223 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
+
+    /* =====================================================
+       ADD / EDIT / DELETE INGREDIENTS
+    ===================================================== */
+
+    const modal =
+        document.getElementById('ingredientModal');
+
+    const ingredientForm =
+        document.getElementById('ingredientForm');
+
+    const actionInput =
+        document.getElementById('ingredientAction');
+
+    const idInput =
+        document.getElementById('ingredientId');
+
+    const nameInput =
+        document.getElementById('ingredientName');
+
+    const descriptionInput =
+        document.getElementById('ingredientDescription');
+
+    const ingredientStatusInput =
+        document.getElementById('ingredientStatus');
+
+    const modalTitle =
+        document.getElementById('ingredientModalTitle');
+
+    const submitButton =
+        document.getElementById('submitIngredientButton');
+
+
+    /* =====================================================
+       OPEN / CLOSE MODAL
+    ===================================================== */
+
+    function openIngredientModal() {
+
+        modal.classList.add('is-open');
+
+        modal.setAttribute('aria-hidden', 'false');
+
+        document.body.classList.add('form-modal-open');
+
+        nameInput.focus();
+    }
+
+    function closeIngredientModal() {
+
+        modal.classList.remove('is-open');
+
+        modal.setAttribute('aria-hidden', 'true');
+
+        document.body.classList.remove('form-modal-open');
+    }
+
+
+    /* =====================================================
+       ADD INGREDIENT
+    ===================================================== */
+
+    document.getElementById('openAddIngredientModal')
+        .addEventListener('click', function () {
+
+            ingredientForm.reset();
+
+            actionInput.value = 'add';
+
+            idInput.value = '';
+
+            ingredientStatusInput.value = 'active';
+
+            modalTitle.textContent = 'Add Ingredient';
+
+            submitButton.textContent = 'Add Ingredient';
+
+            submitButton.disabled = false;
+
+            openIngredientModal();
+        });
+
+
+    /* =====================================================
+       EDIT INGREDIENT
+    ===================================================== */
+
+    document.querySelectorAll('.edit-ingredient-button')
+        .forEach(function (button) {
+
+            button.addEventListener('click', function () {
+
+                ingredientForm.reset();
+
+                actionInput.value = 'edit';
+
+                idInput.value =
+                    button.dataset.ingredientId;
+
+                nameInput.value =
+                    button.dataset.ingredientName;
+
+                descriptionInput.value =
+                    button.dataset.ingredientDescription;
+
+                ingredientStatusInput.value =
+                    button.dataset.ingredientStatus;
+
+                modalTitle.textContent = 'Edit Ingredient';
+
+                submitButton.textContent = 'Save Changes';
+
+                submitButton.disabled = false;
+
+                openIngredientModal();
+            });
+        });
+
+
+    /* =====================================================
+       CLOSE MODAL
+    ===================================================== */
+
+    document.querySelectorAll('[data-close-ingredient-modal]')
+        .forEach(function (button) {
+
+            button.addEventListener(
+                'click',
+                closeIngredientModal
+            );
+        });
+
+    document.addEventListener('keydown', function (event) {
+
+        if (
+            event.key === 'Escape' &&
+            modal.classList.contains('is-open')
+        ) {
+            closeIngredientModal();
+        }
+    });
+
+
     /* =====================================================
        DELETE INGREDIENT
     ===================================================== */
 
     deleteButtons.forEach(function (button) {
 
-        button.addEventListener(
-            'click',
-            function () {
+        button.addEventListener('click', function () {
 
+            const ingredientId =
+                button.dataset.ingredientId;
 
-                const ingredientId =
-                    button.dataset.ingredientId;
+            const ingredientName =
+                button.dataset.ingredientName;
 
-
-                const ingredientName =
-                    button.dataset.ingredientName;
-
-
-                if (!ingredientId) {
-                    return;
-                }
-
-
-                /* CONFIRM DELETE */
-
-                const confirmed =
-                    confirm(
-                        'Are you sure you want to delete "' +
-                        ingredientName +
-                        '"?'
-                    );
-
-
-                if (!confirmed) {
-                    return;
-                }
-
-
-                /* =========================================
-                   GO TO DELETE PROCESSOR
-                ========================================= */
-
-                window.location.href =
-                    './delete_ingredient.php?id=' +
-                    encodeURIComponent(
-                        ingredientId
-                    );
-
+            if (!ingredientId) {
+                return;
             }
-        );
 
+            const confirmed = confirm(
+                'Are you sure you want to delete "' +
+                ingredientName +
+                '"?'
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            document.getElementById('deleteIngredientId').value =
+                ingredientId;
+
+            document.getElementById('deleteIngredientForm')
+                .requestSubmit();
+        });
     });
 
 
     /* =====================================================
-       INITIAL FILTER
+       PREVENT DOUBLE SUBMISSION
     ===================================================== */
 
-    filterIngredients();
+    ingredientForm.addEventListener('submit', function () {
+
+        if (!ingredientForm.checkValidity()) {
+            return;
+        }
+
+        submitButton.disabled = true;
+
+        submitButton.textContent = 'Saving...';
+    });
+
+
+
+    /* =========================================
+       GO TO DELETE PROCESSOR
+    ========================================= */
+
+    window.location.href =
+        './delete_ingredient.php?id=' +
+        encodeURIComponent(
+            ingredientId
+        );
+
+}
+);
+
+    });
+
+
+/* =====================================================
+   INITIAL FILTER
+===================================================== */
+
+filterIngredients();
 
 });
