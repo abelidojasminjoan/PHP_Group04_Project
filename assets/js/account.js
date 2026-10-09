@@ -50,3 +50,61 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+
+
+/* =========================================
+   ADDRESS FORM
+========================================= */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const addressForm = document.getElementById("addressForm");
+    const saveAddressBtn = document.getElementById("saveAddressBtn");
+
+    if (addressForm && saveAddressBtn) {
+
+        addressForm.addEventListener("submit", function (event) {
+
+            const fields = addressForm.querySelectorAll(
+                'input:not([type="hidden"]):not([type="checkbox"])'
+            );
+
+            fields.forEach(function (field) {
+                field.value = field.value.trim();
+            });
+
+            if (!addressForm.checkValidity()) {
+                event.preventDefault();
+                addressForm.reportValidity();
+                return;
+            }
+
+            if (saveAddressBtn.disabled) {
+                event.preventDefault();
+                return;
+            }
+
+            saveAddressBtn.disabled = true;
+            saveAddressBtn.textContent = "Saving...";
+        });
+    }
+
+    /* DELETE CONFIRMATION */
+
+    document.querySelectorAll(
+        "[data-address-delete-form]"
+    ).forEach(function (form) {
+
+        form.addEventListener("submit", function (event) {
+
+            const confirmed = confirm(
+                "Are you sure you want to delete this address?"
+            );
+
+            if (!confirmed) {
+                event.preventDefault();
+            }
+        });
+    });
+
+});

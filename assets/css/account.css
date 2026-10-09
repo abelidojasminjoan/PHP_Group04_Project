@@ -401,3 +401,175 @@
         flex-wrap: wrap;
     }
 }
+
+/* =========================================
+   PUREVIA - DELIVERY ADDRESSES
+========================================= */
+
+.address-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.address-card {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 26px;
+    background: #fff;
+    border: 1px solid #d9d0c4;
+    border-radius: 15px;
+}
+
+.address-card-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.address-card-heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.address-card-heading h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.address-default-badge {
+    padding: 7px 13px;
+    background: #e9efea;
+    color: #315d45;
+    border-radius: 20px;
+    font: 11px monospace;
+    letter-spacing: 1px;
+}
+
+.address-card-content p {
+    margin: 5px 0;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.address-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.address-card-actions form {
+    margin: 0;
+}
+
+.address-edit-link {
+    color: #111;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.address-edit-link:hover {
+    color: #39624b;
+}
+
+.address-default-btn {
+    background: transparent;
+    border: none;
+    color: #39624b;
+    font: 600 13px 'DM Sans', sans-serif;
+    cursor: pointer;
+}
+
+.address-default-btn:hover {
+    text-decoration: underline;
+}
+
+.address-delete-btn {
+    padding: 12px 16px;
+    border: none;
+    border-radius: 9px;
+    background: #c6382c;
+    color: #fff;
+    font: 600 13px 'DM Sans', sans-serif;
+    cursor: pointer;
+}
+
+.address-delete-btn:hover {
+    background: #a72d24;
+}
+
+.address-empty {
+    text-align: center;
+    background: #fff;
+    border: 1px solid #d9d0c4;
+    border-radius: 15px;
+    padding: 45px 20px;
+}
+
+.address-empty-icon {
+    font-size: 35px;
+}
+
+.address-empty p {
+    color: #8a8177;
+    margin-bottom: 24px;
+}
+
+.address-empty .account-save-btn {
+    text-decoration: none;
+}
+
+/* ADDRESS FORM */
+
+.address-label-select {
+    width: 100%;
+    height: 55px;
+    padding: 0 18px;
+    border: 1px solid #d9d0c4;
+    border-radius: 10px;
+    background: #fff;
+    color: #111;
+    font: 15px 'DM Sans', sans-serif;
+    outline: none;
+}
+
+.address-label-select:focus {
+    border-color: #39624b;
+}
+
+.address-default-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.address-default-option input {
+    width: 17px;
+    height: 17px;
+    accent-color: #39624b;
+}
+
+.address-default-note {
+    display: block;
+    margin-top: 9px;
+    color: #8a8177;
+    font-size: 12px;
+}
+
+@media (max-width: 650px) {
+    .address-card {
+        flex-direction: column;
+    }
+
+    .address-card-actions {
+        width: 100%;
+    }
+}
