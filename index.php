@@ -276,165 +276,143 @@ if (!$productResult) {
 
             <div class="bestsellers-container">
 
-                <!-- SECTION HEADER -->
+                <div class="bestsellers-layout">
 
-                <div class="bestsellers-header">
-
-                    <div class="bestsellers-heading">
+                    <div class="bestsellers-intro">
 
                         <p class="section-eyebrow">
-                            PUREVIA BESTSELLERS
+                            SKINCARE LOVED BY PUREVIA<br>
+                            CUSTOMERS
                         </p>
 
                         <h2>
-                            Your Clear Path to Better Skin.
+                            BEST SELLERS
                         </h2>
+
+                        <p class="bestsellers-copy">
+                            Discover our most-loved formulas,
+                            chosen for visible results and trusted by
+                            every kind of skin.
+                        </p>
+
+                        <p class="bestsellers-copy bestsellers-copy-secondary">
+                            From barrier care to brightening, explore
+                            the essentials customers return to again and
+                            again.
+                        </p>
+
+                        <a
+                            href="./shop.php"
+                            class="shop-all-link"
+                        >
+                            <span>SEE ALL PRODUCTS</span>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
 
                     </div>
 
 
-                    <a
-                        href="./shop.php"
-                        class="shop-all-link"
-                    >
-                        <span>SHOP ALL</span>
+                    <div class="product-grid">
 
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                    </a>
-
-                </div>
-
-
-                <!-- =============================
-                     PRODUCT GRID
-                ============================== -->
-
-                <div class="product-grid">
-
-                    <?php if (
-                        $productResult &&
-                        $productResult->num_rows > 0
-                    ): ?>
-
-                        <?php while (
-                            $product = $productResult->fetch_assoc()
+                        <?php if (
+                            $productResult &&
+                            $productResult->num_rows > 0
                         ): ?>
 
-                            <article class="product-card">
+                            <?php while (
+                                $product = $productResult->fetch_assoc()
+                            ): ?>
 
-                                <!-- PRODUCT IMAGE -->
+                                <article class="product-card">
 
-                                <a
-                                    href="./product.php?id=<?= (int) $product['id'] ?>"
-                                    class="product-image-wrapper"
-                                >
+                                    <a
+                                        href="./product.php?id=<?= (int) $product['id'] ?>"
+                                        class="product-image-wrapper"
+                                    >
 
-                                    <?php if (!empty($product['image'])): ?>
+                                        <?php if (!empty($product['image'])): ?>
 
-                                        <img
-                                            src="./uploads/products/<?= htmlspecialchars($product['image']) ?>"
-                                            alt="<?= htmlspecialchars($product['product_name']) ?>"
-                                            class="product-image"
-                                        >
-
-                                    <?php else: ?>
-
-                                        <img
-                                            src="./assets/images/products/default-product.jpg"
-                                            alt="<?= htmlspecialchars($product['product_name']) ?>"
-                                            class="product-image"
-                                        >
-
-                                    <?php endif; ?>
-
-
-                                    <span class="product-badge">
-
-                                        <?= htmlspecialchars(
-                                            strtoupper($product['category_name'])
-                                        ) ?>
-
-                                    </span>
-
-                                </a>
-
-
-                                <!-- PRODUCT DETAILS -->
-
-                                <div class="product-details">
-
-
-                                    <!-- STOCK STATUS -->
-
-                                    <div class="product-rating">
-
-                                        <?php if (
-                                            (int) $product['stock_quantity'] > 0
-                                        ): ?>
-
-                                            <span>
-                                                IN STOCK
-                                            </span>
+                                            <img
+                                                src="./uploads/products/<?= htmlspecialchars($product['image']) ?>"
+                                                alt="<?= htmlspecialchars($product['product_name']) ?>"
+                                                class="product-image"
+                                            >
 
                                         <?php else: ?>
 
-                                            <span>
-                                                OUT OF STOCK
-                                            </span>
+                                            <img
+                                                src="./assets/images/products/default-product.jpg"
+                                                alt="<?= htmlspecialchars($product['product_name']) ?>"
+                                                class="product-image"
+                                            >
 
                                         <?php endif; ?>
 
-                                    </div>
+                                    </a>
 
+                                    <div class="product-details">
 
-                                    <!-- NAME + PRICE -->
+                                        <h3 class="product-name">
+                                            <a
+                                                href="./product.php?id=<?= (int) $product['id'] ?>"
+                                            >
+                                                <?= htmlspecialchars(
+                                                    $product['product_name']
+                                                ) ?>
+                                            </a>
+                                        </h3>
 
-                                    <div class="product-title-row">
-
-                                        <a
-                                            href="./product.php?id=<?= (int) $product['id'] ?>"
-                                            class="product-name"
-                                        >
+                                        <p class="product-description">
                                             <?= htmlspecialchars(
-                                                $product['product_name']
+                                                $product['description'] ?? ''
                                             ) ?>
-                                        </a>
+                                        </p>
 
+                                        <div class="product-size-row" aria-label="Available sizes">
+                                            <button type="button" class="size-option selected" aria-pressed="true">15ml</button>
+                                            <button type="button" class="size-option" aria-pressed="false">30ml</button>
+                                            <button type="button" class="size-option" aria-pressed="false">60ml</button>
+                                        </div>
 
-                                        <span class="product-price">
+                                        <div class="product-meta">
 
-                                            ₱<?= number_format(
-                                                (float) $product['price'],
-                                                2
-                                            ) ?>
+                                            <div class="product-rating" aria-label="4.8 out of 5 stars">
+                                                <span class="stars">★★★★★</span>
+                                                <span class="review-count">
+                                                    217 Reviews
+                                                </span>
+                                            </div>
 
-                                        </span>
+                                            <button
+                                                type="button"
+                                                class="add-to-bag-btn"
+                                            >
+                                                <span>Add to Bag</span>
+
+                                                <span class="product-price">
+                                                    ₱<?= number_format(
+                                                        (float) $product['price'],
+                                                        2
+                                                    ) ?>
+                                                </span>
+                                            </button>
+
+                                        </div>
 
                                     </div>
 
+                                </article>
 
-                                    <!-- DESCRIPTION -->
-
-                                    <p class="product-description">
-
-                                        <?= htmlspecialchars(
-                                            $product['description'] ?? ''
-                                        ) ?>
-
-                                    </p>
-
-                                </div>
-
-                            </article>
-
-                        <?php endwhile; ?>
+                            <?php endwhile; ?>
 
 
-                    <?php else: ?>
+                        <?php else: ?>
 
-                        <p>No products are currently available.</p>
+                            <p>No products are currently available.</p>
 
-                    <?php endif; ?>
+                        <?php endif; ?>
+
+                    </div>
 
                 </div>
 
