@@ -1,48 +1,38 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    const modal = document.getElementById("profileEditModal");
-    const openBtn = document.getElementById("openProfileEdit");
-    const closeBtn = document.getElementById("closeProfileEdit");
-    const cancelBtn = document.getElementById("cancelProfileEdit");
     const form = document.getElementById("profileEditForm");
     const saveBtn = document.getElementById("saveProfileBtn");
 
-    if (!modal || !openBtn || !form) return;
-
-    function openModal() {
-        modal.classList.add("show");
-        modal.setAttribute("aria-hidden", "false");
-        document.body.style.overflow = "hidden";
-        document.getElementById("firstName").focus();
-    }
-
-    function closeModal() {
-        modal.classList.remove("show");
-        modal.setAttribute("aria-hidden", "true");
-        document.body.style.overflow = "";
-        openBtn.focus();
-    }
-
-    openBtn.addEventListener("click", openModal);
-
-    closeBtn.addEventListener("click", closeModal);
-    cancelBtn.addEventListener("click", closeModal);
-
-    modal.addEventListener("click", function (event) {
-        if (event.target === modal) {
-            closeModal();
-        }
-    });
-
-    document.addEventListener("keydown", function (event) {
-        if (event.key === "Escape" &&
-            modal.classList.contains("show")) {
-            closeModal();
-        }
-    });
+    if (!form || !saveBtn) return;
 
     form.addEventListener("submit", function (event) {
+
+        const firstName = document.getElementById("firstName");
+        const lastName = document.getElementById("lastName");
+        const phone = document.getElementById("phone");
+
+        firstName.value = firstName.value.trim();
+        lastName.value = lastName.value.trim();
+        phone.value = phone.value.trim();
+
+        if (!firstName.value || !lastName.value) {
+            event.preventDefault();
+            alert("First name and last name are required.");
+            return;
+        }
+
+        if (phone.value) {
+            const phonePattern = /^[0-9+\s()\-]+$/;
+
+            if (!phonePattern.test(phone.value)) {
+                event.preventDefault();
+                alert("Please enter a valid phone number.");
+                phone.focus();
+                return;
+            }
+        }
+
         if (!form.checkValidity()) {
             event.preventDefault();
             form.reportValidity();
@@ -55,7 +45,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         saveBtn.disabled = true;
-        saveBtn.textContent = "Saving...";
+        saveBtn.textContent = "Saving Changes...";
+
     });
 
 });

@@ -16,7 +16,7 @@ $userId = (int) $_SESSION['user_id'];
 
 $stmt = $conn->prepare("
     SELECT id, role_id, first_name, last_name,
-           email, phone, status, created_at
+           email, phone, status
     FROM users
     WHERE id = ? AND role_id = 3 AND status = 'active'
     LIMIT 1
@@ -49,22 +49,16 @@ $initials = strtoupper(
     substr($user['last_name'], 0, 1)
 );
 
-$memberSince = date(
-    'Y-m-d',
-    strtotime($user['created_at'])
-);
-
 $_SESSION['role'] = 'customer';
 $_SESSION['name'] = $fullName;
 $_SESSION['email'] = $user['email'];
 
-$success = $_SESSION['profile_success'] ?? '';
-$error = $_SESSION['profile_error'] ?? '';
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
-unset(
-    $_SESSION['profile_success'],
-    $_SESSION['profile_error']
-);
+$error = $_SESSION['profile_error'] ?? '';
+unset($_SESSION['profile_error']);
 ?>
 
 <!DOCTYPE html>
@@ -73,7 +67,7 @@ unset(
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>My Account | PureVia</title>
+    <title>Edit Profile | PureVia</title>
 
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
 
@@ -152,25 +146,12 @@ unset(
 
         </aside>
 
-        <!-- PROFILE CONTENT -->
+        <!-- EDIT PROFILE CONTENT -->
         <section class="account-content">
 
             <div class="account-content-header">
-
                 <h1>Personal Information</h1>
-
-                <a href="<?= BASE_URL ?>/account/edit-profile.php"
-                   class="account-edit-btn">
-                    Edit
-                </a>
-
             </div>
-
-            <?php if ($success): ?>
-                <div class="account-alert success">
-                    <?= e($success) ?>
-                </div>
-            <?php endif; ?>
 
             <?php if ($error): ?>
                 <div class="account-alert error">
@@ -178,57 +159,96 @@ unset(
                 </div>
             <?php endif; ?>
 
-            <div class="account-info-card">
+            <div class="account-edit-card">
 
-                <div class="account-info-row">
-                    <span class="account-info-label">
-                        FULL NAME
-                    </span>
+                <form method="POST"
+                      action="<?= BASE_URL ?>/actions/account/update-profile.php"
+                      id="profileEditForm">
 
-                    <span class="account-info-value">
-                        <?= e($fullName) ?>
-                    </span>
-                </div>
+                    <input type="hidden"
+                           name="csrf_token"
+                           value="<?= e($_SESSION['csrf_token']) ?>">
 
-                <div class="account-info-row">
-                    <span class="account-info-label">
-                        EMAIL ADDRESS
-                    </span>
+                    <div class="account-edit-form">
 
-                    <span class="account-info-value">
-                        <?= e($user['email']) ?>
-                    </span>
-                </div>
+                        <div class="account-form-group">
 
-                <div class="account-info-row">
-                    <span class="account-info-label">
-                        PHONE
-                    </span>
+                            <label>Full Name</label>
 
-                    <span class="account-info-value">
-                        <?= e($user['phone'] ?: 'Not provided') ?>
-                    </span>
-                </div>
+                            <div class="account-name-fields">
 
-                <div class="account-info-row">
-                    <span class="account-info-label">
-                        MEMBER SINCE
-                    </span>
+                                <input type="text"
+                                       name="first_name"
+                                       id="firstName"
+                                       value="<?= e($user['first_name']) ?>"
+                                       placeholder="First Name"
+                                       maxlength="100"
+                                       aria-label="First Name"
+                                       required>
 
-                    <span class="account-info-value">
-                        <?= e($memberSince) ?>
-                    </span>
-                </div>
+                                <input type="text"
+                                       name="last_name"
+                                       id="lastName"
+                                       value="<?= e($user['last_name']) ?>"
+                                       placeholder="Last Name"
+                                       maxlength="100"
+                                       aria-label="Last Name"
+                                       required>
 
-                <div class="account-info-row">
-                    <span class="account-info-label">
-                        ACCOUNT STATUS
-                    </span>
+                            </div>
 
-                    <span class="account-info-value">
-                        <?= e(ucfirst($user['status'])) ?>
-                    </span>
-                </div>
+                        </div>
+
+                        <div class="account-form-group">
+
+                            <label for="email">
+                                Email Address
+                            </label>
+
+                            <input type="email"
+                                   id="email"
+                                   value="<?= e($user['email']) ?>"
+                                   readonly>
+
+                            <small>
+                                Email cannot be changed
+                            </small>
+
+                        </div>
+
+                        <div class="account-form-group">
+
+                            <label for="phone">
+                                Phone Number
+                            </label>
+
+                            <input type="tel"
+                                   name="phone"
+                                   id="phone"
+                                   maxlength="30"
+                                   placeholder="+63 9XX XXX XXXX"
+                                   value="<?= e($user['phone']) ?>">
+
+                        </div>
+
+                        <div class="account-form-actions">
+
+                            <button type="submit"
+                                    class="account-save-btn"
+                                    id="saveProfileBtn">
+                                Save Changes
+                            </button>
+
+                            <a href="<?= BASE_URL ?>/account/profile.php"
+                               class="account-cancel-btn">
+                                Cancel
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </form>
 
             </div>
 
@@ -238,7 +258,6 @@ unset(
 
 </main>
 
-<!-- Keep the existing header dropdown script here if required. -->
 <script src="<?= BASE_URL ?>/assets/js/account.js"></script>
 
 </body>
