@@ -1,732 +1,526 @@
 <?php
+require_once __DIR__ . '/../../config/app.php';
+require_once __DIR__ . '/../../config/db.php';
 
-session_start();
+$pageTitle = 'Inventory';
 
-$pageTitle = "Inventory";
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
+/* ADMIN / STAFF AUTHORIZATION */
+if (
+    empty($_SESSION['user_id']) ||
+    !in_array((int) ($_SESSION['role_id'] ?? 0), [1, 2], true)
+) {
+    header('Location: ' . BASE_URL . '/index.php');
+    exit;
+}
+
+function inventoryEscape(?string $value): string
+{
+    return htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8');
+}
+
+/* LOAD INVENTORY PER PRODUCT VARIANT */
+
+$sql = "
+    SELECT
+        pv.id AS variant_id,
+        p.id AS product_id,
+        p.product_name AS product,
+        p.product_code AS sku,
+        c.category_name AS category,
+        pv.size_capacity,
+        pv.variant_label,
+        pv.price,
+        pv.stock_quantity AS stock,
+        pv.updated_at AS last_updated
+    FROM product_variants AS pv
+    INNER JOIN products AS p
+        ON pv.product_id = p.id
+    INNER JOIN categories AS c
+        ON p.category_id = c.id
+    ORDER BY
+        p.product_name ASC,
+        pv.id ASC
+";
 
 
-/* =========================================================
-   TEMPORARY ADMIN SESSION
-   Remove when your login system is fully connected
-========================================================= */
+$result = $conn->query($sql);
+$inventory = $result->fetch_all(MYSQLI_ASSOC);
+$result->free();
 
-$_SESSION['first_name'] =
-    $_SESSION['first_name'] ?? 'Ava';
+/*
+ * DEMO INVENTORY
+ *
+ * Set to true to display sample data.
+ * Set to false to use actual database records.
+ *
+ * Demo data does NOT modify the database.
+ */
+$useDemoInventory = true;
 
-$_SESSION['last_name'] =
-    $_SESSION['last_name'] ?? 'Santos';
+if ($useDemoInventory) {
 
-$_SESSION['email'] =
-    $_SESSION['email'] ?? 'admin@purevia.com';
-
-
-/* =========================================================
-   SAMPLE INVENTORY DATA
-   Replace with database query later
-========================================================= */
-
-$inventory = [
-
-    [
-        'id' => 1,
-        'product' => 'Gentle Botanical Cleanser',
-        'sku' => 'CLN-001',
-        'category' => 'Cleansers',
-        'stock' => 45,
-        'threshold' => 15,
-        'last_restocked' => '2026-09-10'
-    ],
-
-    [
-        'id' => 2,
-        'product' => 'Salicylic Pore Refining Cleanser',
-        'sku' => 'CLN-002',
-        'category' => 'Cleansers',
-        'stock' => 62,
-        'threshold' => 15,
-        'last_restocked' => '2026-09-10'
-    ],
-
-    [
-        'id' => 3,
-        'product' => 'Hyaluronic Acid Hydration Serum',
-        'sku' => 'SRM-001',
-        'category' => 'Serums',
-        'stock' => 89,
-        'threshold' => 15,
-        'last_restocked' => '2026-09-10'
-    ],
-
-    [
-        'id' => 4,
-        'product' => 'Vitamin C Brightening Serum',
-        'sku' => 'SRM-002',
-        'category' => 'Serums',
-        'stock' => 34,
-        'threshold' => 15,
-        'last_restocked' => '2026-09-10'
-    ],
-
-    [
-        'id' => 5,
-        'product' => 'Retinol Renewal Night Serum',
-        'sku' => 'SRM-003',
-        'category' => 'Serums',
-        'stock' => 27,
-        'threshold' => 15,
-        'last_restocked' => '2026-09-10'
-    ],
-
-    [
-        'id' => 6,
-        'product' => 'Niacinamide 10% + Zinc 1% Serum',
-        'sku' => 'SRM-004',
-        'category' => 'Serums',
-        'stock' => 71,
-        'threshold' => 15,
-        'last_restocked' => '2026-09-10'
-    ],
-
-    [
-        'id' => 7,
-        'product' => 'Ceramide Barrier Repair Moisturizer',
-        'sku' => 'MST-001',
-        'category' => 'Moisturizers',
-        'stock' => 53,
-        'threshold' => 15,
-        'last_restocked' => '2026-09-10'
-    ],
-
-    [
-        'id' => 8,
-        'product' => 'Daily Hydrating Moisturizer',
-        'sku' => 'MST-002',
-        'category' => 'Moisturizers',
-        'stock' => 12,
-        'threshold' => 15,
-        'last_restocked' => '2026-09-08'
-    ],
-
-    [
-        'id' => 9,
-        'product' => 'Daily Defense Sunscreen SPF 50',
-        'sku' => 'SUN-001',
-        'category' => 'Sunscreen',
-        'stock' => 38,
-        'threshold' => 15,
-        'last_restocked' => '2026-09-07'
-    ],
-
-    [
-        'id' => 10,
-        'product' => 'Mineral Sunscreen SPF 40',
-        'sku' => 'SUN-002',
-        'category' => 'Sunscreen',
-        'stock' => 8,
-        'threshold' => 15,
-        'last_restocked' => '2026-09-05'
-    ],
-
-    [
-        'id' => 11,
-        'product' => 'Soothing Hydration Toner',
-        'sku' => 'TNR-001',
-        'category' => 'Toners',
-        'stock' => 25,
-        'threshold' => 15,
-        'last_restocked' => '2026-09-03'
-    ],
-
-    [
-        'id' => 12,
-        'product' => 'Gentle Exfoliating Toner',
-        'sku' => 'TNR-002',
-        'category' => 'Toners',
-        'stock' => 0,
-        'threshold' => 15,
-        'last_restocked' => '2026-08-28'
-    ]
-
-];
-
+    $inventory = [
+        [
+            'variant_id' => 1,
+            'product_id' => 1,
+            'product' => 'Gentle Botanical Cleanser',
+            'sku' => 'CLN-001',
+            'category' => 'Cleansers',
+            'size_capacity' => '100ML',
+            'variant_label' => 'Regular',
+            'price' => 249.00,
+            'stock' => 45,
+            'last_updated' => '2026-09-10 10:00:00'
+        ],
+        [
+            'variant_id' => 2,
+            'product_id' => 1,
+            'product' => 'Gentle Botanical Cleanser',
+            'sku' => 'CLN-001',
+            'category' => 'Cleansers',
+            'size_capacity' => '200ML',
+            'variant_label' => 'Large',
+            'price' => 399.00,
+            'stock' => 12,
+            'last_updated' => '2026-09-10 10:00:00'
+        ],
+        [
+            'variant_id' => 3,
+            'product_id' => 2,
+            'product' => 'Salicylic Pore Refining Cleanser',
+            'sku' => 'CLN-002',
+            'category' => 'Cleansers',
+            'size_capacity' => '50ML',
+            'variant_label' => 'Travel Size',
+            'price' => 179.00,
+            'stock' => 62,
+            'last_updated' => '2026-09-12 09:00:00'
+        ],
+        [
+            'variant_id' => 4,
+            'product_id' => 2,
+            'product' => 'Salicylic Pore Refining Cleanser',
+            'sku' => 'CLN-002',
+            'category' => 'Cleansers',
+            'size_capacity' => '150ML',
+            'variant_label' => 'Regular',
+            'price' => 349.00,
+            'stock' => 0,
+            'last_updated' => '2026-09-12 09:00:00'
+        ],
+        [
+            'variant_id' => 5,
+            'product_id' => 3,
+            'product' => 'Hyaluronic Acid Hydration Serum',
+            'sku' => 'SRM-001',
+            'category' => 'Serums',
+            'size_capacity' => '15ML',
+            'variant_label' => 'Mini',
+            'price' => 299.00,
+            'stock' => 89,
+            'last_updated' => '2026-09-15 11:00:00'
+        ],
+        [
+            'variant_id' => 6,
+            'product_id' => 3,
+            'product' => 'Hyaluronic Acid Hydration Serum',
+            'sku' => 'SRM-001',
+            'category' => 'Serums',
+            'size_capacity' => '30ML',
+            'variant_label' => 'Regular',
+            'price' => 499.00,
+            'stock' => 27,
+            'last_updated' => '2026-09-15 11:00:00'
+        ],
+        [
+            'variant_id' => 7,
+            'product_id' => 4,
+            'product' => 'Vitamin C Brightening Serum',
+            'sku' => 'SRM-002',
+            'category' => 'Serums',
+            'size_capacity' => '30ML',
+            'variant_label' => 'Regular',
+            'price' => 549.00,
+            'stock' => 8,
+            'last_updated' => '2026-09-18 14:00:00'
+        ],
+        [
+            'variant_id' => 8,
+            'product_id' => 5,
+            'product' => 'Ceramide Barrier Repair Moisturizer',
+            'sku' => 'MST-001',
+            'category' => 'Moisturizers',
+            'size_capacity' => '50G',
+            'variant_label' => 'Regular',
+            'price' => 459.00,
+            'stock' => 53,
+            'last_updated' => '2026-09-20 08:00:00'
+        ],
+        [
+            'variant_id' => 9,
+            'product_id' => 5,
+            'product' => 'Ceramide Barrier Repair Moisturizer',
+            'sku' => 'MST-001',
+            'category' => 'Moisturizers',
+            'size_capacity' => '100G',
+            'variant_label' => 'Large',
+            'price' => 749.00,
+            'stock' => 10,
+            'last_updated' => '2026-09-20 08:00:00'
+        ],
+        [
+            'variant_id' => 10,
+            'product_id' => 6,
+            'product' => 'Daily Defense Sunscreen SPF 50',
+            'sku' => 'SUN-001',
+            'category' => 'Sunscreen',
+            'size_capacity' => '50ML',
+            'variant_label' => 'Regular',
+            'price' => 399.00,
+            'stock' => 38,
+            'last_updated' => '2026-09-22 10:00:00'
+        ],
+        [
+            'variant_id' => 11,
+            'product_id' => 7,
+            'product' => 'Soothing Hydration Toner',
+            'sku' => 'TNR-001',
+            'category' => 'Toners',
+            'size_capacity' => '100ML',
+            'variant_label' => 'Regular',
+            'price' => 279.00,
+            'stock' => 25,
+            'last_updated' => '2026-09-23 10:00:00'
+        ],
+        [
+            'variant_id' => 12,
+            'product_id' => 7,
+            'product' => 'Soothing Hydration Toner',
+            'sku' => 'TNR-001',
+            'category' => 'Toners',
+            'size_capacity' => '200ML',
+            'variant_label' => 'Large',
+            'price' => 449.00,
+            'stock' => 0,
+            'last_updated' => '2026-09-23 10:00:00'
+        ]
+    ];
+}
 
 $totalInventory = count($inventory);
 
 
-/* =========================================================
-   CREATE UNIQUE CATEGORY LIST
-========================================================= */
+/* CATEGORY FILTER OPTIONS */
 
 $categories = [];
 
 foreach ($inventory as $item) {
-
     if (!in_array($item['category'], $categories, true)) {
-
         $categories[] = $item['category'];
-
     }
-
 }
 
 sort($categories);
 
+/*
+ * Default low-stock threshold.
+ * Change to 15 or another number as needed.
+ */
+$defaultThreshold = 15;
+
 ?>
 
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>
-        <?= htmlspecialchars($pageTitle) ?> | PureVia
-    </title>
-
-
-    <!-- GOOGLE FONTS -->
+    <title>Inventory | PureVia</title>
 
     <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
         rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@400;500;600&display=swap"
     >
-
-
-    <!-- FONT AWESOME -->
 
     <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
     >
 
-
-    <!-- SIDEBAR CSS -->
+    <link
+        rel="stylesheet"
+        href="<?= BASE_URL ?>/assets/css/sidemenu.css"
+    >
 
     <link
         rel="stylesheet"
-        href="../../assets/css/sidemenu.css"
+        href="<?= BASE_URL ?>/assets/css/inventory.css"
     >
-
-
-    <!-- INVENTORY CSS -->
-
-    <link
-        rel="stylesheet"
-        href="../../assets/css/inventory.css"
-    >
-
 </head>
-
 
 <body>
 
+<?php require __DIR__ . '/../../includes/sidemenu.php'; ?>
 
-    <!-- =====================================================
-         SIDEBAR
-    ====================================================== -->
+<div class="admin-layout">
 
-    <?php include("../../includes/sidemenu.php"); ?>
+    <header class="admin-topbar">
+        <p class="admin-topbar-title">Inventory</p>
+    </header>
 
+    <main class="inventory-main">
 
-    <!-- =====================================================
-         ADMIN LAYOUT
-    ====================================================== -->
+        <section class="inventory-page-header">
 
-    <div class="admin-layout">
+            <div class="inventory-heading">
+                <h1>Inventory</h1>
 
+                <p>
+                    <?= number_format($totalInventory) ?>
+                    records
+                </p>
+            </div>
 
-        <!-- =================================================
-             TOP BAR
-        ================================================== -->
+        </section>
 
-        <header class="admin-topbar">
+        <section class="inventory-card">
 
-            <p class="admin-topbar-title">
-                Inventory
-            </p>
+            <!-- SEARCH AND FILTERS -->
 
-        </header>
+            <div class="inventory-toolbar">
 
+                <div class="inventory-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
 
-        <!-- =================================================
-             MAIN CONTENT
-        ================================================== -->
-
-        <main class="inventory-main">
-
-
-            <!-- =============================================
-                 PAGE HEADER
-            ============================================== -->
-
-            <section class="inventory-page-header">
-
-
-                <div class="inventory-heading">
-
-                    <h1>
-                        Inventory
-                    </h1>
-
-                    <p>
-                        <?= number_format($totalInventory) ?>
-                        records
-                    </p>
-
+                    <input
+                        type="search"
+                        id="inventorySearch"
+                        placeholder="Search inventory..."
+                        autocomplete="off"
+                    >
                 </div>
 
+                <div class="inventory-filter-dropdown">
 
-            </section>
+                    <i class="fa-solid fa-filter inventory-filter-icon"></i>
 
+                    <select
+                        id="inventoryCategoryFilter"
+                        class="inventory-filter-select"
+                        aria-label="Filter by category"
+                    >
+                        <option value="all">All Categories</option>
 
-            <!-- =============================================
-                 INVENTORY CARD
-            ============================================== -->
-
-            <section class="inventory-card">
-
-
-                <!-- =========================================
-                     SEARCH + FILTERS
-                ========================================== -->
-
-                <div class="inventory-toolbar">
-
-
-                    <!-- SEARCH -->
-
-                    <div class="inventory-search">
-
-                        <i class="fa-solid fa-magnifying-glass"></i>
-
-                        <input
-                            type="search"
-                            id="inventorySearch"
-                            placeholder="Search inventory..."
-                            autocomplete="off"
-                        >
-
-                    </div>
-
-
-                    <!-- CATEGORY FILTER -->
-
-                    <div class="inventory-filter-dropdown">
-
-                        <i
-                            class="fa-solid fa-filter inventory-filter-icon"
-                        ></i>
-
-                        <select
-                            id="inventoryCategoryFilter"
-                            class="inventory-filter-select"
-                            aria-label="Filter inventory by category"
-                        >
-
-                            <option value="all">
-                                All Categories
+                        <?php foreach ($categories as $category): ?>
+                            <option
+                                value="<?= inventoryEscape(strtolower($category)) ?>"
+                            >
+                                <?= inventoryEscape($category) ?>
                             </option>
+                        <?php endforeach; ?>
+                    </select>
 
-
-                            <?php foreach ($categories as $category): ?>
-
-                                <option
-                                    value="<?= htmlspecialchars(
-                                        strtolower($category)
-                                    ) ?>"
-                                >
-
-                                    <?= htmlspecialchars($category) ?>
-
-                                </option>
-
-                            <?php endforeach; ?>
-
-
-                        </select>
-
-
-                        <i
-                            class="fa-solid fa-chevron-down inventory-filter-arrow"
-                        ></i>
-
-                    </div>
-
-
-                    <!-- STOCK FILTER -->
-
-                    <div class="inventory-filter-dropdown">
-
-                        <select
-                            id="inventoryStockFilter"
-                            class="inventory-filter-select inventory-filter-no-icon"
-                            aria-label="Filter inventory by stock level"
-                        >
-
-                            <option value="all">
-                                All Stock
-                            </option>
-
-                            <option value="in-stock">
-                                In Stock
-                            </option>
-
-                            <option value="low-stock">
-                                Low Stock
-                            </option>
-
-                            <option value="out-of-stock">
-                                Out of Stock
-                            </option>
-
-                        </select>
-
-
-                        <i
-                            class="fa-solid fa-chevron-down inventory-filter-arrow"
-                        ></i>
-
-                    </div>
-
-
+                    <i class="fa-solid fa-chevron-down inventory-filter-arrow"></i>
                 </div>
 
+                <div class="inventory-filter-dropdown">
 
-                <!-- =========================================
-                     TABLE
-                ========================================== -->
+                    <select
+                        id="inventoryStockFilter"
+                        class="inventory-filter-select inventory-filter-no-icon"
+                        aria-label="Filter by stock"
+                    >
+                        <option value="all">All Stock</option>
+                        <option value="in-stock">In Stock</option>
+                        <option value="low-stock">Low Stock</option>
+                        <option value="out-of-stock">Out of Stock</option>
+                    </select>
 
-                <div class="inventory-table-wrapper">
+                    <i class="fa-solid fa-chevron-down inventory-filter-arrow"></i>
+                </div>
 
+            </div>
 
-                    <table class="inventory-table">
+            <!-- INVENTORY TABLE -->
 
+            <div class="inventory-table-wrapper">
 
-                        <!-- TABLE HEADER -->
+                <table class="inventory-table">
 
-                        <thead>
+                    <thead>
+                        <tr>
+                            <th>PRODUCT / SIZE</th>
+                            <th>SKU</th>
+                            <th>CATEGORY</th>
+                            <th>STOCK</th>
+                            <th>THRESHOLD</th>
+                            <th>STATUS</th>
+                            <th>LAST UPDATED</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
 
-                            <tr>
+                    <tbody>
 
-                                <th>PRODUCT</th>
+                        <?php foreach ($inventory as $item): ?>
 
-                                <th>SKU</th>
+                            <?php
+                            $stock = (int) $item['stock'];
+                            $threshold = $defaultThreshold;
 
-                                <th>CATEGORY</th>
+                            if ($stock === 0) {
+                                $stockLevel = 'out-of-stock';
+                                $stockStatusText = 'OUT OF STOCK';
+                            } elseif ($stock <= $threshold) {
+                                $stockLevel = 'low-stock';
+                                $stockStatusText = 'LOW STOCK';
+                            } else {
+                                $stockLevel = 'in-stock';
+                                $stockStatusText = 'IN STOCK';
+                            }
 
-                                <th>STOCK</th>
+                            $searchData = strtolower(
+                                $item['product'] . ' ' .
+                                $item['sku'] . ' ' .
+                                $item['category'] . ' ' .
+                                $item['size_capacity'] . ' ' .
+                                ($item['variant_label'] ?? '')
+                            );
 
-                                <th>THRESHOLD</th>
+                            $lastUpdated = date(
+                                'Y-m-d',
+                                strtotime($item['last_updated'])
+                            );
+                            ?>
 
-                                <th>STATUS</th>
+                            <tr
+                                class="inventory-row"
+                                data-search="<?= inventoryEscape($searchData) ?>"
+                                data-category="<?= inventoryEscape(strtolower($item['category'])) ?>"
+                                data-stock-level="<?= inventoryEscape($stockLevel) ?>"
+                            >
 
-                                <th>LAST RESTOCKED</th>
-
-                                <th>ACTIONS</th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <!-- TABLE BODY -->
-
-                        <tbody>
-
-
-                            <?php foreach ($inventory as $item): ?>
-
-
-                                <?php
-
-                                $stock = (int) $item['stock'];
-
-                                $threshold =
-                                    (int) $item['threshold'];
-
-
-                                /* =========================
-                                   DETERMINE STOCK LEVEL
-                                ========================== */
-
-                                if ($stock <= 0) {
-
-                                    $stockLevel =
-                                        'out-of-stock';
-
-                                } elseif ($stock <= $threshold) {
-
-                                    $stockLevel =
-                                        'low-stock';
-
-                                } else {
-
-                                    $stockLevel =
-                                        'in-stock';
-
-                                }
-
-
-                                /* =========================
-                                   SEARCH DATA
-                                ========================== */
-
-                                $searchData =
-                                    strtolower(
-                                        $item['product']
-                                        . ' '
-                                        . $item['sku']
-                                        . ' '
-                                        . $item['category']
-                                    );
-
-                                ?>
-
-
-                                <tr
-                                    class="inventory-row"
-
-                                    data-search="<?= htmlspecialchars(
-                                        $searchData
-                                    ) ?>"
-
-                                    data-category="<?= htmlspecialchars(
-                                        strtolower(
-                                            $item['category']
-                                        )
-                                    ) ?>"
-
-                                    data-stock-level="<?= htmlspecialchars(
-                                        $stockLevel
-                                    ) ?>"
-                                >
-
-
-                                    <!-- PRODUCT -->
-
-                                    <td>
+                                <!-- PRODUCT / SIZE -->
+                                <td>
+                                    <div class="inventory-product-info">
 
                                         <span class="inventory-product-name">
-
-                                            <?= htmlspecialchars(
-                                                $item['product']
-                                            ) ?>
-
+                                            <?= inventoryEscape($item['product']) ?>
                                         </span>
 
-                                    </td>
+                                        <div class="inventory-variant-details">
 
+                                            <span class="inventory-size-badge">
+                                                <?= inventoryEscape($item['size_capacity']) ?>
+                                            </span>
 
-                                    <!-- SKU -->
-
-                                    <td>
-
-                                        <span class="inventory-sku">
-
-                                            <?= htmlspecialchars(
-                                                $item['sku']
-                                            ) ?>
-
-                                        </span>
-
-                                    </td>
-
-
-                                    <!-- CATEGORY -->
-
-                                    <td>
-
-                                        <span class="inventory-category">
-
-                                            <?= htmlspecialchars(
-                                                $item['category']
-                                            ) ?>
-
-                                        </span>
-
-                                    </td>
-
-
-                                    <!-- STOCK -->
-
-                                    <td>
-
-                                        <span
-                                            class="
-                                                inventory-stock
-                                                <?= htmlspecialchars(
-                                                    $stockLevel
-                                                ) ?>
-                                            "
-                                        >
-
-                                            <?= number_format(
-                                                $stock
-                                            ) ?>
-
-                                        </span>
-
-                                    </td>
-
-
-                                    <!-- THRESHOLD -->
-
-                                    <td>
-
-                                        <span class="inventory-threshold">
-
-                                            <?= number_format(
-                                                $threshold
-                                            ) ?>
-
-                                        </span>
-
-                                    </td>
-
-                                    <!-- STOCK STATUS -->
-                                    <td>
-
-                                        <?php
-
-                                        if ($stockLevel === 'out-of-stock') {
-
-                                            $stockStatusText = 'Out of Stock';
-
-                                        } elseif ($stockLevel === 'low-stock') {
-
-                                            $stockStatusText = 'Low Stock';
-
-                                        } else {
-
-                                            $stockStatusText = 'In Stock';
-
-                                        }
-
-                                        ?>
-
-                                        <span
-                                            class="inventory-stock-status <?= htmlspecialchars($stockLevel) ?>"
-                                        >
-                                            <?= htmlspecialchars($stockStatusText) ?>
-                                        </span>
-
-                                    </td>
-
-
-                                    <!-- LAST RESTOCKED -->
-
-                                    <td>
-
-                                        <span class="inventory-date">
-
-                                            <?= htmlspecialchars(
-                                                $item['last_restocked']
-                                            ) ?>
-
-                                        </span>
-
-                                    </td>
-
-
-                                    <!-- ACTION -->
-
-                                    <td>
-
-                                        <div class="inventory-actions">
-
-
-                                            <a
-                                                href="./edit_inventory.php?id=<?= urlencode(
-                                                    $item['id']
-                                                ) ?>"
-
-                                                class="inventory-edit-button"
-
-                                                title="Edit inventory"
-
-                                                aria-label="Edit inventory for <?= htmlspecialchars(
-                                                    $item['product']
-                                                ) ?>"
-                                            >
-
-                                                <i class="fa-regular fa-pen-to-square"></i>
-
-                                            </a>
-
+                                            <?php if (!empty($item['variant_label'])): ?>
+                                                <span class="inventory-variant-label">
+                                                    <?= inventoryEscape($item['variant_label']) ?>
+                                                </span>
+                                            <?php endif; ?>
 
                                         </div>
 
-                                    </td>
+                                    </div>
+                                </td>
 
+                                <!-- SKU -->
+                                <td>
+                                    <span class="inventory-sku">
+                                        <?= inventoryEscape($item['sku']) ?>
+                                    </span>
+                                </td>
 
-                                </tr>
+                                <!-- CATEGORY -->
+                                <td>
+                                    <span class="inventory-category">
+                                        <?= inventoryEscape($item['category']) ?>
+                                    </span>
+                                </td>
 
+                                <!-- STOCK -->
+                                <td>
+                                    <span class="inventory-stock <?= $stockLevel ?>">
+                                        <?= number_format($stock) ?>
+                                    </span>
+                                </td>
 
-                            <?php endforeach; ?>
+                                <!-- THRESHOLD -->
+                                <td>
+                                    <span class="inventory-threshold">
+                                        <?= number_format($threshold) ?>
+                                    </span>
+                                </td>
 
+                                <!-- STATUS -->
+                                <td>
+                                    <span class="inventory-stock-status <?= $stockLevel ?>">
+                                        <?= inventoryEscape($stockStatusText) ?>
+                                    </span>
+                                </td>
 
-                            <!-- =================================
-                                 NO RESULTS
-                            ================================== -->
+                                <!-- LAST UPDATED -->
+                                <td>
+                                    <span class="inventory-date">
+                                        <?= inventoryEscape($lastUpdated) ?>
+                                    </span>
+                                </td>
 
-                            <tr
-                                id="noInventoryFound"
-                                class="no-inventory-row"
-                                style="display: none;"
-                            >
+                                <!-- ACTIONS -->
+                                <td>
+                                    <div class="inventory-actions">
 
-                                <td colspan="8">
-
-                                    <div class="no-inventory-message">
-
-                                        <i class="fa-solid fa-box-open"></i>
-
-                                        <p>
-                                            No inventory records found.
-                                        </p>
+                                        <a
+                                            href="./edit_inventory.php?id=<?= (int) $item['variant_id'] ?>"
+                                            class="inventory-edit-button"
+                                            title="Edit variant inventory"
+                                            aria-label="Edit inventory for <?= inventoryEscape($item['product'] . ' ' . $item['size_capacity']) ?>"
+                                        >
+                                            <i class="fa-regular fa-pen-to-square"></i>
+                                        </a>
 
                                     </div>
-
                                 </td>
 
                             </tr>
 
+                        <?php endforeach; ?>
 
-                        </tbody>
+                        <!-- NO RESULTS -->
+                        <tr
+                            id="noInventoryFound"
+                            class="no-inventory-row"
+                            style="display:none;"
+                        >
+                            <td colspan="8">
+                                <div class="no-inventory-message">
+                                    <i class="fa-solid fa-box-open"></i>
+                                    <p>No inventory records found.</p>
+                                </div>
+                            </td>
+                        </tr>
 
+                    </tbody>
 
-                    </table>
+                </table>
 
+            </div>
 
-                </div>
+        </section>
 
+    </main>
 
-            </section>
+</div>
 
-
-        </main>
-
-
-    </div>
-
-
-<!-- SIDEBAR JS -->
-
-<script src="../../assets/js/sidemenu.js"></script>
-
-
-<!-- INVENTORY JS -->
-
-<script src="../../assets/js/inventory.js"></script>
-
+<script src="<?= BASE_URL ?>/assets/js/sidemenu.js"></script>
+<script src="<?= BASE_URL ?>/assets/js/inventory.js"></script>
 
 </body>
-
 </html>
