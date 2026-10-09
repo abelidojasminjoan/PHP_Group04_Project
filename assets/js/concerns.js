@@ -145,59 +145,197 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     /* =====================================================
-       DELETE BUTTONS
+       ADD / EDIT / DELETE SKIN CONCERNS
+    ===================================================== */
+
+    const modal =
+        document.getElementById('concernModal');
+
+    const concernForm =
+        document.getElementById('concernForm');
+
+    const actionInput =
+        document.getElementById('concernAction');
+
+    const idInput =
+        document.getElementById('concernId');
+
+    const nameInput =
+        document.getElementById('concernName');
+
+    const descriptionInput =
+        document.getElementById('concernDescription');
+
+    const concernStatusInput =
+        document.getElementById('concernStatus');
+
+    const modalTitle =
+        document.getElementById('concernModalTitle');
+
+    const submitButton =
+        document.getElementById('submitConcernButton');
+
+
+    /* =====================================================
+       OPEN / CLOSE MODAL
+    ===================================================== */
+
+    function openConcernModal() {
+
+        modal.classList.add('is-open');
+
+        modal.setAttribute('aria-hidden', 'false');
+
+        document.body.classList.add('form-modal-open');
+
+        nameInput.focus();
+    }
+
+    function closeConcernModal() {
+
+        modal.classList.remove('is-open');
+
+        modal.setAttribute('aria-hidden', 'true');
+
+        document.body.classList.remove('form-modal-open');
+    }
+
+
+    /* =====================================================
+       ADD CONCERN
+    ===================================================== */
+
+    document.getElementById('openAddConcernModal')
+        .addEventListener('click', function () {
+
+            concernForm.reset();
+
+            actionInput.value = 'add';
+
+            idInput.value = '';
+
+            concernStatusInput.value = 'active';
+
+            modalTitle.textContent = 'Add Skin Concern';
+
+            submitButton.textContent = 'Add Concern';
+
+            submitButton.disabled = false;
+
+            openConcernModal();
+        });
+
+
+    /* =====================================================
+       EDIT CONCERN
+    ===================================================== */
+
+    document.querySelectorAll('.edit-concern-button')
+        .forEach(function (button) {
+
+            button.addEventListener('click', function () {
+
+                concernForm.reset();
+
+                actionInput.value = 'edit';
+
+                idInput.value =
+                    button.dataset.concernId;
+
+                nameInput.value =
+                    button.dataset.concernName;
+
+                descriptionInput.value =
+                    button.dataset.concernDescription;
+
+                concernStatusInput.value =
+                    button.dataset.concernStatus;
+
+                modalTitle.textContent = 'Edit Skin Concern';
+
+                submitButton.textContent = 'Save Changes';
+
+                submitButton.disabled = false;
+
+                openConcernModal();
+            });
+        });
+
+
+    /* =====================================================
+       CLOSE MODAL
+    ===================================================== */
+
+    document.querySelectorAll('[data-close-concern-modal]')
+        .forEach(function (button) {
+
+            button.addEventListener(
+                'click',
+                closeConcernModal
+            );
+        });
+
+    document.addEventListener('keydown', function (event) {
+
+        if (
+            event.key === 'Escape' &&
+            modal.classList.contains('is-open')
+        ) {
+            closeConcernModal();
+        }
+    });
+
+
+    /* =====================================================
+       DELETE CONCERN
     ===================================================== */
 
     deleteButtons.forEach(function (button) {
 
-        button.addEventListener(
-            'click',
-            function () {
+        button.addEventListener('click', function () {
 
+            const concernId =
+                button.dataset.concernId;
 
-                const concernId =
-                    button.dataset.concernId;
+            const concernName =
+                button.dataset.concernName;
 
-
-                const concernName =
-                    button.dataset.concernName;
-
-
-                if (!concernId) {
-                    return;
-                }
-
-
-                /* =========================================
-                   CONFIRM DELETE
-                ========================================= */
-
-                const confirmed =
-                    confirm(
-                        'Are you sure you want to delete "' +
-                        concernName +
-                        '"?'
-                    );
-
-
-                if (!confirmed) {
-                    return;
-                }
-
-
-                /* =========================================
-                   DELETE PROCESSOR
-                ========================================= */
-
-                window.location.href =
-                    './delete_concern.php?id=' +
-                    encodeURIComponent(
-                        concernId
-                    );
-
+            if (!concernId) {
+                return;
             }
-        );
 
+            const confirmed = confirm(
+                'Are you sure you want to delete "' +
+                concernName +
+                '"?'
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            document.getElementById('deleteConcernId').value =
+                concernId;
+
+            document.getElementById('deleteConcernForm')
+                .requestSubmit();
+        });
+    });
+
+
+    /* =====================================================
+       PREVENT DOUBLE SUBMISSION
+    ===================================================== */
+
+    concernForm.addEventListener('submit', function () {
+
+        if (!concernForm.checkValidity()) {
+            return;
+        }
+
+        submitButton.disabled = true;
+
+        submitButton.textContent = 'Saving...';
     });
 
 
