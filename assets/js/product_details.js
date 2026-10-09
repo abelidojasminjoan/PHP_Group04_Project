@@ -1,258 +1,361 @@
 
-/* =========================================
+/* =========================================================
    PUREVIA PRODUCT DETAILS JAVASCRIPT
-========================================= */
+========================================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
 
-
-    /* =====================================
+    /* =====================================================
        ELEMENTS
-    ====================================== */
+    ====================================================== */
+
+    const form = document.getElementById('productForm');
+
+    if (!form) return;
 
     const radios = [
-        ...document.querySelectorAll(
+        ...form.querySelectorAll(
             'input[name="variant_id"]'
         )
     ];
 
-    const quantity = document.getElementById(
-        'quantity'
-    );
+    const quantity = document.getElementById('quantity');
 
-    const price = document.getElementById(
-        'displayPrice'
-    );
+    const displayPrice = document.getElementById('displayPrice');
 
-    const stock = document.getElementById(
-        'stockStatus'
-    );
+    const stockStatus = document.getElementById('stockStatus');
 
-    const button = document.getElementById(
-        'addToBag'
-    );
+    const addToBag = document.getElementById('addToBag');
 
-    const message = document.getElementById(
-        'cartMessage'
-    );
+    const cartMessage = document.getElementById('cartMessage');
+
+    const decreaseButton = document.getElementById('decreaseQty');
+
+    const increaseButton = document.getElementById('increaseQty');
 
 
-    /* =====================================
-       FORMAT PHILIPPINE PESO
-    ====================================== */
+    /* =====================================================
+       PESO FORMATTER
+    ====================================================== */
 
-    const peso = value => {
+    const formatPeso = value => {
 
-        return '₱' + value.toLocaleString(
-            'en-PH',
-            {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }
-        );
+        return new Intl.NumberFormat('en-PH', {
+            style: 'currency',
+            currency: 'PHP'
+        }).format(value);
 
     };
 
 
-    /* =====================================
+    /* =====================================================
        GET SELECTED VARIANT
-    ====================================== */
+    ====================================================== */
 
-    const active = () => {
+    function getSelectedVariant() {
 
         return radios.find(
-            radio => radio.checked
+            radio => radio.checked && !radio.disabled
         );
 
-    };
+    }
 
 
-    /* =====================================
-       UPDATE PRODUCT INFORMATION
-    ====================================== */
+    /* =====================================================
+       GET VARIANT DETAILS
+    ====================================================== */
 
-    function refresh() {
+    function getVariantDetails() {
 
-        const selected = active();
+        const selected = getSelectedVariant();
 
-        if (!selected) return;
+        if (!selected) return null;
+
+        return {
+
+            price: Number(selected.dataset.price),
+
+            stock: Math.max(
+                0,
+                Number(selected.dataset.stock)
+            )
+
+        };
+
+    }
 
 
-        /* GET VARIANT DETAILS */
+    /* =====================================================
+       VALIDATE QUANTITY
+    ====================================================== */
 
-        const available = Number(
-            selected.dataset.stock
-        );
+    function getValidQuantity(stock) {
 
-        const unitPrice = Number(
-            selected.dataset.price
-        );
+        const count = Number(quantity.value);
 
+        if (
+            quantity.value.trim() === '' ||
+            !Number.isInteger(count) ||
+            count < 1 ||
+            count > stock
+        ) {
 
-        /* VALIDATE QUANTITY */
+            return null;
 
-        let count = Number.parseInt(
-            quantity.value,
-            10
-        );
-
-        if (!Number.isFinite(count)) {
-            count = 1;
         }
 
-        count = Math.max(
-            1,
-            Math.min(
-                count,
-                Math.max(1, available)
-            )
-        );
+        return count;
+
+    }
 
 
-        /* UPDATE QUANTITY */
+    /* =====================================================
+       UPDATE VARIANT SELECTION STYLE
+    ====================================================== */
 
-        quantity.value = count;
-
-        quantity.max = Math.max(
-            1,
-            available
-        );
-
-
-        /* UPDATE SELECTED VARIANT STYLE */
+    function updateVariantStyles() {
 
         document.querySelectorAll(
             '.variant-option'
         ).forEach(option => {
 
+            const radio = option.querySelector('input');
+
             option.classList.toggle(
                 'selected',
-                option.querySelector('input').checked
+                radio.checked && !radio.disabled
             );
 
         });
 
-
-        /* UPDATE DISPLAYED PRICE */
-
-        price.textContent = peso(
-            unitPrice
-        );
+    }
 
 
-        /* UPDATE STOCK STATUS */
+    /* =====================================================
+       REFRESH PRICE, STOCK AND BUTTON
+    ====================================================== */
 
-        stock.textContent = available
-            ? `In Stock (${available})`
-            : 'Out of Stock';
+    function refreshProduct() {
 
-        stock.style.color = available
-            ? '#00a05c'
-            : '#b34c42';
+        const variant = getVariantDetails();
+
+        updateVariantStyles();
+
+        if (!variant || variant.stock <= 0) {
+
+            stockStatus.textContent = 'Out of Stock';
+
+            stockStatus.classList.add('out-of-stock');
+
+            addToBag.disabled = true;
+
+            addToBag.textContent = 'Out of Stock';
+
+            quantity.disabled = true;
+            decreaseButton.disabled = true;
+            increaseButton.disabled = true;
+
+            return;
+        }
 
 
-        /* UPDATE ADD TO BAG BUTTON */
+        const unitPrice = variant.price;
 
-        button.disabled = available === 0;
-
-        button.textContent = available
-            ? `Add to Bag — ${peso(unitPrice * count)}`
-            : 'Out of Stock';
+        const availableStock = variant.stock;
 
 
-        /* CLEAR PREVIOUS MESSAGE */
+        /* PRICE */
 
-        message.textContent = '';
+        displayPrice.textContent = formatPeso(unitPrice);
+
+
+        /* STOCK */
+
+        stockStatus.textContent =
+            `In Stock (${availableStock})`;
+
+        stockStatus.classList.remove('out-of-stock');
+
+
+        /* QUANTITY LIMIT */
+
+        quantity.disabled = false;
+
+        quantity.max = availableStock;
+
+        const count = getValidQuantity(availableStock);
+
+
+        /* INVALID QUANTITY */
+
+        if (count === null) {
+
+            addToBag.disabled = true;
+
+            addToBag.textContent = 'Enter Valid Quantity';
+
+            decreaseButton.disabled = false;
+            increaseButton.disabled = false;
+
+            return;
+        }
+
+
+        /* QUANTITY BUTTON STATES */
+
+        decreaseButton.disabled = count <= 1;
+
+        increaseButton.disabled = count >= availableStock;
+
+
+        /* ADD TO BAG PRICE */
+
+        const totalPrice = unitPrice * count;
+
+        addToBag.disabled = false;
+
+        addToBag.textContent =
+            `Add to Bag — ${formatPeso(totalPrice)}`;
 
     }
 
 
-
-    /* =====================================
-       VARIANT SELECTION
-    ====================================== */
+    /* =====================================================
+       PRODUCT VARIANT CHANGE
+    ====================================================== */
 
     radios.forEach(radio => {
 
-        radio.addEventListener(
-            'change',
-            refresh
+        radio.addEventListener('change', () => {
+
+            if (radio.disabled) return;
+
+            quantity.value = 1;
+
+            cartMessage.textContent = '';
+
+            refreshProduct();
+
+        });
+
+    });
+
+
+    /* =====================================================
+       DECREASE QUANTITY
+    ====================================================== */
+
+    decreaseButton.addEventListener('click', () => {
+
+        const variant = getVariantDetails();
+
+        if (!variant) return;
+
+        const count = getValidQuantity(variant.stock) ?? 1;
+
+        quantity.value = Math.max(1, count - 1);
+
+        refreshProduct();
+
+    });
+
+
+    /* =====================================================
+       INCREASE QUANTITY
+    ====================================================== */
+
+    increaseButton.addEventListener('click', () => {
+
+        const variant = getVariantDetails();
+
+        if (!variant) return;
+
+        const count = getValidQuantity(variant.stock) ?? 0;
+
+        quantity.value = Math.min(
+            variant.stock,
+            count + 1
         );
 
-    });
-
-
-
-    /* =====================================
-       DECREASE QUANTITY
-    ====================================== */
-
-    document.getElementById(
-        'decreaseQty'
-    ).addEventListener('click', () => {
-
-        quantity.value =
-            Number(quantity.value || 1) - 1;
-
-        refresh();
+        refreshProduct();
 
     });
 
 
-
-    /* =====================================
-       INCREASE QUANTITY
-    ====================================== */
-
-    document.getElementById(
-        'increaseQty'
-    ).addEventListener('click', () => {
-
-        quantity.value =
-            Number(quantity.value || 1) + 1;
-
-        refresh();
-
-    });
-
-
-
-    /* =====================================
+    /* =====================================================
        MANUAL QUANTITY INPUT
-    ====================================== */
+    ====================================================== */
 
-    quantity.addEventListener(
-        'input',
-        refresh
-    );
+    quantity.addEventListener('input', () => {
+
+        refreshProduct();
+
+    });
 
 
+    /* =====================================================
+       CORRECT INVALID QUANTITY ON CHANGE
+    ====================================================== */
 
-    /* =====================================
+    quantity.addEventListener('change', () => {
+
+        const variant = getVariantDetails();
+
+        if (!variant) return;
+
+        const entered = Number(quantity.value);
+
+        if (
+            !Number.isInteger(entered) ||
+            entered < 1
+        ) {
+
+            quantity.value = 1;
+
+        } else if (entered > variant.stock) {
+
+            quantity.value = variant.stock;
+
+        }
+
+        refreshProduct();
+
+    });
+
+
+    /* =====================================================
        ADD TO BAG
-
        FRONTEND PREVIEW ONLY
-    ====================================== */
+    ====================================================== */
 
-    document.getElementById(
-        'productForm'
-    ).addEventListener('submit', event => {
+    form.addEventListener('submit', event => {
 
         event.preventDefault();
 
-        refresh();
+        const variant = getVariantDetails();
 
-        message.textContent =
-            'Frontend preview only. Connect actions/cart/add.php to save items in the cart.';
+        if (!variant) return;
+
+        const count = getValidQuantity(variant.stock);
+
+        if (count === null || variant.stock <= 0) {
+
+            cartMessage.textContent =
+                'Please select an available product and valid quantity.';
+
+            return;
+        }
+
+        cartMessage.textContent =
+            'Product selected successfully. Cart saving will be enabled when the cart backend is connected.';
 
     });
 
 
+    /* =====================================================
+       INITIALIZE
+    ====================================================== */
 
-    /* =====================================
-       INITIALIZE PRODUCT
-    ====================================== */
-
-    refresh();
+    refreshProduct();
 
 });
