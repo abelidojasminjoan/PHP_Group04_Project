@@ -268,10 +268,8 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('[data-close-ingredient-modal]')
         .forEach(function (button) {
 
-            button.addEventListener(
-                'click',
-                closeIngredientModal
-            );
+            button.addEventListener('click', closeIngredientModal);
+
         });
 
     document.addEventListener('keydown', function (event) {
@@ -338,27 +336,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 
+    /* =====================================================
+       INITIAL FILTER
+    ===================================================== */
 
-    /* =========================================
-       GO TO DELETE PROCESSOR
-    ========================================= */
-
-    window.location.href =
-        './delete_ingredient.php?id=' +
-        encodeURIComponent(
-            ingredientId
-        );
-
-}
-);
-
-    });
-
-
-/* =====================================================
-   INITIAL FILTER
-===================================================== */
-
-filterIngredients();
+    filterIngredients();
 
 });

@@ -1,0 +1,681 @@
+/* =========================================
+   PUREVIA PRODUCT DETAILS
+========================================= */
+
+.product-page {
+    background: #faf7f2;
+    color: #1e211c;
+
+    min-height: 730px;
+    padding: 34px 0 75px;
+
+    font-family: 'DM Sans', Arial, sans-serif;
+}
+
+
+/* =========================================
+   PAGE CONTAINER
+========================================= */
+
+.product-breadcrumb,
+.product-layout {
+    width: min(1158px, calc(100% - 48px));
+
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* =========================================
+   BREADCRUMB
+========================================= */
+
+.product-breadcrumb {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 11px;
+    margin-bottom: 31px;
+
+    font-size: 11px;
+    color: #242720;
+}
+
+.product-breadcrumb a {
+    color: #95877c;
+    text-decoration: none;
+}
+
+.product-breadcrumb a:hover {
+    color: #355d46;
+}
+
+.product-breadcrumb>span:not(:last-child) {
+    color: #aa9c90;
+}
+
+
+/* =========================================
+   PRODUCT LAYOUT
+========================================= */
+
+.product-layout {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr) minmax(0, 1fr);
+
+    gap: 60px;
+
+    align-items: start;
+}
+
+
+/* =========================================
+   PRODUCT IMAGE
+========================================= */
+
+.product-image-panel {
+    width: 100%;
+
+    aspect-ratio: 1 / 1;
+
+    border-radius: 15px;
+    background: #ebe6e5;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 15px 40px rgba(55, 45, 40, 0.05);
+}
+
+.product-image {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+
+/* IMAGE FALLBACK */
+
+.image-placeholder {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 12px;
+
+    color: #91867f;
+}
+
+.image-placeholder[hidden] {
+    display: none;
+}
+
+.image-placeholder i {
+    font-size: 64px;
+    color: #b7aaa3;
+}
+
+.image-placeholder small {
+    font-size: 11px;
+}
+
+
+/* =========================================
+   PRODUCT INFORMATION
+========================================= */
+
+.product-information {
+    padding-top: 1px;
+}
+
+
+/* CATEGORY AND LABEL */
+
+.product-meta,
+.field-label {
+    color: #9b8174;
+
+    font-size: 10px;
+    font-weight: 500;
+
+    letter-spacing: 1.3px;
+}
+
+.product-meta {
+    margin: 0 0 11px;
+}
+
+.product-meta span {
+    margin: 0 5px;
+}
+
+
+/* =========================================
+   PRODUCT NAME
+========================================= */
+
+.product-information h1 {
+    margin: 0 0 15px;
+
+    font-family:
+        'Playfair Display',
+        Georgia,
+        serif;
+
+    font-size: 30px;
+    font-weight: 500;
+
+    line-height: 1.22;
+    letter-spacing: -0.5px;
+}
+
+
+/* =========================================
+   PRODUCT RATING
+========================================= */
+
+.product-rating {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    font-size: 11px;
+    color: #978b85;
+}
+
+.product-rating strong {
+    color: #171d18;
+}
+
+.stars {
+    color: #b58254;
+
+    font-size: 17px;
+    letter-spacing: 1px;
+}
+
+
+/* STOCK STATUS */
+
+.stock-indicator {
+    color: #00a05c;
+    font-weight: 600;
+}
+
+
+/* =========================================
+   PRODUCT PRICE
+========================================= */
+
+.product-price {
+    margin: 18px 0 17px;
+
+    font-family:
+        'Playfair Display',
+        Georgia,
+        serif;
+
+    font-size: 33px;
+    font-weight: 600;
+
+    color: #315f46;
+}
+
+
+/* =========================================
+   PRODUCT DESCRIPTION
+========================================= */
+
+.product-description {
+    max-width: 560px;
+
+    margin: 0 0 24px;
+
+    font-size: 12px;
+    line-height: 1.95;
+}
+
+
+/* =========================================
+   PRODUCT VARIANTS
+========================================= */
+
+.variant-fieldset {
+    min-width: 0;
+
+    margin: 0 0 24px;
+    padding: 0;
+
+    border: none;
+}
+
+.variant-fieldset legend {
+    margin-bottom: 12px;
+    padding: 0;
+}
+
+
+/* VARIANT CONTAINER */
+
+.variant-options {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 10px;
+}
+
+
+/* VARIANT CARD */
+
+.variant-option {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    min-width: 125px;
+    min-height: 57px;
+
+    padding: 10px 15px;
+
+    border: 1px solid #d8d0c6;
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s,
+        border-color 0.2s;
+}
+
+
+/* SELECTED VARIANT */
+
+.variant-option.selected {
+    background: #e9ede7;
+    border-color: #35644a;
+}
+
+
+/* RADIO INPUT */
+
+.variant-option input {
+    position: absolute;
+
+    opacity: 0;
+
+    width: 1px;
+    height: 1px;
+}
+
+.variant-option:focus-within {
+    outline: 2px solid #6b8c72;
+    outline-offset: 2px;
+}
+
+
+/* VARIANT TEXT */
+
+.variant-copy {
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+.variant-copy strong,
+.variant-price {
+    font-size: 11px;
+}
+
+.variant-copy small {
+    color: #b18b76;
+    font-size: 10px;
+}
+
+.variant-price {
+    white-space: nowrap;
+}
+
+
+/* SELECTED CHECK ICON */
+
+.variant-check {
+    display: none;
+
+    position: absolute;
+
+    top: -7px;
+    right: -7px;
+
+    width: 16px;
+    height: 16px;
+
+    border-radius: 50%;
+
+    background: #35644a;
+    color: #ffffff;
+
+    text-align: center;
+    line-height: 16px;
+
+    font-size: 10px;
+}
+
+.variant-option.selected .variant-check {
+    display: block;
+}
+
+
+/* =========================================
+   SKIN TYPES AND CONCERNS
+========================================= */
+
+.product-tags-section {
+    margin-bottom: 20px;
+}
+
+.product-tags-section .field-label {
+    margin: 0 0 9px;
+}
+
+.product-tags {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 5px;
+}
+
+
+/* GENERAL TAG */
+
+.tag {
+    display: inline-block;
+
+    padding: 6px 10px;
+
+    border-radius: 20px;
+
+    background: #eee8e1;
+    color: #9a745c;
+
+    font-size: 10px;
+    letter-spacing: 0.4px;
+}
+
+
+/* NORMAL SKIN */
+
+.tag-normal {
+    background: #dfeddf;
+    color: #258c50;
+}
+
+
+/* COMBINATION SKIN */
+
+.tag-combination {
+    background: #eeeae3;
+    color: #8a8173;
+}
+
+
+/* SENSITIVE SKIN */
+
+.tag-sensitive {
+    background: #f7e6d8;
+    color: #dd7834;
+}
+
+
+/* SKIN CONCERNS */
+
+.concern-tag {
+    background: #f1e9e2;
+    color: #b18566;
+}
+
+
+/* =========================================
+   PURCHASE SECTION
+========================================= */
+
+.purchase-row {
+    display: flex;
+
+    gap: 12px;
+
+    margin-top: 23px;
+}
+
+
+/* =========================================
+   QUANTITY CONTROL
+========================================= */
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 118px;
+    height: 44px;
+
+    flex-shrink: 0;
+
+    border: 1px solid #d8d0c6;
+    border-radius: 8px;
+}
+
+
+/* QUANTITY BUTTONS */
+
+.quantity-control button {
+    width: 34px;
+    height: 100%;
+
+    border: none;
+    background: transparent;
+
+    color: #776b61;
+
+    cursor: pointer;
+    font-size: 17px;
+}
+
+
+/* QUANTITY INPUT */
+
+.quantity-control input {
+    width: 38px;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    text-align: center;
+
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+.quantity-control input::-webkit-inner-spin-button,
+.quantity-control input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+
+/* =========================================
+   ADD TO BAG BUTTON
+========================================= */
+
+.add-to-bag {
+    flex: 1;
+
+    min-height: 44px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: #35634a;
+    color: #ffffff;
+
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.add-to-bag:hover {
+    background: #294d39;
+}
+
+.add-to-bag:disabled {
+    background: #9eaaa0;
+    cursor: not-allowed;
+}
+
+
+/* =========================================
+   SHIPPING INFORMATION
+========================================= */
+
+.shipping-note {
+    margin-top: 19px;
+
+    padding: 16px 18px;
+
+    border-radius: 8px;
+
+    background: #ede9e1;
+
+    font-size: 11px;
+}
+
+.shipping-note i {
+    margin-right: 5px;
+    color: #b77a42;
+}
+
+
+/* =========================================
+   CART MESSAGE
+========================================= */
+
+.cart-message {
+    margin-top: 9px;
+
+    color: #a26430;
+    font-size: 11px;
+}
+
+.cart-message:empty {
+    display: none;
+}
+
+
+/* =========================================
+   TABLET RESPONSIVE
+========================================= */
+
+@media (max-width: 900px) {
+
+    .product-layout {
+        gap: 30px;
+    }
+
+    .product-information h1 {
+        font-size: 26px;
+    }
+
+    .variant-option {
+        min-width: 110px;
+        padding: 10px;
+    }
+
+}
+
+
+/* =========================================
+   MOBILE RESPONSIVE
+========================================= */
+
+@media (max-width: 680px) {
+
+    .product-page {
+        padding-top: 22px;
+        padding-bottom: 45px;
+    }
+
+    .product-breadcrumb,
+    .product-layout {
+        width: calc(100% - 36px);
+    }
+
+    .product-layout {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+
+    .product-image-panel {
+        max-height: 520px;
+    }
+
+    .product-information h1 {
+        font-size: 28px;
+    }
+
+    .variant-option {
+        flex: 1;
+        min-width: 105px;
+    }
+
+}
+
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 390px) {
+
+    .variant-option {
+        min-width: calc(50% - 5px);
+    }
+
+    .purchase-row {
+        gap: 8px;
+    }
+
+    .quantity-control {
+        width: 100px;
+    }
+
+    .shipping-note {
+        line-height: 1.6;
+    }
+
+}
