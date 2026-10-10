@@ -1,6 +1,6 @@
 
 /* =========================================================
-   PUREVIA PRODUCT DETAILS JAVASCRIPT
+   PUREVIA PRODUCT DETAILS
 ========================================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -13,249 +13,107 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!form) return;
 
-    const radios = [
-        ...form.querySelectorAll(
-            'input[name="variant_id"]'
-        )
-    ];
+    const container = form.querySelector('.quantity-control');
 
     const quantity = document.getElementById('quantity');
 
-    const displayPrice = document.getElementById('displayPrice');
+    const decrease = document.getElementById('decreaseQty');
 
-    const stockStatus = document.getElementById('stockStatus');
+    const increase = document.getElementById('increaseQty');
 
     const addToBag = document.getElementById('addToBag');
 
-    const cartMessage = document.getElementById('cartMessage');
-
-    const decreaseButton = document.getElementById('decreaseQty');
-
-    const increaseButton = document.getElementById('increaseQty');
-
-
-    /* =====================================================
-       PESO FORMATTER
-    ====================================================== */
-
-    const formatPeso = value => {
-
-        return new Intl.NumberFormat('en-PH', {
-            style: 'currency',
-            currency: 'PHP'
-        }).format(value);
-
-    };
-
-
-    /* =====================================================
-       GET SELECTED VARIANT
-    ====================================================== */
-
-    function getSelectedVariant() {
-
-        return radios.find(
-            radio => radio.checked && !radio.disabled
-        );
-
+    if (
+        !container ||
+        !quantity ||
+        !decrease ||
+        !increase ||
+        !addToBag
+    ) {
+        return;
     }
 
 
     /* =====================================================
-       GET VARIANT DETAILS
+       PRODUCT INFORMATION
     ====================================================== */
 
-    function getVariantDetails() {
+    const unitPrice = Number(container.dataset.price);
 
-        const selected = getSelectedVariant();
-
-        if (!selected) return null;
-
-        return {
-
-            price: Number(selected.dataset.price),
-
-            stock: Math.max(
-                0,
-                Number(selected.dataset.stock)
-            )
-
-        };
-
-    }
+    const stock = Number(container.dataset.stock);
 
 
     /* =====================================================
-       VALIDATE QUANTITY
+       FORMAT PHILIPPINE PESO
     ====================================================== */
 
-    function getValidQuantity(stock) {
+    function formatPeso(value) {
 
-        const count = Number(quantity.value);
-
-        if (
-            quantity.value.trim() === '' ||
-            !Number.isInteger(count) ||
-            count < 1 ||
-            count > stock
-        ) {
-
-            return null;
-
-        }
-
-        return count;
-
-    }
-
-
-    /* =====================================================
-       UPDATE VARIANT SELECTION STYLE
-    ====================================================== */
-
-    function updateVariantStyles() {
-
-        document.querySelectorAll(
-            '.variant-option'
-        ).forEach(option => {
-
-            const radio = option.querySelector('input');
-
-            option.classList.toggle(
-                'selected',
-                radio.checked && !radio.disabled
-            );
-
+        return '₱' + value.toLocaleString('en-PH', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
         });
 
     }
 
 
     /* =====================================================
-       REFRESH PRICE, STOCK AND BUTTON
+       UPDATE QUANTITY AND PRICE
     ====================================================== */
 
-    function refreshProduct() {
+    function updateQuantity() {
 
-        const variant = getVariantDetails();
+        const entered = quantity.value.trim();
 
-        updateVariantStyles();
+        const amount = Number(entered);
 
-        if (!variant || variant.stock <= 0) {
-
-            stockStatus.textContent = 'Out of Stock';
-
-            stockStatus.classList.add('out-of-stock');
-
-            addToBag.disabled = true;
-
-            addToBag.textContent = 'Out of Stock';
-
-            quantity.disabled = true;
-            decreaseButton.disabled = true;
-            increaseButton.disabled = true;
-
-            return;
-        }
+        const valid =
+            entered !== '' &&
+            Number.isInteger(amount) &&
+            amount >= 1 &&
+            amount <= stock;
 
 
-        const unitPrice = variant.price;
+        /* ADD TO BAG BUTTON */
 
-        const availableStock = variant.stock;
+        addToBag.disabled = !valid;
 
-
-        /* PRICE */
-
-        displayPrice.textContent = formatPeso(unitPrice);
-
-
-        /* STOCK */
-
-        stockStatus.textContent =
-            `In Stock (${availableStock})`;
-
-        stockStatus.classList.remove('out-of-stock');
+        addToBag.textContent = valid
+            ? `Add to Bag — ${formatPeso(unitPrice * amount)}`
+            : stock <= 0
+                ? 'Out of Stock'
+                : 'Enter Valid Quantity';
 
 
-        /* QUANTITY LIMIT */
+        /* QUANTITY BUTTONS */
 
-        quantity.disabled = false;
+        decrease.disabled =
+            stock <= 0 ||
+            (valid && amount <= 1);
 
-        quantity.max = availableStock;
-
-        const count = getValidQuantity(availableStock);
-
-
-        /* INVALID QUANTITY */
-
-        if (count === null) {
-
-            addToBag.disabled = true;
-
-            addToBag.textContent = 'Enter Valid Quantity';
-
-            decreaseButton.disabled = false;
-            increaseButton.disabled = false;
-
-            return;
-        }
-
-
-        /* QUANTITY BUTTON STATES */
-
-        decreaseButton.disabled = count <= 1;
-
-        increaseButton.disabled = count >= availableStock;
-
-
-        /* ADD TO BAG PRICE */
-
-        const totalPrice = unitPrice * count;
-
-        addToBag.disabled = false;
-
-        addToBag.textContent =
-            `Add to Bag — ${formatPeso(totalPrice)}`;
+        increase.disabled =
+            stock <= 0 ||
+            (valid && amount >= stock);
 
     }
-
-
-    /* =====================================================
-       PRODUCT VARIANT CHANGE
-    ====================================================== */
-
-    radios.forEach(radio => {
-
-        radio.addEventListener('change', () => {
-
-            if (radio.disabled) return;
-
-            quantity.value = 1;
-
-            cartMessage.textContent = '';
-
-            refreshProduct();
-
-        });
-
-    });
 
 
     /* =====================================================
        DECREASE QUANTITY
     ====================================================== */
 
-    decreaseButton.addEventListener('click', () => {
+    decrease.addEventListener('click', () => {
 
-        const variant = getVariantDetails();
+        const current = Number(quantity.value);
 
-        if (!variant) return;
+        quantity.value = Math.max(
+            1,
+            Number.isInteger(current)
+                ? current - 1
+                : 1
+        );
 
-        const count = getValidQuantity(variant.stock) ?? 1;
-
-        quantity.value = Math.max(1, count - 1);
-
-        refreshProduct();
+        updateQuantity();
 
     });
 
@@ -264,20 +122,18 @@ document.addEventListener('DOMContentLoaded', () => {
        INCREASE QUANTITY
     ====================================================== */
 
-    increaseButton.addEventListener('click', () => {
+    increase.addEventListener('click', () => {
 
-        const variant = getVariantDetails();
-
-        if (!variant) return;
-
-        const count = getValidQuantity(variant.stock) ?? 0;
+        const current = Number(quantity.value);
 
         quantity.value = Math.min(
-            variant.stock,
-            count + 1
+            stock,
+            Number.isInteger(current)
+                ? current + 1
+                : 1
         );
 
-        refreshProduct();
+        updateQuantity();
 
     });
 
@@ -286,68 +142,31 @@ document.addEventListener('DOMContentLoaded', () => {
        MANUAL QUANTITY INPUT
     ====================================================== */
 
-    quantity.addEventListener('input', () => {
-
-        refreshProduct();
-
-    });
+    quantity.addEventListener('input', updateQuantity);
 
 
     /* =====================================================
-       CORRECT INVALID QUANTITY ON CHANGE
+       CORRECT INVALID QUANTITY
     ====================================================== */
 
     quantity.addEventListener('change', () => {
 
-        const variant = getVariantDetails();
-
-        if (!variant) return;
-
-        const entered = Number(quantity.value);
+        const current = Number(quantity.value);
 
         if (
-            !Number.isInteger(entered) ||
-            entered < 1
+            !Number.isInteger(current) ||
+            current < 1
         ) {
 
             quantity.value = 1;
 
-        } else if (entered > variant.stock) {
+        } else if (current > stock) {
 
-            quantity.value = variant.stock;
+            quantity.value = stock;
 
         }
 
-        refreshProduct();
-
-    });
-
-
-    /* =====================================================
-       ADD TO BAG
-       FRONTEND PREVIEW ONLY
-    ====================================================== */
-
-    form.addEventListener('submit', event => {
-
-        event.preventDefault();
-
-        const variant = getVariantDetails();
-
-        if (!variant) return;
-
-        const count = getValidQuantity(variant.stock);
-
-        if (count === null || variant.stock <= 0) {
-
-            cartMessage.textContent =
-                'Please select an available product and valid quantity.';
-
-            return;
-        }
-
-        cartMessage.textContent =
-            'Product selected successfully. Cart saving will be enabled when the cart backend is connected.';
+        updateQuantity();
 
     });
 
@@ -356,6 +175,6 @@ document.addEventListener('DOMContentLoaded', () => {
        INITIALIZE
     ====================================================== */
 
-    refreshProduct();
+    updateQuantity();
 
 });

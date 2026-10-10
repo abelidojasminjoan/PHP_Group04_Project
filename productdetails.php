@@ -1,68 +1,22 @@
 <?php
-
 /* =========================================================
    PUREVIA
    CUSTOMER PRODUCT DETAILS
-========================================================= */
-
-/* =========================================================
-   SESSION
 ========================================================= */
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-
-/* =========================================================
-   CONFIGURATION
-========================================================= */
-
 require_once __DIR__ . '/config/app.php';
 require_once __DIR__ . '/config/db.php';
 
 
 /* =========================================================
-   CUSTOMER ACCESS
-========================================================= */
-
-if (
-    empty($_SESSION['user_id']) ||
-    ($_SESSION['role'] ?? '') !== 'customer'
-) {
-
-    header(
-        'Location: ' . BASE_URL . '/index.php'
-    );
-
-    exit;
-}
-
-
-/* =========================================================
-   GET PRODUCT ID
-========================================================= */
-
-$productId = filter_input(
-    INPUT_GET,
-    'id',
-    FILTER_VALIDATE_INT
-);
-
-if (!$productId || $productId < 1) {
-
-    http_response_code(404);
-
-    exit('Product not found.');
-}
-
-
-/* =========================================================
-   ESCAPE OUTPUT
+   SECURE OUTPUT
 ========================================================= */
 
 if (!function_exists('productEscape')) {
-
     function productEscape($value): string
     {
         return htmlspecialchars(
@@ -75,230 +29,476 @@ if (!function_exists('productEscape')) {
 
 
 /* =========================================================
-   DATABASE ASSUMPTIONS
-
-   products:
-   id, category_id, product_name, description,
-   image, price, stock, status
-
-   categories:
-   id, category_name
-
-   product_variants:
-   id, product_id, variant_name, price, stock
-
-   Adjust these columns to your actual MySQL schema.
+   CUSTOMER AUTHENTICATION
 ========================================================= */
 
-
-/* =========================================================
-   VERIFY ACTIVE CUSTOMER
-========================================================= */
+if (
+    empty($_SESSION['user_id']) ||
+    ($_SESSION['role'] ?? '') !== 'customer'
+) {
+    header('Location: ' . BASE_URL . '/index.php');
+    exit;
+}
 
 $customerId = (int) $_SESSION['user_id'];
 
-$userStatement = $conn->prepare(
+$stmt = $conn->prepare(
     "SELECT u.id
-     FROM users AS u
-     INNER JOIN roles AS r ON r.id = u.role_id
+     FROM users u
+     INNER JOIN roles r ON r.id = u.role_id
      WHERE u.id = ?
        AND u.status = 'active'
        AND LOWER(r.role_name) = 'customer'
      LIMIT 1"
 );
 
-if (!$userStatement) {
-    error_log($conn->error);
-    http_response_code(500);
-    exit('Unable to load your account.');
-}
+$stmt->bind_param('i', $customerId);
+$stmt->execute();
 
-$userStatement->bind_param('i', $customerId);
-$userStatement->execute();
+$customer = $stmt->get_result()->fetch_assoc();
+$stmt->close();
 
-$validCustomer = $userStatement
-    ->get_result()
-    ->fetch_assoc();
-
-$userStatement->close();
-
-if (!$validCustomer) {
-
+if (!$customer) {
     http_response_code(403);
-
     exit('Customer access required.');
 }
+
+
+/* =========================================================
+   STEP 1: COLLECT PRODUCT ID
+========================================================= */
+
+$productId = filter_input(
+    INPUT_GET,
+    'id',
+    FILTER_VALIDATE_INT
+);
+
+if (!$productId || $productId < 1) {
+    http_response_code(404);
+    exit('Product not found.');
+}
+
+
+/* =========================================================
+   CSRF TOKEN
+========================================================= */
+
+if (empty($_SESSION['product_cart_csrf'])) {
+    $_SESSION['product_cart_csrf'] =
+        bin2hex(random_bytes(32));
+}
+
+$errors = [];
+
+$success = $_SESSION['product_cart_success'] ?? '';
+
+unset($_SESSION['product_cart_success']);
+
+$enteredQuantity = '1';
 
 
 /* =========================================================
    GET SELECTED PRODUCT
 ========================================================= */
 
-$productSql = "
-    SELECT
+$stmt = $conn->prepare(
+    "SELECT
         p.id,
         p.product_name,
+        p.product_code,
         p.description,
-        p.image,
+        p.usage_instructions,
         p.price,
-        p.stock,
+        p.stock_quantity,
+        p.image,
         p.status,
         c.category_name
 
-    FROM products AS p
+     FROM products p
 
-    LEFT JOIN categories AS c
+     INNER JOIN categories c
         ON c.id = p.category_id
 
-    WHERE p.id = ?
-      AND p.status = 'active'
+     WHERE p.id = ?
+       AND p.status IN ('active', 'out_of_stock')
+       AND c.status = 'active'
 
-    LIMIT 1
-";
-
-$productStatement = $conn->prepare($productSql);
-
-if (!$productStatement) {
-    error_log($conn->error);
-    http_response_code(500);
-    exit('Unable to load product.');
-}
-
-$productStatement->bind_param(
-    'i',
-    $productId
+     LIMIT 1"
 );
 
-$productStatement->execute();
+$stmt->bind_param('i', $productId);
+$stmt->execute();
 
-$product = $productStatement
-    ->get_result()
-    ->fetch_assoc();
-
-$productStatement->close();
-
-
-/* =========================================================
-   PRODUCT NOT FOUND
-========================================================= */
+$product = $stmt->get_result()->fetch_assoc();
+$stmt->close();
 
 if (!$product) {
-
     http_response_code(404);
-
     exit('This product is unavailable or does not exist.');
 }
 
 
 /* =========================================================
-   GET PRODUCT VARIANTS
+   HANDLE ADD TO BAG FORM
 ========================================================= */
 
-$variantSql = "
-    SELECT
-        id,
-        variant_name,
-        price,
-        stock
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    FROM product_variants
+    /* =====================================================
+       STEP 1: COLLECTION
+    ====================================================== */
 
-    WHERE product_id = ?
+    $enteredQuantity = trim(
+        (string) ($_POST['quantity'] ?? '')
+    );
 
-    ORDER BY id ASC
-";
+    $submittedProductId = filter_var(
+        $_POST['product_id'] ?? null,
+        FILTER_VALIDATE_INT
+    );
 
-$variantStatement = $conn->prepare($variantSql);
-
-if (!$variantStatement) {
-    error_log($conn->error);
-    http_response_code(500);
-    exit('Unable to load product options.');
-}
-
-$variantStatement->bind_param(
-    'i',
-    $productId
-);
-
-$variantStatement->execute();
-
-$variantResult = $variantStatement->get_result();
-
-$variants = [];
-
-while ($variant = $variantResult->fetch_assoc()) {
-
-    $variants[] = [
-        'id' => (int) $variant['id'],
-        'name' => $variant['variant_name'],
-        'price' => (float) $variant['price'],
-        'stock' => max(0, (int) $variant['stock'])
-    ];
-}
-
-$variantStatement->close();
+    $csrf = $_POST['csrf_token'] ?? '';
 
 
-/* =========================================================
-   FALLBACK IF PRODUCT HAS NO VARIANTS
+    /* =====================================================
+       STEP 2: VALIDATION
+    ====================================================== */
 
-   When variant_id is 0, the cart backend must use
-   the product's own price and stock.
-========================================================= */
+    if (
+        !is_string($csrf) ||
+        !hash_equals(
+            $_SESSION['product_cart_csrf'],
+            $csrf
+        )
+    ) {
+        $errors[] = 'Invalid request. Please refresh the page.';
+    }
 
-if (empty($variants)) {
+    if ($submittedProductId !== $productId) {
+        $errors[] = 'The selected product is invalid.';
+    }
 
-    $variants[] = [
-        'id' => 0,
-        'name' => 'Standard',
-        'price' => (float) $product['price'],
-        'stock' => max(0, (int) $product['stock'])
-    ];
-}
+    if (
+        $enteredQuantity === '' ||
+        !ctype_digit($enteredQuantity) ||
+        strlen($enteredQuantity) > 9
+    ) {
+        $errors[] = 'Please enter a valid whole-number quantity.';
+    } elseif ((int) $enteredQuantity < 1) {
+        $errors[] = 'Quantity must be at least 1.';
+    } elseif (
+        $product['status'] !== 'active' ||
+        (int) $enteredQuantity >
+        (int) $product['stock_quantity']
+    ) {
+        $errors[] = 'The requested quantity is not available.';
+    }
 
 
-/* =========================================================
-   INITIAL SELECTED VARIANT
-========================================================= */
+    /* =====================================================
+       STEP 3: SANITIZATION
 
-$selectedIndex = 0;
+       User values are validated above and escaped
+       with htmlspecialchars() when displayed below.
+    ====================================================== */
 
-foreach ($variants as $index => $variant) {
 
-    if ($variant['stock'] > 0) {
-        $selectedIndex = $index;
-        break;
+    /* =====================================================
+       STEP 4: DATABASE PROCESSING
+    ====================================================== */
+
+    if (empty($errors)) {
+
+        try {
+
+            $conn->begin_transaction();
+
+            $requested = (int) $enteredQuantity;
+
+
+            /* LOCK PRODUCT AND RECHECK STOCK */
+
+            $stmt = $conn->prepare(
+                "SELECT stock_quantity, status
+                 FROM products
+                 WHERE id = ?
+                 FOR UPDATE"
+            );
+
+            $stmt->bind_param('i', $productId);
+            $stmt->execute();
+
+            $freshProduct = $stmt
+                ->get_result()
+                ->fetch_assoc();
+
+            $stmt->close();
+
+            if (
+                !$freshProduct ||
+                $freshProduct['status'] !== 'active' ||
+                $requested >
+                (int) $freshProduct['stock_quantity']
+            ) {
+                throw new DomainException(
+                    'The requested quantity is no longer available.'
+                );
+            }
+
+
+            /* CREATE OR RETRIEVE CUSTOMER CART */
+
+            $stmt = $conn->prepare(
+                "INSERT INTO carts (user_id)
+                 VALUES (?)
+                 ON DUPLICATE KEY UPDATE
+                 id = LAST_INSERT_ID(id)"
+            );
+
+            $stmt->bind_param('i', $customerId);
+            $stmt->execute();
+
+            $cartId = (int) $conn->insert_id;
+
+            $stmt->close();
+
+
+            /* CHECK EXISTING CART ITEM */
+
+            $stmt = $conn->prepare(
+                "SELECT quantity
+                 FROM cart_items
+                 WHERE cart_id = ?
+                   AND product_id = ?
+                 FOR UPDATE"
+            );
+
+            $stmt->bind_param(
+                'ii',
+                $cartId,
+                $productId
+            );
+
+            $stmt->execute();
+
+            $existingItem = $stmt
+                ->get_result()
+                ->fetch_assoc();
+
+            $stmt->close();
+
+
+            /* VALIDATE COMBINED CART QUANTITY */
+
+            $currentQuantity =
+                (int) ($existingItem['quantity'] ?? 0);
+
+            $newQuantity = $currentQuantity + $requested;
+
+            if (
+                $newQuantity >
+                (int) $freshProduct['stock_quantity']
+            ) {
+                throw new DomainException(
+                    'Your cart quantity exceeds available stock.'
+                );
+            }
+
+
+            /* UPDATE OR INSERT CART ITEM */
+
+            if ($existingItem) {
+
+                $stmt = $conn->prepare(
+                    "UPDATE cart_items
+                     SET quantity = ?
+                     WHERE cart_id = ?
+                       AND product_id = ?"
+                );
+
+                $stmt->bind_param(
+                    'iii',
+                    $newQuantity,
+                    $cartId,
+                    $productId
+                );
+            } else {
+
+                $stmt = $conn->prepare(
+                    "INSERT INTO cart_items
+                     (cart_id, product_id, quantity)
+                     VALUES (?, ?, ?)"
+                );
+
+                $stmt->bind_param(
+                    'iii',
+                    $cartId,
+                    $productId,
+                    $newQuantity
+                );
+            }
+
+            $stmt->execute();
+            $stmt->close();
+
+            $conn->commit();
+
+
+            /* =================================================
+               STEP 5: RESPONSE
+            ================================================== */
+
+            $_SESSION['product_cart_success'] =
+                'Product successfully added to your bag.';
+
+            $_SESSION['product_cart_csrf'] =
+                bin2hex(random_bytes(32));
+
+            header(
+                'Location: ' . BASE_URL .
+                    '/productdetails.php?id=' . $productId,
+                true,
+                303
+            );
+
+            exit;
+        } catch (DomainException $exception) {
+
+            $conn->rollback();
+
+            $errors[] = $exception->getMessage();
+        } catch (Throwable $exception) {
+
+            $conn->rollback();
+
+            error_log(
+                'Add to bag error: ' .
+                    $exception->getMessage()
+            );
+
+            $errors[] =
+                'Unable to add the product. Please try again.';
+        }
     }
 }
 
-$selectedVariant = $variants[$selectedIndex];
-
-$initialPrice = $selectedVariant['price'];
-
-$initialStock = $selectedVariant['stock'];
-
 
 /* =========================================================
-   SKIN SUITABILITY
-
-   Replace these empty arrays with database queries
-   once the skin-type, concern and ingredient
-   relationship tables are connected.
+   GET PRODUCT SKIN TYPES
 ========================================================= */
 
 $skinTypes = [];
 
+$stmt = $conn->prepare(
+    "SELECT st.skin_type_name
+     FROM product_skin_types pst
+     INNER JOIN skin_types st
+        ON st.id = pst.skin_type_id
+     WHERE pst.product_id = ?
+       AND st.status = 'active'
+     ORDER BY st.skin_type_name"
+);
+
+$stmt->bind_param('i', $productId);
+$stmt->execute();
+
+$result = $stmt->get_result();
+
+while ($row = $result->fetch_assoc()) {
+    $skinTypes[] = $row['skin_type_name'];
+}
+
+$stmt->close();
+
+
+/* =========================================================
+   GET PRODUCT SKIN CONCERNS
+========================================================= */
+
 $skinConcerns = [];
 
+$stmt = $conn->prepare(
+    "SELECT sc.concern_name
+     FROM product_concerns pc
+     INNER JOIN skin_concerns sc
+        ON sc.id = pc.concern_id
+     WHERE pc.product_id = ?
+       AND sc.status = 'active'
+     ORDER BY sc.concern_name"
+);
+
+$stmt->bind_param('i', $productId);
+$stmt->execute();
+
+$result = $stmt->get_result();
+
+while ($row = $result->fetch_assoc()) {
+    $skinConcerns[] = $row['concern_name'];
+}
+
+$stmt->close();
+
+
+/* =========================================================
+   GET INGREDIENTS AND COMPATIBILITY
+========================================================= */
+
 $ingredients = [];
+$avoidedMatches = [];
+
+$stmt = $conn->prepare(
+    "SELECT
+        i.ingredient_name,
+        CASE
+            WHEN uai.user_id IS NOT NULL THEN 1
+            ELSE 0
+        END AS avoided
+
+     FROM product_ingredients pi
+
+     INNER JOIN ingredients i
+        ON i.id = pi.ingredient_id
+
+     LEFT JOIN user_avoided_ingredients uai
+        ON uai.ingredient_id = i.id
+       AND uai.user_id = ?
+
+     WHERE pi.product_id = ?
+       AND i.status = 'active'
+
+     ORDER BY i.ingredient_name"
+);
+
+$stmt->bind_param(
+    'ii',
+    $customerId,
+    $productId
+);
+
+$stmt->execute();
+
+$result = $stmt->get_result();
+
+while ($row = $result->fetch_assoc()) {
+
+    $ingredients[] = $row['ingredient_name'];
+
+    if ((int) $row['avoided'] === 1) {
+        $avoidedMatches[] = $row['ingredient_name'];
+    }
+}
+
+$stmt->close();
 
 
 /* =========================================================
    PRODUCT IMAGE
 ========================================================= */
 
-$imageName = trim((string) ($product['image'] ?? ''));
+$imageName = trim(
+    (string) ($product['image'] ?? '')
+);
 
 $productImage = '';
 
@@ -306,48 +506,27 @@ if ($imageName !== '') {
 
     if (
         filter_var($imageName, FILTER_VALIDATE_URL) &&
-        in_array(
-            strtolower((string) parse_url($imageName, PHP_URL_SCHEME)),
-            ['http', 'https'],
-            true
-        )
+        strtolower((string) parse_url(
+            $imageName,
+            PHP_URL_SCHEME
+        )) === 'https'
     ) {
-
         $productImage = $imageName;
     } else {
-
-        $productImage = BASE_URL
-            . '/assets/images/'
-            . rawurlencode(basename($imageName));
+        $productImage = BASE_URL .
+            '/assets/images/' .
+            rawurlencode(basename($imageName));
     }
 }
 
 
 /* =========================================================
-   CATEGORY
+   AVAILABILITY
 ========================================================= */
 
-$categoryName = $product['category_name']
-    ?? 'Skincare';
-
-
-/* =========================================================
-   SAFE PRODUCT DISPLAY VALUES
-========================================================= */
-
-$productName = $product['product_name'];
-
-$productDescription = $product['description'];
-
-$allOutOfStock = true;
-
-foreach ($variants as $variant) {
-
-    if ($variant['stock'] > 0) {
-        $allOutOfStock = false;
-        break;
-    }
-}
+$available =
+    $product['status'] === 'active' &&
+    (int) $product['stock_quantity'] > 0;
 
 ?>
 
@@ -363,32 +542,20 @@ foreach ($variants as $variant) {
         content="width=device-width, initial-scale=1.0">
 
     <title>
-        <?= productEscape($productName) ?> | PureVia
+        <?= productEscape($product['product_name']) ?> | PureVia
     </title>
-
-
-    <!-- HEADER CSS -->
 
     <link
         rel="stylesheet"
         href="<?= productEscape(BASE_URL) ?>/css/header.css">
 
-
-    <!-- FOOTER CSS -->
-
     <link
         rel="stylesheet"
         href="<?= productEscape(BASE_URL) ?>/css/footer.css">
 
-
-    <!-- PRODUCT DETAILS CSS -->
-
     <link
         rel="stylesheet"
         href="<?= productEscape(BASE_URL) ?>/css/product_details.css">
-
-
-    <!-- FONT AWESOME -->
 
     <link
         rel="stylesheet"
@@ -396,33 +563,16 @@ foreach ($variants as $variant) {
 
 </head>
 
-
 <body>
 
+    <?php include __DIR__ . '/includes/header.php'; ?>
 
-    <!-- =========================================================
-     SHARED HEADER
-========================================================= -->
-
-    <?php
-    include __DIR__ . '/includes/header.php';
-    ?>
-
-
-    <!-- =========================================================
-     PRODUCT DETAILS
-========================================================= -->
 
     <main class="product-page">
 
+        <!-- BREADCRUMB -->
 
-        <!-- =====================================================
-         BREADCRUMB
-    ====================================================== -->
-
-        <nav
-            class="product-breadcrumb"
-            aria-label="Breadcrumb">
+        <nav class="product-breadcrumb" aria-label="Breadcrumb">
 
             <a href="<?= productEscape(BASE_URL) ?>/index.php">
                 Home
@@ -437,39 +587,30 @@ foreach ($variants as $variant) {
             <span>/</span>
 
             <span aria-current="page">
-                <?= productEscape($productName) ?>
+                <?= productEscape($product['product_name']) ?>
             </span>
 
         </nav>
 
 
-
-        <!-- =====================================================
-         PRODUCT CONTENT
-    ====================================================== -->
+        <!-- PRODUCT LAYOUT -->
 
         <section class="product-layout">
 
 
-            <!-- =================================================
-             LEFT: PRODUCT IMAGE
-        ================================================== -->
+            <!-- PRODUCT IMAGE -->
 
             <div class="product-image-panel">
-
 
                 <?php if ($productImage !== ''): ?>
 
                     <img
                         src="<?= productEscape($productImage) ?>"
-                        alt="<?= productEscape($productName) ?>"
+                        alt="<?= productEscape($product['product_name']) ?>"
                         class="product-image"
                         onerror="this.hidden=true;this.nextElementSibling.hidden=false;">
 
                 <?php endif; ?>
-
-
-                <!-- IMAGE PLACEHOLDER -->
 
                 <div
                     class="image-placeholder"
@@ -477,374 +618,314 @@ foreach ($variants as $variant) {
 
                     <i class="fa-solid fa-pump-soap"></i>
 
-                    <span>
-                        Product Image
-                    </span>
+                    <span>Product Image</span>
 
-                    <small>
-                        No product image available
-                    </small>
+                    <small>No product image available</small>
 
                 </div>
-
 
             </div>
 
 
-
-            <!-- =================================================
-             RIGHT: PRODUCT INFORMATION
-        ================================================== -->
+            <!-- PRODUCT INFORMATION -->
 
             <div class="product-information">
 
-
-                <!-- CATEGORY AND PRODUCT CODE -->
-
                 <p class="product-meta">
 
-                    <?= productEscape(strtoupper($categoryName)) ?>
+                    <?= productEscape(
+                        strtoupper($product['category_name'])
+                    ) ?>
 
                     <span>·</span>
 
-                    PRODUCT #<?= (int) $product['id'] ?>
+                    <?= productEscape($product['product_code']) ?>
 
                 </p>
 
 
-
-                <!-- PRODUCT NAME -->
-
                 <h1>
-                    <?= productEscape($productName) ?>
+                    <?= productEscape($product['product_name']) ?>
                 </h1>
 
 
-
-                <!-- =================================================
-                 AVAILABILITY
-            ================================================== -->
+                <!-- STOCK -->
 
                 <div class="product-rating">
 
                     <span
-                        class="stock-indicator <?= $allOutOfStock ? 'out-of-stock' : '' ?>"
-                        id="stockStatus">
-
-                        <?php if ($allOutOfStock): ?>
-
-                            Out of Stock
-
-                        <?php else: ?>
-
-                            In Stock (<?= $initialStock ?>)
-
-                        <?php endif; ?>
-
+                        id="stockStatus"
+                        class="stock-indicator <?= !$available ? 'out-of-stock' : '' ?>">
+                        <?= $available
+                            ? 'In Stock (' .
+                            (int) $product['stock_quantity'] . ')'
+                            : 'Out of Stock' ?>
                     </span>
 
                 </div>
 
 
+                <!-- PRICE -->
 
-                <!-- =================================================
-                 PRODUCT PRICE
-            ================================================== -->
-
-                <p
-                    class="product-price"
-                    id="displayPrice">
-
-                    ₱<?= number_format($initialPrice, 2) ?>
-
+                <p class="product-price" id="displayPrice">
+                    ₱<?= number_format(
+                            (float) $product['price'],
+                            2
+                        ) ?>
                 </p>
 
 
-
-                <!-- =================================================
-                 DESCRIPTION
-            ================================================== -->
+                <!-- DESCRIPTION -->
 
                 <p class="product-description">
-
-                    <?= nl2br(productEscape($productDescription)) ?>
-
+                    <?= nl2br(
+                        productEscape(
+                            $product['description'] ?? ''
+                        )
+                    ) ?>
                 </p>
 
 
+                <!-- SUCCESS MESSAGE -->
 
-                <!-- =================================================
-                 PRODUCT FORM
-            ================================================== -->
+                <?php if ($success !== ''): ?>
+
+                    <p class="cart-message cart-success" role="status">
+                        <?= productEscape($success) ?>
+                    </p>
+
+                <?php endif; ?>
+
+
+                <!-- VALIDATION ERRORS -->
+
+                <?php if (!empty($errors)): ?>
+
+                    <div class="cart-message cart-error" role="alert">
+
+                        <strong>Unable to add to bag:</strong>
+
+                        <ul>
+                            <?php foreach ($errors as $error): ?>
+
+                                <li>
+                                    <?= productEscape($error) ?>
+                                </li>
+
+                            <?php endforeach; ?>
+                        </ul>
+
+                    </div>
+
+                <?php endif; ?>
+
+
+                <!-- SUITABLE SKIN TYPES -->
+
+                <?php if (!empty($skinTypes)): ?>
+
+                    <div class="product-tags-section">
+
+                        <p class="field-label">SUITABLE FOR</p>
+
+                        <div class="product-tags">
+
+                            <?php foreach ($skinTypes as $type): ?>
+
+                                <span class="tag">
+                                    <?= productEscape(strtoupper($type)) ?>
+                                </span>
+
+                            <?php endforeach; ?>
+
+                        </div>
+
+                    </div>
+
+                <?php endif; ?>
+
+
+                <!-- TARGETED CONCERNS -->
+
+                <?php if (!empty($skinConcerns)): ?>
+
+                    <div class="product-tags-section">
+
+                        <p class="field-label">TARGETS</p>
+
+                        <div class="product-tags">
+
+                            <?php foreach ($skinConcerns as $concern): ?>
+
+                                <span class="tag concern-tag">
+                                    <?= productEscape(strtoupper($concern)) ?>
+                                </span>
+
+                            <?php endforeach; ?>
+
+                        </div>
+
+                    </div>
+
+                <?php endif; ?>
+
+
+                <!-- INGREDIENTS -->
+
+                <?php if (!empty($ingredients)): ?>
+
+                    <div class="product-tags-section">
+
+                        <p class="field-label">INGREDIENTS</p>
+
+                        <p class="product-ingredients">
+                            <?= productEscape(
+                                implode(', ', $ingredients)
+                            ) ?>
+                        </p>
+
+                    </div>
+
+                <?php endif; ?>
+
+
+                <!-- INGREDIENT COMPATIBILITY -->
+
+                <?php if (!empty($avoidedMatches)): ?>
+
+                    <div
+                        class="compatibility-notice"
+                        role="status">
+
+                        <strong>
+                            Ingredient Compatibility Notice
+                        </strong>
+
+                        <p>
+                            This product contains
+                            <?= productEscape(
+                                implode(', ', $avoidedMatches)
+                            ) ?>,
+                            which
+                            <?= count($avoidedMatches) === 1
+                                ? 'is'
+                                : 'are' ?>
+                            on your ingredients-to-avoid list.
+                        </p>
+
+                        <small>
+                            This notice is informational and
+                            does not constitute medical advice.
+                        </small>
+
+                    </div>
+
+                <?php endif; ?>
+
+
+                <!-- USAGE INSTRUCTIONS -->
+
+                <?php if (
+                    trim((string) (
+                        $product['usage_instructions'] ?? ''
+                    )) !== ''
+                ): ?>
+
+                    <div class="product-tags-section">
+
+                        <p class="field-label">HOW TO USE</p>
+
+                        <p class="product-description">
+                            <?= nl2br(
+                                productEscape(
+                                    $product['usage_instructions']
+                                )
+                            ) ?>
+                        </p>
+
+                    </div>
+
+                <?php endif; ?>
+
+
+                <!-- ADD TO BAG FORM -->
 
                 <form
                     id="productForm"
-                    action="<?= productEscape(BASE_URL) ?>/actions/cart/add.php"
-                    method="POST">
-
-
-                    <!-- PRODUCT ID -->
+                    method="POST"
+                    action="<?= productEscape(BASE_URL) ?>/productdetails.php?id=<?= (int) $productId ?>">
 
                     <input
                         type="hidden"
                         name="product_id"
-                        value="<?= (int) $product['id'] ?>">
+                        value="<?= (int) $productId ?>">
+
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="<?= productEscape(
+                                    $_SESSION['product_cart_csrf']
+                                ) ?>">
 
-
-
-                    <!-- =================================================
-                     PRODUCT VARIANTS
-                ================================================== -->
-
-                    <fieldset class="variant-fieldset">
-
-                        <legend class="field-label">
-                            SIZE / OPTION
-                        </legend>
-
-
-                        <div class="variant-options">
-
-
-                            <?php foreach ($variants as $index => $variant): ?>
-
-
-                                <label
-                                    class="variant-option
-                                <?= $index === $selectedIndex ? 'selected' : '' ?>
-                                <?= $variant['stock'] <= 0 ? 'variant-unavailable' : '' ?>">
-
-
-                                    <input
-                                        type="radio"
-                                        name="variant_id"
-                                        value="<?= (int) $variant['id'] ?>"
-                                        data-price="<?= productEscape($variant['price']) ?>"
-                                        data-stock="<?= (int) $variant['stock'] ?>"
-                                        <?= $index === $selectedIndex ? 'checked' : '' ?>
-                                        <?= $variant['stock'] <= 0 ? 'disabled' : '' ?>>
-
-
-                                    <span class="variant-copy">
-
-                                        <strong>
-                                            <?= productEscape($variant['name']) ?>
-                                        </strong>
-
-
-                                        <small>
-
-                                            <?= $variant['stock'] > 0
-                                                ? 'Available'
-                                                : 'Out of Stock' ?>
-
-                                        </small>
-
-                                    </span>
-
-
-
-                                    <strong class="variant-price">
-
-                                        ₱<?= number_format(
-                                                $variant['price'],
-                                                2
-                                            ) ?>
-
-                                    </strong>
-
-
-
-                                    <span
-                                        class="variant-check"
-                                        aria-hidden="true">
-                                        ✓
-                                    </span>
-
-
-                                </label>
-
-
-                            <?php endforeach; ?>
-
-
-                        </div>
-
-                    </fieldset>
-
-
-
-                    <!-- =================================================
-                     SUITABLE SKIN TYPES
-                ================================================== -->
-
-                    <?php if (!empty($skinTypes)): ?>
-
-                        <div class="product-tags-section">
-
-                            <p class="field-label">
-                                SUITABLE FOR
-                            </p>
-
-                            <div class="product-tags skin-tags">
-
-                                <?php foreach ($skinTypes as $type): ?>
-
-                                    <span class="tag">
-
-                                        <?= productEscape(strtoupper($type)) ?>
-
-                                    </span>
-
-                                <?php endforeach; ?>
-
-                            </div>
-
-                        </div>
-
-                    <?php endif; ?>
-
-
-
-                    <!-- =================================================
-                     TARGETED SKIN CONCERNS
-                ================================================== -->
-
-                    <?php if (!empty($skinConcerns)): ?>
-
-                        <div class="product-tags-section">
-
-                            <p class="field-label">
-                                TARGETS
-                            </p>
-
-                            <div class="product-tags">
-
-                                <?php foreach ($skinConcerns as $concern): ?>
-
-                                    <span class="tag concern-tag">
-
-                                        <?= productEscape(strtoupper($concern)) ?>
-
-                                    </span>
-
-                                <?php endforeach; ?>
-
-                            </div>
-
-                        </div>
-
-                    <?php endif; ?>
-
-
-
-                    <!-- =================================================
-                     INGREDIENTS
-                ================================================== -->
-
-                    <?php if (!empty($ingredients)): ?>
-
-                        <div class="product-tags-section">
-
-                            <p class="field-label">
-                                INGREDIENTS
-                            </p>
-
-                            <p class="product-ingredients">
-
-                                <?= productEscape(
-                                    implode(', ', $ingredients)
-                                ) ?>
-
-                            </p>
-
-                        </div>
-
-                    <?php endif; ?>
-
-
-
-                    <!-- =================================================
-                     QUANTITY AND ADD TO BAG
-                ================================================== -->
 
                     <div class="purchase-row">
 
-
-                        <!-- QUANTITY CONTROL -->
-
-                        <div class="quantity-control">
-
+                        <div
+                            class="quantity-control"
+                            data-price="<?= productEscape($product['price']) ?>"
+                            data-stock="<?= (int) $product['stock_quantity'] ?>">
 
                             <button
                                 type="button"
                                 id="decreaseQty"
                                 aria-label="Decrease quantity"
-                                <?= $allOutOfStock ? 'disabled' : '' ?>>
+                                <?= !$available ? 'disabled' : '' ?>>
                                 −
                             </button>
-
 
                             <input
                                 type="number"
                                 name="quantity"
                                 id="quantity"
-                                value="1"
+                                value="<?= productEscape($enteredQuantity) ?>"
                                 min="1"
-                                max="<?= max(1, $initialStock) ?>"
+                                max="<?= (int) $product['stock_quantity'] ?>"
+                                step="1"
+                                required
                                 aria-label="Quantity"
-                                <?= $allOutOfStock ? 'disabled' : '' ?>>
-
+                                <?= !$available ? 'disabled' : '' ?>>
 
                             <button
                                 type="button"
                                 id="increaseQty"
                                 aria-label="Increase quantity"
-                                <?= $allOutOfStock ? 'disabled' : '' ?>>
+                                <?= !$available ? 'disabled' : '' ?>>
                                 +
                             </button>
 
-
                         </div>
 
-
-
-                        <!-- ADD TO BAG -->
 
                         <button
                             type="submit"
                             class="add-to-bag"
                             id="addToBag"
-                            <?= $allOutOfStock ? 'disabled' : '' ?>>
-
-                            <?= $allOutOfStock
-                                ? 'Out of Stock'
-                                : 'Add to Bag — ₱' .
-                                number_format($initialPrice, 2) ?>
-
+                            <?= !$available ? 'disabled' : '' ?>>
+                            <?= $available
+                                ? 'Add to Bag — ₱' .
+                                number_format(
+                                    (float) $product['price'],
+                                    2
+                                )
+                                : 'Out of Stock' ?>
                         </button>
 
-
                     </div>
-
-
-
-                    <!-- MESSAGE -->
-
-                    <p
-                        class="cart-message"
-                        id="cartMessage"
-                        role="status"
-                        aria-live="polite"></p>
-
 
                 </form>
 
 
-
-                <!-- =================================================
-                 SHIPPING INFORMATION
-            ================================================== -->
+                <!-- SHIPPING INFORMATION -->
 
                 <div class="shipping-note">
 
@@ -855,34 +936,19 @@ foreach ($variants as $variant) {
 
                 </div>
 
-
             </div>
 
-
         </section>
-
 
     </main>
 
 
+    <?php include __DIR__ . '/includes/footer.php'; ?>
 
-    <!-- =========================================================
-     SHARED FOOTER
-========================================================= -->
-
-    <?php
-    include __DIR__ . '/includes/footer.php';
-    ?>
-
-
-    <!-- =========================================================
-     PRODUCT DETAILS JAVASCRIPT
-========================================================= -->
 
     <script
         src="<?= productEscape(BASE_URL) ?>/js/product_details.js"
         defer></script>
-
 
 </body>
 

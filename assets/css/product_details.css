@@ -32,7 +32,6 @@
     gap: 11px;
     margin-bottom: 31px;
     font-size: 11px;
-    color: #242720;
 }
 
 .product-breadcrumb a {
@@ -44,8 +43,12 @@
     color: #355d46;
 }
 
-.product-breadcrumb>span:not(:last-child) {
-    color: #aa9c90;
+.product-breadcrumb span {
+    color: #978b85;
+}
+
+.product-breadcrumb span:last-child {
+    color: #242720;
 }
 
 /* =========================================================
@@ -82,8 +85,6 @@
 .product-image[hidden] {
     display: none;
 }
-
-/* IMAGE PLACEHOLDER */
 
 .image-placeholder {
     width: 100%;
@@ -124,8 +125,6 @@
     padding-top: 1px;
 }
 
-/* CATEGORY */
-
 .product-meta,
 .field-label {
     color: #9b8174;
@@ -142,8 +141,6 @@
     margin: 0 5px;
 }
 
-/* PRODUCT NAME */
-
 .product-information h1 {
     margin: 0 0 15px;
     font-family: 'Playfair Display', Georgia, serif;
@@ -154,7 +151,7 @@
 }
 
 /* =========================================================
-   STOCK AVAILABILITY
+   STOCK STATUS
 ========================================================= */
 
 .product-rating {
@@ -188,7 +185,7 @@
 }
 
 /* =========================================================
-   DESCRIPTION
+   PRODUCT DESCRIPTION
 ========================================================= */
 
 .product-description {
@@ -199,114 +196,7 @@
 }
 
 /* =========================================================
-   PRODUCT VARIANTS
-========================================================= */
-
-.variant-fieldset {
-    min-width: 0;
-    margin: 0 0 24px;
-    padding: 0;
-    border: none;
-}
-
-.variant-fieldset legend {
-    margin-bottom: 12px;
-    padding: 0;
-}
-
-.variant-options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-/* VARIANT CARD */
-
-.variant-option {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    min-width: 125px;
-    min-height: 57px;
-    padding: 10px 15px;
-    border: 1px solid #d8d0c6;
-    border-radius: 8px;
-    background: transparent;
-    cursor: pointer;
-    transition:
-        background 0.2s ease,
-        border-color 0.2s ease;
-}
-
-.variant-option:hover {
-    border-color: #687e69;
-}
-
-.variant-option.selected {
-    background: #e9ede7;
-    border-color: #35644a;
-}
-
-.variant-option.variant-unavailable {
-    opacity: 0.48;
-    cursor: not-allowed;
-}
-
-.variant-option input {
-    position: absolute;
-    opacity: 0;
-    width: 1px;
-    height: 1px;
-}
-
-.variant-option:focus-within {
-    outline: 2px solid #6b8c72;
-    outline-offset: 2px;
-}
-
-.variant-copy {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.variant-copy strong,
-.variant-price {
-    font-size: 11px;
-}
-
-.variant-copy small {
-    color: #b18b76;
-    font-size: 10px;
-}
-
-.variant-price {
-    white-space: nowrap;
-}
-
-.variant-check {
-    display: none;
-    position: absolute;
-    top: -7px;
-    right: -7px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: #35644a;
-    color: #fff;
-    text-align: center;
-    line-height: 16px;
-    font-size: 10px;
-}
-
-.variant-option.selected .variant-check {
-    display: block;
-}
-
-/* =========================================================
-   SKIN TYPES, CONCERNS AND INGREDIENTS
+   SKIN TYPES AND CONCERNS
 ========================================================= */
 
 .product-tags-section {
@@ -338,6 +228,10 @@
     color: #a4775e;
 }
 
+/* =========================================================
+   INGREDIENTS
+========================================================= */
+
 .product-ingredients {
     font-size: 12px;
     line-height: 1.8;
@@ -345,7 +239,37 @@
 }
 
 /* =========================================================
-   PURCHASE CONTROLS
+   INGREDIENT COMPATIBILITY
+========================================================= */
+
+.compatibility-notice {
+    margin: 20px 0;
+    padding: 16px 18px;
+    border-radius: 8px;
+    border: 1px solid #eed0a7;
+    background: #fff0de;
+    color: #8c4c24;
+}
+
+.compatibility-notice strong {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+.compatibility-notice p {
+    margin: 0 0 8px;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.compatibility-notice small {
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+/* =========================================================
+   QUANTITY AND ADD TO BAG
 ========================================================= */
 
 .purchase-row {
@@ -353,8 +277,6 @@
     gap: 12px;
     margin-top: 23px;
 }
-
-/* QUANTITY */
 
 .quantity-control {
     display: flex;
@@ -405,7 +327,9 @@
     margin: 0;
 }
 
-/* ADD TO BAG */
+/* =========================================================
+   ADD TO BAG BUTTON
+========================================================= */
 
 .add-to-bag {
     flex: 1;
@@ -431,21 +355,39 @@
     cursor: not-allowed;
 }
 
-/* CART MESSAGE */
+/* =========================================================
+   FORM FEEDBACK
+========================================================= */
 
 .cart-message {
-    margin-top: 9px;
-    color: #a26430;
-    font-size: 11px;
+    margin: 12px 0;
+    padding: 12px 15px;
+    border-radius: 7px;
+    font-size: 12px;
     line-height: 1.6;
 }
 
-.cart-message:empty {
-    display: none;
+.cart-success {
+    background: #e8f1e9;
+    color: #266943;
+}
+
+.cart-error {
+    background: #fff0ed;
+    color: #a23430;
+}
+
+.cart-error ul {
+    margin: 8px 0 0;
+    padding-left: 20px;
+}
+
+.cart-error li {
+    margin-bottom: 3px;
 }
 
 /* =========================================================
-   SHIPPING NOTE
+   SHIPPING INFORMATION
 ========================================================= */
 
 .shipping-note {
@@ -476,11 +418,6 @@
         font-size: 26px;
     }
 
-    .variant-option {
-        min-width: 110px;
-        padding: 10px;
-    }
-
 }
 
 /* =========================================================
@@ -490,8 +427,7 @@
 @media (max-width: 680px) {
 
     .product-page {
-        padding-top: 22px;
-        padding-bottom: 45px;
+        padding: 22px 0 45px;
     }
 
     .product-breadcrumb,
@@ -512,11 +448,6 @@
         font-size: 28px;
     }
 
-    .variant-option {
-        flex: 1;
-        min-width: 105px;
-    }
-
 }
 
 /* =========================================================
@@ -525,16 +456,17 @@
 
 @media (max-width: 390px) {
 
-    .variant-option {
-        min-width: calc(50% - 5px);
-    }
-
     .purchase-row {
         gap: 8px;
     }
 
     .quantity-control {
         width: 100px;
+    }
+
+    .add-to-bag {
+        font-size: 11px;
+        padding: 10px 8px;
     }
 
     .shipping-note {
