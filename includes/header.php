@@ -32,7 +32,6 @@ if ($role !== 'guest' && !empty($userName)) {
     $userInitial = strtoupper(
         substr($userName, 0, 1)
     );
-
 }
 
 
@@ -89,8 +88,7 @@ $cartCount = 0;
 
             <a
                 href="<?= BASE_URL ?>/index.php"
-                class="brand"
-            >
+                class="brand">
 
                 <span class="brand-icon">
                     <i class="fa-solid fa-leaf"></i>
@@ -109,16 +107,14 @@ $cartCount = 0;
 
                 <a
                     href="<?= BASE_URL ?>/shop.php"
-                    class="<?= $currentPage === 'shop.php' ? 'active' : '' ?>"
-                >
+                    class="<?= $currentPage === 'shop.php' ? 'active' : '' ?>">
                     Shop
                 </a>
 
 
                 <a
                     href="<?= BASE_URL ?>/skin-match.php"
-                    class="<?= $currentPage === 'skin-match.php' ? 'active' : '' ?>"
-                >
+                    class="<?= $currentPage === 'skin-match.php' ? 'active' : '' ?>">
                     Skin Match
                 </a>
 
@@ -135,19 +131,19 @@ $cartCount = 0;
 
 
             <!-- =================================
-                 SEARCH
-            ================================== -->
+     SEARCH BUTTON
+================================= -->
 
-            <a
-                href="<?= BASE_URL ?>/search.php"
+            <button
+                type="button"
                 class="nav-icon"
-                aria-label="Search"
-                title="Search"
-            >
-
+                id="openSearchOverlay"
+                aria-label="Open search"
+                aria-expanded="false"
+                aria-controls="pureviaSearchPanel"
+                title="Search">
                 <i class="fa-solid fa-magnifying-glass"></i>
-
-            </a>
+            </button>
 
 
             <!-- =================================
@@ -160,8 +156,7 @@ $cartCount = 0;
                     href="<?= BASE_URL ?>/account/skin-profile.php"
                     class="nav-icon"
                     aria-label="Skin Profile"
-                    title="Skin Profile"
-                >
+                    title="Skin Profile">
                     <i class="fa-regular fa-heart"></i>
                 </a>
 
@@ -171,8 +166,7 @@ $cartCount = 0;
                     href="#"
                     class="nav-icon"
                     aria-label="Favorites"
-                    title="Favorites"
-                >
+                    title="Favorites">
                     <i class="fa-regular fa-heart"></i>
                 </a>
 
@@ -194,8 +188,7 @@ $cartCount = 0;
                         id="accountDropdownTrigger"
                         aria-label="Account menu"
                         aria-expanded="false"
-                        aria-controls="accountDropdownMenu"
-                    >
+                        aria-controls="accountDropdownMenu">
 
                         <span class="account-avatar">
                             <?= htmlspecialchars($userInitial) ?>
@@ -212,13 +205,11 @@ $cartCount = 0;
                     <div
                         class="account-dropdown-menu"
                         id="accountDropdownMenu"
-                        aria-hidden="true"
-                    >
+                        aria-hidden="true">
 
                         <a
                             href="<?= BASE_URL ?>/account/profile.php"
-                            class="account-dropdown-item"
-                        >
+                            class="account-dropdown-item">
                             <i class="fa-regular fa-user"></i>
 
                             <span>My Profile</span>
@@ -227,8 +218,7 @@ $cartCount = 0;
 
                         <a
                             href="<?= BASE_URL ?>/my-orders.php"
-                            class="account-dropdown-item"
-                        >
+                            class="account-dropdown-item">
                             <i class="fa-solid fa-box"></i>
 
                             <span>My Orders</span>
@@ -240,8 +230,7 @@ $cartCount = 0;
 
                         <a
                             href="<?= BASE_URL ?>/actions/auth/logout.php"
-                            class="account-dropdown-item account-dropdown-logout"
-                        >
+                            class="account-dropdown-item account-dropdown-logout">
                             <i class="fa-solid fa-arrow-right-from-bracket"></i>
 
                             <span>Sign Out</span>
@@ -251,7 +240,7 @@ $cartCount = 0;
 
                 </div>
 
-            <!-- =================================
+                <!-- =================================
                  ADMIN ACCOUNT
             ================================== -->
 
@@ -261,8 +250,7 @@ $cartCount = 0;
                     href="<?= BASE_URL ?>/admin/dashboard.php"
                     class="account-link"
                     aria-label="Admin Dashboard"
-                    title="Admin Dashboard"
-                >
+                    title="Admin Dashboard">
 
                     <span class="account-avatar">
                         <?= htmlspecialchars($userInitial) ?>
@@ -275,7 +263,7 @@ $cartCount = 0;
                 </a>
 
 
-            <!-- =================================
+                <!-- =================================
                  STAFF ACCOUNT
             ================================== -->
 
@@ -285,8 +273,7 @@ $cartCount = 0;
                     href="<?= BASE_URL ?>/staff/dashboard.php"
                     class="account-link"
                     aria-label="Staff Dashboard"
-                    title="Staff Dashboard"
-                >
+                    title="Staff Dashboard">
 
                     <span class="account-avatar">
                         <?= htmlspecialchars($userInitial) ?>
@@ -299,7 +286,7 @@ $cartCount = 0;
                 </a>
 
 
-            <!-- =================================
+                <!-- =================================
                 GUEST ACCOUNT
             ================================== -->
 
@@ -310,8 +297,7 @@ $cartCount = 0;
                     class="nav-icon guest-account-icon login-modal-trigger"
                     id="openLoginModal"
                     aria-label="Login"
-                    title="Login"
-                >
+                    title="Login">
                     <i class="fa-regular fa-user"></i>
                 </button>
 
@@ -326,8 +312,7 @@ $cartCount = 0;
                 href="<?= BASE_URL ?>/cart.php"
                 class="bag-link"
                 aria-label="Shopping Bag"
-                title="Shopping Bag"
-            >
+                title="Shopping Bag">
 
                 <i class="fa-solid fa-bag-shopping"></i>
 
@@ -347,3 +332,163 @@ $cartCount = 0;
     </div>
 
 </header>
+
+
+<!-- =========================================================
+     PUREVIA SEARCH OVERLAY
+========================================================= -->
+
+<div
+    class="pv-search-overlay"
+    id="pureviaSearchOverlay"
+    hidden>
+
+    <!-- DARK BACKDROP -->
+
+    <div
+        class="pv-search-backdrop"
+        id="searchBackdrop"></div>
+
+
+    <!-- SEARCH PANEL -->
+
+    <section
+        class="pv-search-panel"
+        id="pureviaSearchPanel"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Search PureVia products">
+
+        <div class="pv-search-container">
+
+
+            <!-- SEARCH INPUT ROW -->
+
+            <form
+                class="pv-search-form"
+                id="pureviaSearchForm"
+                action="<?= htmlspecialchars(BASE_URL, ENT_QUOTES, 'UTF-8') ?>/shop.php"
+                method="GET"
+                role="search">
+
+                <div class="pv-search-field">
+
+                    <label for="pureviaSearchInput">
+                        Search
+                    </label>
+
+                    <input
+                        type="search"
+                        id="pureviaSearchInput"
+                        name="q"
+                        placeholder="Search skincare products..."
+                        autocomplete="off"
+                        maxlength="100"
+                        aria-controls="pureviaSearchSuggestions"
+                        aria-expanded="false">
+
+
+                    <!-- CLEAR INPUT -->
+
+                    <button
+                        type="button"
+                        class="pv-search-clear"
+                        id="clearSearchInput"
+                        aria-label="Clear search"
+                        hidden>
+                        <i class="fa-solid fa-circle-xmark"></i>
+                    </button>
+
+
+                    <!-- SUBMIT SEARCH -->
+
+                    <button
+                        type="submit"
+                        class="pv-search-submit"
+                        aria-label="Search products">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+
+                </div>
+
+            </form>
+
+
+            <!-- CLOSE SEARCH -->
+
+            <button
+                type="button"
+                class="pv-search-close"
+                id="closeSearchOverlay"
+                aria-label="Close search">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+
+            <!-- LIVE SEARCH DROPDOWN -->
+
+            <div
+                class="pv-search-results"
+                id="pureviaSearchSuggestions"
+                hidden>
+
+                <div class="pv-search-columns">
+
+
+                    <!-- LEFT COLUMN -->
+
+                    <div class="pv-search-suggestions">
+
+                        <h3>SUGGESTIONS</h3>
+
+                        <div
+                            class="pv-suggestion-list"
+                            id="searchSuggestionList"></div>
+
+                    </div>
+
+
+                    <!-- RIGHT COLUMN -->
+
+                    <div class="pv-search-products">
+
+                        <h3>PRODUCTS</h3>
+
+                        <div
+                            class="pv-product-results"
+                            id="searchProductList"></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- BOTTOM SEARCH ACTION -->
+
+                <a
+                    href="<?= htmlspecialchars(BASE_URL, ENT_QUOTES, 'UTF-8') ?>/shop.php"
+                    class="pv-search-all"
+                    id="searchAllLink">
+
+                    <span id="searchAllText">
+                        Search all products
+                    </span>
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </a>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+</div>
+
+<!-- SEARCH JAVASCRIPT -->
+
+<script
+    src="<?= htmlspecialchars(BASE_URL, ENT_QUOTES, 'UTF-8') ?>/assets/js/search_overlay.js"
+    defer></script>

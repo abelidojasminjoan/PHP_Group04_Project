@@ -4,7 +4,6 @@
 
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@400;500&display=swap');
 
-
 /* =========================================
    BASIC RESET
 ========================================= */
@@ -656,4 +655,528 @@ this will control its size.
 .account-dropdown-logout:hover {
     background: #fff4f4;
     color: #c73333;
+}
+
+
+
+/* =========================================================
+   PUREVIA SEARCH BUTTON
+========================================================= */
+
+.navbar-right button.nav-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+    background: transparent;
+
+    color: #292a25;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+
+    cursor: pointer;
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    transition:
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.navbar-right button.nav-icon:hover {
+    color: #69745d;
+    transform: translateY(-1px);
+}
+
+.navbar-right button.nav-icon:focus-visible {
+    outline: 2px solid #69745d;
+    outline-offset: 5px;
+    border-radius: 3px;
+}
+
+
+/* =========================================================
+   SEARCH OVERLAY
+========================================================= */
+
+body.pv-search-open {
+    overflow: hidden;
+}
+
+.pv-search-overlay[hidden],
+.pv-search-results[hidden],
+.pv-search-clear[hidden] {
+    display: none !important;
+}
+
+.pv-search-overlay {
+    position: fixed;
+
+    top: var(--pv-announcement-height, 32px);
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    z-index: 9999;
+
+    font-family: 'DM Sans', sans-serif;
+}
+
+.pv-search-backdrop {
+    position: absolute;
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.50);
+}
+
+.pv-search-panel {
+    position: relative;
+
+    width: 100%;
+
+    padding: 22px 24px 20px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.06);
+}
+
+.pv-search-container {
+    position: relative;
+
+    width: min(970px, 100%);
+
+    margin: 0 auto;
+    padding-right: 52px;
+}
+
+
+/* =========================================================
+   SEARCH FIELD
+========================================================= */
+
+.pv-search-form {
+    width: 100%;
+}
+
+.pv-search-field {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+    height: 60px;
+
+    padding: 0 14px 0 25px;
+
+    border: 1px solid #9c9c9c;
+    background: #ffffff;
+}
+
+.pv-search-field:focus-within {
+    border-color: #53634b;
+
+    outline: 2px solid rgba(83, 99, 75, 0.22);
+}
+
+.pv-search-field label {
+    position: absolute;
+
+    top: 8px;
+    left: 25px;
+
+    color: #999999;
+
+    font-size: 10px;
+    letter-spacing: 0.2px;
+}
+
+.pv-search-field input {
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+
+    padding: 17px 0 0;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+    color: #171717;
+
+    font-family: inherit;
+    font-size: 17px;
+}
+
+.pv-search-field input::placeholder {
+    color: #a5a5a5;
+    font-size: 13px;
+}
+
+.pv-search-field input::-webkit-search-cancel-button {
+    display: none;
+}
+
+
+/* =========================================================
+   SEARCH ACTION BUTTONS
+========================================================= */
+
+.pv-search-clear,
+.pv-search-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border: none;
+    background: transparent;
+
+    cursor: pointer;
+}
+
+.pv-search-clear {
+    width: 35px;
+    height: 38px;
+
+    color: #777777;
+    font-size: 18px;
+}
+
+.pv-search-submit {
+    width: 45px;
+    height: 36px;
+
+    border-left: 1px solid #e7e7e7;
+
+    color: #3c403d;
+    font-size: 19px;
+}
+
+.pv-search-close {
+    position: absolute;
+
+    top: 0;
+    right: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 42px;
+    height: 60px;
+
+    border: none;
+    background: transparent;
+
+    color: #1a1a1a;
+    font-size: 23px;
+
+    cursor: pointer;
+}
+
+.pv-search-close:hover,
+.pv-search-submit:hover,
+.pv-search-clear:hover {
+    color: #53634b;
+}
+
+
+/* =========================================================
+   LIVE SEARCH RESULTS
+========================================================= */
+
+.pv-search-results {
+    position: absolute;
+
+    top: 60px;
+    left: 0;
+    right: 52px;
+
+    z-index: 2;
+
+    max-height: min(70vh, 540px);
+
+    overflow-y: auto;
+
+    background: #ffffff;
+
+    border: 1px solid #ededed;
+    border-top: none;
+
+    box-shadow:
+        0 15px 35px rgba(0, 0, 0, 0.10);
+}
+
+.pv-search-columns {
+    display: grid;
+
+    grid-template-columns: 35% 65%;
+
+    gap: 0;
+
+    padding: 22px 24px 25px;
+}
+
+.pv-search-suggestions {
+    min-width: 0;
+    padding-right: 32px;
+}
+
+.pv-search-products {
+    min-width: 0;
+    padding-left: 18px;
+}
+
+.pv-search-suggestions h3,
+.pv-search-products h3 {
+    margin: 0 0 12px;
+    padding-bottom: 12px;
+
+    border-bottom: 1px solid #e8e8e8;
+
+    color: #8b8b8b;
+
+    font-size: 10px;
+    font-weight: 500;
+
+    letter-spacing: 2px;
+}
+
+
+/* =========================================================
+   SEARCH SUGGESTIONS
+========================================================= */
+
+.pv-suggestion-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.pv-suggestion-item {
+    display: block;
+
+    padding: 11px 0;
+
+    color: #363636;
+    font-size: 13px;
+    line-height: 1.5;
+
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+
+.pv-suggestion-item:hover {
+    color: #53634b;
+    text-decoration: underline;
+}
+
+.pv-suggestion-item strong {
+    color: #151515;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   SEARCH PRODUCT RESULTS
+========================================================= */
+
+.pv-product-results {
+    display: flex;
+    flex-direction: column;
+
+    gap: 14px;
+}
+
+.pv-search-product {
+    display: flex;
+    align-items: center;
+
+    gap: 18px;
+    padding: 5px 0;
+
+    color: #262626;
+    text-decoration: none;
+}
+
+.pv-search-product:hover {
+    color: #42614b;
+}
+
+.pv-search-product-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 62px;
+    height: 62px;
+
+    flex-shrink: 0;
+
+    overflow: hidden;
+
+    background: #f2f0ed;
+}
+
+.pv-search-product-image img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+.pv-search-product-image i {
+    color: #b4aea5;
+    font-size: 24px;
+}
+
+.pv-search-product-details {
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+.pv-search-product-name {
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.pv-search-product-price {
+    color: #35634a;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.pv-search-empty {
+    margin: 10px 0;
+
+    color: #8b8b8b;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   SEARCH ALL RESULTS
+========================================================= */
+
+.pv-search-all {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 18px 24px;
+
+    border-top: 1px solid #ececec;
+
+    color: #222222;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.pv-search-all:hover {
+    background: #f7f7f5;
+    color: #53634b;
+}
+
+.pv-search-all i {
+    font-size: 17px;
+}
+
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+.pv-search-overlay button:focus-visible,
+.pv-search-overlay a:focus-visible {
+    outline: 2px solid #53634b;
+    outline-offset: 3px;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .pv-search-container {
+        width: min(800px, 100%);
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 680px) {
+
+    .pv-search-panel {
+        padding: 14px 12px;
+    }
+
+    .pv-search-container {
+        padding-right: 43px;
+    }
+
+    .pv-search-field {
+        height: 54px;
+        padding-left: 15px;
+    }
+
+    .pv-search-field label {
+        top: 6px;
+        left: 15px;
+    }
+
+    .pv-search-field input {
+        font-size: 15px;
+    }
+
+    .pv-search-close {
+        width: 38px;
+        height: 54px;
+    }
+
+    .pv-search-results {
+        top: 54px;
+        right: 43px;
+
+        max-height: 72vh;
+    }
+
+    .pv-search-columns {
+        grid-template-columns: 1fr;
+
+        gap: 23px;
+        padding: 17px;
+    }
+
+    .pv-search-suggestions,
+    .pv-search-products {
+        padding: 0;
+    }
+
+    .pv-suggestion-list {
+        max-height: 145px;
+        overflow-y: auto;
+    }
+
+    .pv-search-all {
+        padding: 15px 17px;
+    }
+
 }
