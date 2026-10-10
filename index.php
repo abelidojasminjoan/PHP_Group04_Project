@@ -65,6 +65,7 @@ $pageTitle = "PureVia Skin Care";
    GET PRODUCTS FROM DATABASE
 ========================================= */
 
+
 $sql = "
     SELECT
         p.id,
@@ -73,7 +74,15 @@ $sql = "
         p.price,
         p.image,
         p.stock_quantity,
-        c.category_name
+        c.category_name,
+
+        (
+            SELECT pi.image_path
+            FROM product_images pi
+            WHERE pi.product_id = p.id
+            ORDER BY pi.sort_order ASC, pi.id ASC
+            LIMIT 1
+        ) AS primary_image
 
     FROM products p
 
@@ -88,22 +97,14 @@ $sql = "
     LIMIT 3
 ";
 
-
 $productResult = $conn->query($sql);
 
-
-/* =========================================
-   CHECK QUERY
-========================================= */
-
 if (!$productResult) {
-
     error_log(
-        'Homepage product query failed: '
-        . $conn->error
+        'Homepage product query failed: ' . $conn->error
     );
-
 }
+
 
 ?>
 
@@ -323,32 +324,79 @@ if (!$productResult) {
                                 $product = $productResult->fetch_assoc()
                             ): ?>
 
-                                <article class="product-card">
+                                <article class="product-card">               
+                                <?php
+                                $imagePath = trim(
+                                    (string) (
+                                        $product['primary_image']
+                                        ?: $product['image']
+                                        ?: ''
+                                    )
+                                );
 
-                                    <a
-                                        href="./product.php?id=<?= (int) $product['id'] ?>"
-                                        class="product-image-wrapper"
+                                $defaultImage = './assets/images/products/default-product.jpg';
+
+                                if ($imagePath === '') {
+
+                                    $productImage = $defaultImage;
+
+                                } elseif (
+                                    filter_var($imagePath, FILTER_VALIDATE_URL) &&
+                                    in_array(
+                                        strtolower((string) parse_url($imagePath, PHP_URL_SCHEME)),
+                                        ['http', 'https'],
+                                        true
+                                    )
+                                ) {
+
+                                    // External image URL
+                                    $productImage = $imagePath;
+
+                                } else {
+
+                                    // Local image path
+                                    $imagePath = str_replace('\\', '/', $imagePath);
+                                    $imagePath = ltrim($imagePath, '/');
+
+                                    // Only allow files in the product uploads directory
+                                    $filename = basename($imagePath);
+
+                                    $fullPath = __DIR__ . '/uploads/products/' . $filename;
+
+                                    if (
+                                        $filename !== '.' &&
+                                        $filename !== '..' &&
+                                        is_file($fullPath)
+                                    ) {
+                                        $productImage =
+                                            './uploads/products/' . rawurlencode($filename);
+                                    } else {
+                                        $productImage = $defaultImage;
+                                    }
+                                }
+                                ?>
+
+                                <a
+                                    href="./product.php?id=<?= (int) $product['id'] ?>"
+                                    class="product-image-wrapper"
+                                >
+                                    <img
+                                        src="<?= htmlspecialchars(
+                                            $productImage,
+                                            ENT_QUOTES,
+                                            'UTF-8'
+                                        ) ?>"
+                                        alt="<?= htmlspecialchars(
+                                            $product['product_name'],
+                                            ENT_QUOTES,
+                                            'UTF-8'
+                                        ) ?>"
+                                        class="product-image"
+                                        loading="lazy"
+                                        onerror="this.onerror=null;this.src='./assets/images/products/default-product.jpg';"
                                     >
+                                </a>
 
-                                        <?php if (!empty($product['image'])): ?>
-
-                                            <img
-                                                src="./uploads/products/<?= htmlspecialchars($product['image']) ?>"
-                                                alt="<?= htmlspecialchars($product['product_name']) ?>"
-                                                class="product-image"
-                                            >
-
-                                        <?php else: ?>
-
-                                            <img
-                                                src="./assets/images/products/default-product.jpg"
-                                                alt="<?= htmlspecialchars($product['product_name']) ?>"
-                                                class="product-image"
-                                            >
-
-                                        <?php endif; ?>
-
-                                    </a>
 
                                     <div class="product-details">
 

@@ -916,3 +916,64 @@ body {
 
     white-space: nowrap;
 }
+
+.product-sizes {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.product-sizes .size-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: #e9eee9;
+    color: #345d43;
+    font-family: monospace;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.product-sizes .variant-label-badge {
+    background: #f8eee7;
+    color: #bd825f;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+/* PRODUCT TABLE IMAGE PLACEHOLDER */
+
+.products-table .product-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 56px;
+    height: 56px;
+
+    overflow: hidden;
+    border-radius: 8px;
+    background: #f0ede7;
+}
+
+.products-table .product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.products-table .product-image-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100%;
+
+    color: #a69d90;
+    font-size: 21px;
+}
