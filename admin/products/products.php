@@ -1,137 +1,163 @@
 <?php
-
-session_start();
-
 require_once __DIR__ . '/../../config/app.php';
 require_once __DIR__ . '/../../config/db.php';
 
-$pageTitle = "Products";
-
-
-/* =========================================================
-   ADMIN ACCESS ONLY
-
-   1 = Admin
-   2 = Staff
-   3 = Customer
-========================================================= */
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 
 if (
     empty($_SESSION['user_id']) ||
-    empty($_SESSION['role_id']) ||
-    (int) $_SESSION['role_id'] !== 1
+    (int) ($_SESSION['role_id'] ?? 0) !== 1
 ) {
-    header("Location: " . BASE_URL . "/index.php");
+    header('Location: ' . BASE_URL . '/index.php');
     exit;
 }
 
+$pageTitle = 'Products';
 
-/* =========================================================
-   GET CATEGORIES
-========================================================= */
+function productEscape(?string $value): string
+{
+    return htmlspecialchars(
+        $value ?? '',
+        ENT_QUOTES,
+        'UTF-8'
+    );
+}
+
+if (empty($_SESSION['csrf_product'])) {
+    $_SESSION['csrf_product'] = bin2hex(random_bytes(32));
+}
+
+/* CATEGORIES */
 
 $categories = [];
 
-$categoryResult = $conn->query("
-    SELECT
-        id,
-        category_name
-
+$result = $conn->query("
+    SELECT id, category_name
     FROM categories
-
     WHERE status = 'active'
-
-    ORDER BY category_name ASC
+    ORDER BY category_name
 ");
 
-if ($categoryResult) {
-
-    while ($row = $categoryResult->fetch_assoc()) {
-
-        $categories[] = $row;
-    }
+while ($row = $result->fetch_assoc()) {
+    $categories[] = $row;
 }
 
+/* SKIN TYPES, CONCERNS, INGREDIENTS */
 
-/* =========================================================
-   GET PRODUCTS
-========================================================= */
+function loadProductOptions(
+    mysqli $conn,
+    string $table,
+    string $column
+): array {
+    $allowed = [
+        'skin_types' => 'skin_type_name',
+        'skin_concerns' => 'concern_name',
+        'ingredients' => 'ingredient_name'
+    ];
+
+    if (($allowed[$table] ?? null) !== $column) {
+        throw new InvalidArgumentException('Invalid option source.');
+    }
+
+    $items = [];
+
+    $result = $conn->query("
+        SELECT id, {$column} AS label
+        FROM {$table}
+        WHERE status = 'active'
+        ORDER BY {$column}
+    ");
+
+    while ($row = $result->fetch_assoc()) {
+        $items[] = $row;
+    }
+
+    return $items;
+}
+
+$skinTypes = loadProductOptions(
+    $conn,
+    'skin_types',
+    'skin_type_name'
+);
+
+$skinConcerns = loadProductOptions(
+    $conn,
+    'skin_concerns',
+    'concern_name'
+);
+
+$ingredients = loadProductOptions(
+    $conn,
+    'ingredients',
+    'ingredient_name'
+);
+
+/* PRODUCTS */
 
 $products = [];
 
-$productResult = $conn->query("
+$result = $conn->query("
     SELECT
         p.id,
         p.product_name,
         p.product_code,
-        p.description,
         p.price,
         p.stock_quantity,
         p.image,
         p.status,
-
         c.category_name,
 
         GROUP_CONCAT(
-            pv.size_capacity
-            ORDER BY pv.id ASC
+            CONCAT(
+                pv.size_capacity,
+                '::',
+                COALESCE(pv.variant_label, '')
+            )
+            ORDER BY pv.id
             SEPARATOR '||'
-        ) AS sizes
+        ) AS variants
 
-    FROM products AS p
+    FROM products p
 
-    INNER JOIN categories AS c
-        ON p.category_id = c.id
+    INNER JOIN categories c
+        ON c.id = p.category_id
 
-    LEFT JOIN product_variants AS pv
-        ON p.id = pv.product_id
+    LEFT JOIN product_variants pv
+        ON pv.product_id = p.id
 
     GROUP BY
         p.id,
         p.product_name,
         p.product_code,
-        p.description,
         p.price,
         p.stock_quantity,
         p.image,
         p.status,
         c.category_name
 
-    ORDER BY p.created_at DESC, p.id DESC
+    ORDER BY p.id DESC
 ");
 
-if ($productResult) {
-
-    while ($row = $productResult->fetch_assoc()) {
-
-        $products[] = $row;
-    }
+while ($row = $result->fetch_assoc()) {
+    $products[] = $row;
 }
 
+$success = $_SESSION['product_success'] ?? '';
+$error = $_SESSION['product_error'] ?? '';
 
-$totalProducts = count($products);
-
-
-/* =========================================================
-   FLASH MESSAGE
-========================================================= */
-
-$successMessage =
-    $_SESSION['product_success'] ?? '';
-
-$errorMessage =
-    $_SESSION['product_error'] ?? '';
-
-unset($_SESSION['product_success']);
-unset($_SESSION['product_error']);
-
+unset(
+    $_SESSION['product_success'],
+    $_SESSION['product_error']
+);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -139,28 +165,17 @@ unset($_SESSION['product_error']);
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>
-        <?= htmlspecialchars($pageTitle) ?> | PureVia Admin
-    </title>
-
-
-    <!-- GOOGLE FONTS -->
+    <title>Products | PureVia Admin</title>
 
     <link
-        rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
     >
-
-
-    <!-- FONT AWESOME -->
 
     <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
     >
-
-
-    <!-- EXISTING CSS -->
 
     <link
         rel="stylesheet"
@@ -172,130 +187,75 @@ unset($_SESSION['product_error']);
         href="<?= BASE_URL ?>/assets/css/product.css"
     >
 
-
-    <!-- NEW REUSABLE FORM CSS -->
-
     <link
         rel="stylesheet"
         href="<?= BASE_URL ?>/assets/css/form2.css"
     >
-
 </head>
 
-
 <body>
-
 
 <?php
 include __DIR__ . '/../../includes/sidemenu.php';
 ?>
 
-
 <div class="admin-layout">
 
-
-    <!-- TOP BAR -->
-
     <header class="admin-topbar">
-
-        <p class="admin-topbar-title">
-            Products
-        </p>
-
+        <p class="admin-topbar-title">Products</p>
     </header>
 
-
     <main class="products-main">
-
-
-        <!-- PAGE HEADER -->
 
         <section class="products-page-header">
 
             <div class="products-heading">
-
                 <h1>Products</h1>
 
                 <p>
                     <span id="productCount">
-                        <?= number_format($totalProducts) ?>
+                        <?= count($products) ?>
                     </span>
                     records
                 </p>
-
             </div>
-
 
             <button
                 type="button"
                 class="add-product-button"
                 id="openAddProductModal"
             >
-
                 <i class="fa-solid fa-plus"></i>
-
-                <span>Add Product</span>
-
+                Add Product
             </button>
 
         </section>
 
-
-        <!-- SUCCESS MESSAGE -->
-
-        <?php if ($successMessage !== ''): ?>
-
+        <?php if ($success !== ''): ?>
             <div class="form-alert form-alert-success">
-
-                <i class="fa-solid fa-circle-check"></i>
-
-                <?= htmlspecialchars($successMessage) ?>
-
+                <?= productEscape($success) ?>
             </div>
-
         <?php endif; ?>
 
-
-        <!-- ERROR MESSAGE -->
-
-        <?php if ($errorMessage !== ''): ?>
-
+        <?php if ($error !== ''): ?>
             <div class="form-alert form-alert-error">
-
-                <i class="fa-solid fa-circle-exclamation"></i>
-
-                <?= htmlspecialchars($errorMessage) ?>
-
+                <?= productEscape($error) ?>
             </div>
-
         <?php endif; ?>
-
-
-        <!-- PRODUCTS CARD -->
 
         <section class="products-card">
 
-
-            <!-- SEARCH / FILTER -->
-
             <div class="products-toolbar">
 
-
                 <div class="products-search">
-
                     <i class="fa-solid fa-magnifying-glass"></i>
 
                     <input
                         type="search"
                         id="productSearch"
                         placeholder="Search products..."
-                        autocomplete="off"
                     >
-
                 </div>
-
-
-                <!-- CATEGORY -->
 
                 <div class="product-filter-dropdown">
 
@@ -305,84 +265,45 @@ include __DIR__ . '/../../includes/sidemenu.php';
                         id="categoryFilter"
                         class="product-filter-select"
                     >
-
                         <option value="all">
                             All Categories
                         </option>
 
                         <?php foreach ($categories as $category): ?>
-
-                            <option
-                                value="<?= htmlspecialchars(
-                                    strtolower(
-                                        $category['category_name']
-                                    )
-                                ) ?>"
-                            >
-
-                                <?= htmlspecialchars(
-                                    $category['category_name']
-                                ) ?>
-
+                            <option value="<?= productEscape(strtolower($category['category_name'])) ?>">
+                                <?= productEscape($category['category_name']) ?>
                             </option>
-
                         <?php endforeach; ?>
-
                     </select>
 
                     <i class="fa-solid fa-chevron-down product-filter-arrow"></i>
 
                 </div>
-
-
-                <!-- STATUS -->
 
                 <div class="product-filter-dropdown">
 
                     <select
                         id="statusFilter"
-                        class="
-                            product-filter-select
-                            status-filter-select
-                        "
+                        class="product-filter-select status-filter-select"
                     >
-
-                        <option value="all">
-                            All Status
-                        </option>
-
-                        <option value="active">
-                            Active
-                        </option>
-
-                        <option value="inactive">
-                            Inactive
-                        </option>
-
-                        <option value="out_of_stock">
-                            Out of Stock
-                        </option>
-
+                        <option value="all">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="out_of_stock">Out of Stock</option>
                     </select>
 
                     <i class="fa-solid fa-chevron-down product-filter-arrow"></i>
 
                 </div>
 
-
             </div>
-
-
-            <!-- PRODUCT TABLE -->
 
             <div class="products-table-wrapper">
 
                 <table class="products-table">
 
                     <thead>
-
                         <tr>
-
                             <th>PRODUCT</th>
                             <th>SKU</th>
                             <th>CATEGORY</th>
@@ -390,302 +311,163 @@ include __DIR__ . '/../../includes/sidemenu.php';
                             <th>STOCK</th>
                             <th>STATUS</th>
                             <th>ACTIONS</th>
-
                         </tr>
-
                     </thead>
-
 
                     <tbody>
 
-
                     <?php foreach ($products as $product): ?>
 
-
                         <?php
-
-                        $status = strtolower(
-                            $product['status']
-                        );
-
-                        $category = strtolower(
+                        $searchData = strtolower(
+                            $product['product_name'] . ' ' .
+                            $product['product_code'] . ' ' .
                             $product['category_name']
                         );
 
-                        $searchData = strtolower(
-                            $product['product_name']
-                            . ' '
-                            . $product['product_code']
-                            . ' '
-                            . $product['category_name']
-                        );
+                        $variantItems = $product['variants']
+                            ? explode('||', $product['variants'])
+                            : [];
 
-                        $sizes = [];
+                        $image = $product['image'] ?? '';
 
-                        if (!empty($product['sizes'])) {
-
-                            $sizes = explode(
-                                '||',
-                                $product['sizes']
-                            );
+                        if (
+                            $image !== '' &&
+                            !preg_match('~^https?://~i', $image)
+                        ) {
+                            $image = BASE_URL . '/' . ltrim($image, '/');
                         }
-
                         ?>
-
 
                         <tr
                             class="product-row"
-
-                            data-category="<?= htmlspecialchars(
-                                $category
-                            ) ?>"
-
-                            data-status="<?= htmlspecialchars(
-                                $status
-                            ) ?>"
-
-                            data-search="<?= htmlspecialchars(
-                                $searchData
-                            ) ?>"
+                            data-search="<?= productEscape($searchData) ?>"
+                            data-category="<?= productEscape(strtolower($product['category_name'])) ?>"
+                            data-status="<?= productEscape(strtolower($product['status'])) ?>"
                         >
 
-
-                            <!-- PRODUCT -->
-
                             <td>
-
                                 <div class="product-information">
-
 
                                     <div class="product-image">
 
-                                        <?php if (!empty($product['image'])): ?>
+                                        <?php if ($image !== ''): ?>
 
                                             <img
-                                                src="<?= htmlspecialchars(
-                                                    BASE_URL . '/' . ltrim(
-                                                        $product['image'],
-                                                        '/'
-                                                    )
-                                                ) ?>"
-                                                alt="<?= htmlspecialchars(
-                                                    $product['product_name']
-                                                ) ?>"
+                                                src="<?= productEscape($image) ?>"
+                                                alt="<?= productEscape($product['product_name']) ?>"
+                                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                                             >
+
+                                            <div class="product-image-fallback" style="display:none;">
+                                                <i class="fa-regular fa-image"></i>
+                                            </div>
 
                                         <?php else: ?>
 
-                                            <div
-                                                style="
-                                                    width:100%;
-                                                    height:100%;
-                                                    display:flex;
-                                                    align-items:center;
-                                                    justify-content:center;
-                                                    color:#9a9288;
-                                                "
-                                            >
-                                                <i class="fa-solid fa-pump-soap"></i>
+                                            <div class="product-image-fallback">
+                                                <i class="fa-regular fa-image"></i>
                                             </div>
 
                                         <?php endif; ?>
 
                                     </div>
 
-
                                     <p class="product-name">
-
-                                        <?= htmlspecialchars(
-                                            $product['product_name']
-                                        ) ?>
-
+                                        <?= productEscape($product['product_name']) ?>
                                     </p>
 
                                 </div>
-
                             </td>
-
-
-                            <!-- SKU -->
 
                             <td class="product-sku">
-
-                                <?= htmlspecialchars(
-                                    $product['product_code']
-                                ) ?>
-
+                                <?= productEscape($product['product_code']) ?>
                             </td>
-
-
-                            <!-- CATEGORY -->
 
                             <td class="product-category">
-
-                                <?= htmlspecialchars(
-                                    $product['category_name']
-                                ) ?>
-
+                                <?= productEscape($product['category_name']) ?>
                             </td>
 
-
-                            <!-- SIZES -->
-
                             <td>
-
                                 <div class="product-sizes">
 
-                                    <?php if (!empty($sizes)): ?>
+                                    <?php foreach ($variantItems as $item): ?>
 
-                                        <?php foreach ($sizes as $size): ?>
-
-                                            <span class="size-badge">
-
-                                                <?= htmlspecialchars(
-                                                    $size
-                                                ) ?>
-
-                                            </span>
-
-                                        <?php endforeach; ?>
-
-                                    <?php else: ?>
+                                        <?php
+                                        [$size, $label] = array_pad(
+                                            explode('::', $item, 2),
+                                            2,
+                                            ''
+                                        );
+                                        ?>
 
                                         <span class="size-badge">
-                                            —
+                                            <?= productEscape($size) ?>
                                         </span>
 
-                                    <?php endif; ?>
+                                        <?php if ($label !== ''): ?>
+                                            <span class="size-badge variant-label-badge">
+                                                <?= productEscape($label) ?>
+                                            </span>
+                                        <?php endif; ?>
+
+                                    <?php endforeach; ?>
 
                                 </div>
-
                             </td>
 
-
-                            <!-- STOCK -->
-
                             <td>
-
-                                <span
-                                    class="
-                                        product-stock
-
-                                        <?= (int) $product['stock_quantity'] <= 10
-                                            ? 'low-stock'
-                                            : '' ?>
-                                    "
-                                >
-
-                                    <?= number_format(
-                                        (int) $product['stock_quantity']
-                                    ) ?>
-
+                                <span class="product-stock <?= (int)$product['stock_quantity'] <= 10 ? 'low-stock' : '' ?>">
+                                    <?= (int)$product['stock_quantity'] ?>
                                 </span>
-
                             </td>
 
-
-                            <!-- STATUS -->
-
                             <td>
-
-                                <span
-                                    class="
-                                        product-status
-                                        status-<?= htmlspecialchars(
-                                            $status
-                                        ) ?>
-                                    "
-                                >
-
-                                    <?= strtoupper(
-                                        str_replace(
-                                            '_',
-                                            ' ',
-                                            htmlspecialchars($status)
-                                        )
-                                    ) ?>
-
+                                <span class="product-status status-<?= productEscape($product['status']) ?>">
+                                    <?= productEscape(strtoupper(str_replace('_', ' ', $product['status']))) ?>
                                 </span>
-
                             </td>
 
-
-                            <!-- ACTIONS -->
-
                             <td>
-
                                 <div class="product-actions">
 
-
                                     <a
-                                        href="./edit_product.php?id=<?= (int) $product['id'] ?>"
-                                        class="
-                                            product-action-button
-                                            edit-product-button
-                                        "
+                                        href="./edit_product.php?id=<?= (int)$product['id'] ?>"
+                                        class="product-action-button edit-product-button"
                                         title="Edit product"
                                     >
-
                                         <i class="fa-regular fa-pen-to-square"></i>
-
                                     </a>
-
 
                                     <button
                                         type="button"
-                                        class="
-                                            product-action-button
-                                            delete-product-button
-                                        "
-                                        data-product-id="<?= (int) $product['id'] ?>"
-                                        data-product-name="<?= htmlspecialchars(
-                                            $product['product_name']
-                                        ) ?>"
+                                        class="product-action-button delete-product-button"
+                                        data-product-id="<?= (int)$product['id'] ?>"
+                                        data-product-name="<?= productEscape($product['product_name']) ?>"
                                         title="Delete product"
                                     >
-
                                         <i class="fa-regular fa-trash-can"></i>
-
                                     </button>
 
-
                                 </div>
-
                             </td>
-
 
                         </tr>
 
-
                     <?php endforeach; ?>
-
-
-                    <!-- NO PRODUCTS -->
 
                     <tr
                         id="noProductsFound"
                         class="no-products-row"
-                        <?= !empty($products)
-                            ? 'style="display:none;"'
-                            : '' ?>
+                        <?= count($products) ? 'style="display:none"' : '' ?>
                     >
-
                         <td colspan="7">
-
                             <div class="no-products-message">
-
                                 <i class="fa-solid fa-box-open"></i>
-
-                                <p>
-                                    No products found.
-                                </p>
-
+                                <p>No products found.</p>
                             </div>
-
                         </td>
-
                     </tr>
-
 
                     </tbody>
 
@@ -700,10 +482,7 @@ include __DIR__ . '/../../includes/sidemenu.php';
 </div>
 
 
-
-<!-- =========================================================
-     ADD PRODUCT MODAL
-========================================================= -->
+<!-- ADD PRODUCT MODAL -->
 
 <div
     class="form-modal"
@@ -711,12 +490,10 @@ include __DIR__ . '/../../includes/sidemenu.php';
     aria-hidden="true"
 >
 
-
     <div
         class="form-modal-backdrop"
         data-close-form-modal
     ></div>
-
 
     <div
         class="form-modal-dialog form-modal-large"
@@ -725,21 +502,25 @@ include __DIR__ . '/../../includes/sidemenu.php';
         aria-labelledby="addProductTitle"
     >
 
-
         <form
             action="./add_product.php"
             method="POST"
+            enctype="multipart/form-data"
             id="addProductForm"
             class="purevia-form"
         >
 
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="<?= productEscape($_SESSION['csrf_product']) ?>"
+            >
 
-            <!-- HEADER -->
+            <!-- MODAL HEADER -->
 
             <div class="form-modal-header">
 
                 <div>
-
                     <h2 id="addProductTitle">
                         Add New Product
                     </h2>
@@ -747,9 +528,7 @@ include __DIR__ . '/../../includes/sidemenu.php';
                     <p>
                         Fill in the details and add all available sizes
                     </p>
-
                 </div>
-
 
                 <button
                     type="button"
@@ -757,34 +536,23 @@ include __DIR__ . '/../../includes/sidemenu.php';
                     data-close-form-modal
                     aria-label="Close"
                 >
-
                     <i class="fa-solid fa-xmark"></i>
-
                 </button>
 
             </div>
 
-
-            <!-- BODY -->
+            <!-- SCROLLABLE BODY -->
 
             <div class="form-modal-body">
 
-
-                <!-- PRODUCT NAME + SKU -->
+                <!-- PRODUCT NAME AND SKU -->
 
                 <div class="form-grid form-grid-2">
 
-
                     <div class="form-group">
-
                         <label for="productName">
-
                             Product Name
-
-                            <span class="form-required">
-                                *
-                            </span>
-
+                            <span class="form-required">*</span>
                         </label>
 
                         <input
@@ -796,20 +564,12 @@ include __DIR__ . '/../../includes/sidemenu.php';
                             maxlength="200"
                             required
                         >
-
                     </div>
 
-
                     <div class="form-group">
-
                         <label for="productCode">
-
                             SKU
-
-                            <span class="form-required">
-                                *
-                            </span>
-
+                            <span class="form-required">*</span>
                         </label>
 
                         <input
@@ -821,30 +581,19 @@ include __DIR__ . '/../../includes/sidemenu.php';
                             maxlength="100"
                             required
                         >
-
                     </div>
-
 
                 </div>
 
-
-                <!-- CATEGORY + STATUS -->
+                <!-- CATEGORY AND STATUS -->
 
                 <div class="form-grid form-grid-2">
 
-
                     <div class="form-group">
-
                         <label for="productCategory">
-
                             Category
-
-                            <span class="form-required">
-                                *
-                            </span>
-
+                            <span class="form-required">*</span>
                         </label>
-
 
                         <div class="form-select-wrapper">
 
@@ -854,42 +603,27 @@ include __DIR__ . '/../../includes/sidemenu.php';
                                 class="form-control form-select"
                                 required
                             >
-
                                 <option value="">
                                     Select category
                                 </option>
 
-
                                 <?php foreach ($categories as $category): ?>
-
-                                    <option
-                                        value="<?= (int) $category['id'] ?>"
-                                    >
-
-                                        <?= htmlspecialchars(
-                                            $category['category_name']
-                                        ) ?>
-
+                                    <option value="<?= (int)$category['id'] ?>">
+                                        <?= productEscape($category['category_name']) ?>
                                     </option>
-
                                 <?php endforeach; ?>
-
 
                             </select>
 
                             <i class="fa-solid fa-chevron-down"></i>
 
                         </div>
-
                     </div>
 
-
                     <div class="form-group">
-
                         <label for="productStatus">
                             Status
                         </label>
-
 
                         <div class="form-select-wrapper">
 
@@ -898,26 +632,16 @@ include __DIR__ . '/../../includes/sidemenu.php';
                                 name="status"
                                 class="form-control form-select"
                             >
-
-                                <option value="active">
-                                    Active
-                                </option>
-
-                                <option value="inactive">
-                                    Inactive
-                                </option>
-
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
                             </select>
 
                             <i class="fa-solid fa-chevron-down"></i>
 
                         </div>
-
                     </div>
 
-
                 </div>
-
 
                 <!-- DESCRIPTION -->
 
@@ -937,154 +661,340 @@ include __DIR__ . '/../../includes/sidemenu.php';
 
                 </div>
 
+                <!-- PRODUCT IMAGES -->
+                <section class="product-form-section">
 
-                <!-- =================================================
-                     SIZES
-                ================================================== -->
+                    <h3>Product images</h3>
 
-                <div class="form-section">
+                    <div class="product-images-layout">
 
+                        <div class="product-images-inputs">
+
+                            <label for="productImageUrl">
+                                Image URL
+                            </label>
+
+                            <div class="image-url-row">
+
+                                <input
+                                    type="url"
+                                    id="productImageUrl"
+                                    class="form-control"
+                                    placeholder="https://..."
+                                >
+
+                                <button
+                                    type="button"
+                                    id="addImageUrl"
+                                    class="product-image-add"
+                                >
+                                    Add
+                                </button>
+
+                            </div>
+
+                            <button
+                                type="button"
+                                id="uploadImagesButton"
+                                class="product-upload-button"
+                            >
+                                <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                                Upload images
+                            </button>
+
+                            <input
+                                type="file"
+                                id="productImageFiles"
+                                name="product_images[]"
+                                accept="image/jpeg,image/png,image/webp"
+                                multiple
+                                hidden
+                            >
+
+                            <!-- IMAGE THUMBNAILS -->
+
+                            <div
+                                id="productImageList"
+                                class="product-image-list"
+                            ></div>
+
+                            <p class="product-help">
+                                Add image URLs or upload multiple images.
+                                The first image will be the primary product image.
+                                Maximum 10 images, 5 MB each.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div id="productImageUrlFields"></div>
+
+                </section>
+
+                <!-- SKIN MATCHING -->
+
+                <section class="product-form-section">
+
+                    <h3>Skin matching &amp; formulation</h3>
+
+                    <!-- SKIN TYPES -->
+
+                    <div class="form-group">
+
+                        <label>Skin Types</label>
+
+                        <div class="skin-type-options">
+
+                            <?php foreach ($skinTypes as $item): ?>
+
+                                <label class="product-checkbox">
+
+                                    <input
+                                        type="checkbox"
+                                        name="skin_type_ids[]"
+                                        value="<?= (int)$item['id'] ?>"
+                                    >
+
+                                    <span>
+                                        <?= productEscape($item['label']) ?>
+                                    </span>
+
+                                </label>
+
+                            <?php endforeach; ?>
+
+                        </div>
+
+                    </div>
+
+                    <!-- SKIN CONCERNS -->
+
+                    <div class="form-group">
+
+                        <label for="concernSearch">
+                            Skin Concerns
+                        </label>
+
+                        <input
+                            type="search"
+                            id="concernSearch"
+                            class="form-control checkbox-search"
+                            placeholder="Search skin concerns..."
+                        >
+
+                        <div
+                            class="checkbox-list"
+                            id="concernOptions"
+                        >
+
+                            <?php foreach ($skinConcerns as $item): ?>
+
+                                <label class="product-checkbox">
+
+                                    <input
+                                        type="checkbox"
+                                        name="concern_ids[]"
+                                        value="<?= (int)$item['id'] ?>"
+                                    >
+
+                                    <span>
+                                        <?= productEscape($item['label']) ?>
+                                    </span>
+
+                                </label>
+
+                            <?php endforeach; ?>
+
+                        </div>
+
+                    </div>
+
+                    <!-- INGREDIENTS -->
+
+                    <div class="form-group">
+
+                        <label for="ingredientSearch">
+                            Ingredients
+                        </label>
+
+                        <input
+                            type="search"
+                            id="ingredientSearch"
+                            class="form-control checkbox-search"
+                            placeholder="Search ingredients..."
+                        >
+
+                        <div
+                            class="checkbox-list"
+                            id="ingredientOptions"
+                        >
+
+                            <?php foreach ($ingredients as $item): ?>
+
+                                <label class="product-checkbox">
+
+                                    <input
+                                        type="checkbox"
+                                        name="ingredient_ids[]"
+                                        value="<?= (int)$item['id'] ?>"
+                                    >
+
+                                    <span>
+                                        <?= productEscape($item['label']) ?>
+                                    </span>
+
+                                </label>
+
+                            <?php endforeach; ?>
+
+                        </div>
+
+                    </div>
+
+                    <!-- KEY BENEFITS -->
+
+                    <div class="form-group">
+
+                        <label for="keyBenefits">
+                            Key Benefits
+                        </label>
+
+                        <textarea
+                            id="keyBenefits"
+                            name="key_benefits"
+                            class="form-control form-textarea"
+                            rows="3"
+                            placeholder="One benefit per line&#10;e.g. Supports the skin barrier&#10;Provides lasting hydration"
+                        ></textarea>
+
+                        <p class="product-help">
+                            Enter one customer-facing benefit per line.
+                        </p>
+
+                    </div>
+
+                </section>
+
+                <!-- SIZES AND OPTIONS -->
+
+                <section class="product-form-section variant-section">
 
                     <div class="form-section-header">
 
                         <div>
-
-                            <h3>
-                                Sizes &amp; Options
-                            </h3>
+                            <h3>Sizes &amp; Options</h3>
 
                             <p>
                                 Price and stock are set per size.
                                 Base price is derived from the first size.
                             </p>
-
                         </div>
-
 
                         <button
                             type="button"
                             class="form-outline-button"
                             id="addSizeButton"
                         >
-
-                            <i class="fa-solid fa-plus"></i>
-
-                            Add Size
-
+                            + Add Size
                         </button>
 
                     </div>
 
+                    <div class="variant-scroll">
 
-                    <!-- COLUMN LABELS -->
+                        <div class="variant-header">
+                            <span>SIZE / CAPACITY</span>
+                            <span>LABEL (OPTIONAL)</span>
+                            <span>PRICE (₱)</span>
+                            <span>STOCK</span>
+                            <span>THRESHOLD</span>
+                            <span></span>
+                        </div>
 
-                    <div class="variant-header">
+                        <div id="variantRows">
 
-                        <span>SIZE / CAPACITY</span>
-
-                        <span>LABEL (OPTIONAL)</span>
-
-                        <span>PRICE (₱)</span>
-
-                        <span>STOCK</span>
-
-                        <span></span>
-
-                    </div>
-
-
-                    <!-- VARIANT ROWS -->
-
-                    <div id="variantRows">
-
-
-                        <div class="variant-row">
-
-
-                            <input
-                                type="text"
-                                name="size_capacity[]"
-                                class="form-control"
-                                placeholder="e.g. 30ml, 1 sheet"
-                                maxlength="100"
-                                required
-                            >
-
-
-                            <input
-                                type="text"
-                                name="variant_label[]"
-                                class="form-control"
-                                placeholder="e.g. Regular, Trial"
-                                maxlength="100"
-                            >
-
-
-                            <div class="price-input">
-
-                                <span>₱</span>
+                            <div class="variant-row">
 
                                 <input
-                                    type="number"
-                                    name="variant_price[]"
+                                    type="text"
+                                    name="size_capacity[]"
                                     class="form-control"
-                                    placeholder="0.00"
-                                    min="0"
-                                    step="0.01"
+                                    placeholder="e.g. 30ml, 1 sheet"
+                                    maxlength="100"
                                     required
                                 >
 
+                                <input
+                                    type="text"
+                                    name="variant_label[]"
+                                    class="form-control"
+                                    placeholder="e.g. Regular, Trial"
+                                    maxlength="100"
+                                >
+
+                                <div class="price-input">
+
+                                    <span>₱</span>
+
+                                    <input
+                                        type="number"
+                                        name="variant_price[]"
+                                        class="form-control"
+                                        placeholder="0.00"
+                                        min="0"
+                                        step="0.01"
+                                        required
+                                    >
+
+                                </div>
+
+                                <input
+                                    type="number"
+                                    name="variant_stock[]"
+                                    class="form-control"
+                                    value="0"
+                                    min="0"
+                                    step="1"
+                                    required
+                                >
+
+                                <input
+                                    type="number"
+                                    name="variant_threshold[]"
+                                    class="form-control"
+                                    value="15"
+                                    min="0"
+                                    step="1"
+                                    required
+                                >
+
+                                <button
+                                    type="button"
+                                    class="variant-remove"
+                                    aria-label="Remove size"
+                                    disabled
+                                >
+                                    &times;
+                                </button>
+
                             </div>
-
-
-                            <input
-                                type="number"
-                                name="variant_stock[]"
-                                class="form-control"
-                                value="0"
-                                min="0"
-                                step="1"
-                                required
-                            >
-
-
-                            <button
-                                type="button"
-                                class="variant-remove"
-                                aria-label="Remove size"
-                                disabled
-                            >
-
-                                <i class="fa-solid fa-xmark"></i>
-
-                            </button>
-
 
                         </div>
 
-
                     </div>
 
-
                     <p class="form-helper">
-
-                        <i class="fa-solid fa-arrow-up"></i>
-
-                        First size sets the base price shown in the catalog.
-
+                        ↑ First size sets the base price shown in the catalog
                     </p>
 
-
-                </div>
-
+                </section>
 
             </div>
 
+            <!-- FIXED FOOTER -->
 
-            <!-- FOOTER -->
-
-            <div class="form-modal-footer">
-
+            <footer class="form-modal-footer">
 
                 <button
                     type="button"
@@ -1094,43 +1004,25 @@ include __DIR__ . '/../../includes/sidemenu.php';
                     Cancel
                 </button>
 
-
                 <button
                     type="submit"
                     class="form-submit-button"
                     id="submitProductButton"
                 >
-
                     Add Product
-
                 </button>
 
-
-            </div>
-
+            </footer>
 
         </form>
 
-
     </div>
-
 
 </div>
 
-
-
-<!-- EXISTING JS -->
-
 <script src="<?= BASE_URL ?>/assets/js/sidemenu.js"></script>
-
 <script src="<?= BASE_URL ?>/assets/js/products.js"></script>
-
-
-<!-- NEW REUSABLE FORM JS -->
-
-<script src="<?= BASE_URL ?>/assets/js/forms.js"></script>
-
+<script src="<?= BASE_URL ?>/assets/js/add_product_form.js"></script>
 
 </body>
-
 </html>

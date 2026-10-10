@@ -1,511 +1,714 @@
 <?php
 
-session_start();
-
 require_once __DIR__ . '/../../config/app.php';
 require_once __DIR__ . '/../../config/db.php';
 
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 
-/* =========================================================
-   ADMIN ONLY
-========================================================= */
+function failProduct(string $message): never
+{
+    $_SESSION['product_error'] = $message;
+
+    header('Location: ./products.php');
+    exit;
+}
+
+/* POST ONLY */
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: ./products.php');
+    exit;
+}
+
+/* ADMIN ONLY */
 
 if (
     empty($_SESSION['user_id']) ||
-    empty($_SESSION['role_id']) ||
-    (int) $_SESSION['role_id'] !== 1
+    (int) ($_SESSION['role_id'] ?? 0) !== 1
 ) {
-    header("Location: " . BASE_URL . "/index.php");
-    exit;
+    http_response_code(403);
+    exit('Access denied.');
 }
 
+/* CSRF */
 
-/* =========================================================
-   POST ONLY
-========================================================= */
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-
-    header("Location: ./products.php");
-    exit;
-}
-
-
-/* =========================================================
-   GET FORM DATA
-========================================================= */
-
-$productName = trim(
-    $_POST['product_name'] ?? ''
-);
-
-$productCode = strtoupper(
-    trim(
-        $_POST['product_code'] ?? ''
-    )
-);
-
-$categoryId = filter_input(
-    INPUT_POST,
-    'category_id',
-    FILTER_VALIDATE_INT
-);
-
-$status = strtolower(
-    trim(
-        $_POST['status'] ?? 'active'
-    )
-);
-
-$description = trim(
-    $_POST['description'] ?? ''
-);
-
-
-$sizeCapacities =
-    $_POST['size_capacity'] ?? [];
-
-$variantLabels =
-    $_POST['variant_label'] ?? [];
-
-$variantPrices =
-    $_POST['variant_price'] ?? [];
-
-$variantStocks =
-    $_POST['variant_stock'] ?? [];
-
-
-/* =========================================================
-   BASIC VALIDATION
-========================================================= */
-
-$errors = [];
-
-
-if ($productName === '') {
-
-    $errors[] =
-        'Product name is required.';
-}
-
-
-if ($productCode === '') {
-
-    $errors[] =
-        'SKU is required.';
-}
-
-
-if (!$categoryId) {
-
-    $errors[] =
-        'Please select a category.';
-}
-
-
-$allowedStatuses = [
-    'active',
-    'inactive'
-];
-
+$token = $_POST['csrf_token'] ?? '';
 
 if (
-    !in_array(
-        $status,
-        $allowedStatuses,
-        true
-    )
+    !is_string($token) ||
+    empty($_SESSION['csrf_product']) ||
+    !hash_equals($_SESSION['csrf_product'], $token)
 ) {
-
-    $errors[] =
-        'Invalid product status.';
+    failProduct('Invalid security token. Refresh the page.');
 }
 
+/* VALIDATE SELECTED DATABASE IDS */
 
-/* =========================================================
-   VALIDATE CATEGORY
-========================================================= */
+function validProductIds(
+    mysqli $conn,
+    string $table,
+    array $ids
+): array {
 
-if ($categoryId) {
+    $allowedTables = [
+        'skin_types',
+        'skin_concerns',
+        'ingredients'
+    ];
 
-    $categoryStmt = $conn->prepare("
+    if (!in_array($table, $allowedTables, true)) {
+        throw new RuntimeException('Invalid selection table.');
+    }
+
+    if (count($ids) > 200) {
+        throw new RuntimeException('Too many selections.');
+    }
+
+    foreach ($ids as $value) {
+        if (
+            !is_scalar($value) ||
+            filter_var(
+                $value,
+                FILTER_VALIDATE_INT,
+                ['options' => ['min_range' => 1]]
+            ) === false
+        ) {
+            throw new RuntimeException('Invalid selected item.');
+        }
+    }
+
+    $ids = array_values(array_unique(array_map('intval', $ids)));
+
+    if (!$ids) {
+        return [];
+    }
+
+    $placeholders = implode(
+        ',',
+        array_fill(0, count($ids), '?')
+    );
+
+    $stmt = $conn->prepare("
+        SELECT id
+        FROM {$table}
+        WHERE status = 'active'
+        AND id IN ({$placeholders})
+    ");
+
+    $types = str_repeat('i', count($ids));
+
+    $stmt->bind_param($types, ...$ids);
+    $stmt->execute();
+
+    $found = array_map(
+        'intval',
+        array_column(
+            $stmt->get_result()->fetch_all(MYSQLI_ASSOC),
+            'id'
+        )
+    );
+
+    $stmt->close();
+
+    if (count($found) !== count($ids)) {
+        throw new RuntimeException(
+            'Some selected options are invalid.'
+        );
+    }
+
+    return $found;
+}
+
+/* MAIN PROCESS */
+
+$savedFiles = [];
+$transactionStarted = false;
+
+try {
+
+    /* PRODUCT INFORMATION */
+
+    $productName = trim(
+        (string) ($_POST['product_name'] ?? '')
+    );
+
+    $productCode = strtoupper(trim(
+        (string) ($_POST['product_code'] ?? '')
+    ));
+
+    $categoryId = filter_var(
+        $_POST['category_id'] ?? null,
+        FILTER_VALIDATE_INT
+    );
+
+    $status = (string) ($_POST['status'] ?? 'active');
+
+    $description = trim(
+        (string) ($_POST['description'] ?? '')
+    );
+
+    $benefitsText = trim(
+        (string) ($_POST['key_benefits'] ?? '')
+    );
+
+    if (
+        $productName === '' ||
+        mb_strlen($productName) > 200 ||
+        $productCode === '' ||
+        strlen($productCode) > 100 ||
+        !$categoryId ||
+        !in_array($status, ['active', 'inactive'], true) ||
+        mb_strlen($description) > 10000 ||
+        mb_strlen($benefitsText) > 5000
+    ) {
+        throw new RuntimeException(
+            'Please check the product details.'
+        );
+    }
+
+    /* VALIDATE CATEGORY */
+
+    $stmt = $conn->prepare("
         SELECT id
         FROM categories
-        WHERE
-            id = ?
-            AND status = 'active'
+        WHERE id = ?
+        AND status = 'active'
         LIMIT 1
     ");
 
-    $categoryStmt->bind_param(
-        "i",
-        $categoryId
-    );
+    $stmt->bind_param('i', $categoryId);
+    $stmt->execute();
 
-    $categoryStmt->execute();
+    $categoryExists = $stmt->get_result()->num_rows > 0;
 
-    $categoryResult =
-        $categoryStmt->get_result();
+    $stmt->close();
 
-    if (!$categoryResult->fetch_assoc()) {
-
-        $errors[] =
-            'The selected category is invalid.';
+    if (!$categoryExists) {
+        throw new RuntimeException('Invalid category.');
     }
 
-    $categoryStmt->close();
-}
+    /* CHECK DUPLICATE SKU */
 
-
-/* =========================================================
-   CHECK DUPLICATE SKU
-========================================================= */
-
-if ($productCode !== '') {
-
-    $skuStmt = $conn->prepare("
+    $stmt = $conn->prepare("
         SELECT id
         FROM products
         WHERE product_code = ?
         LIMIT 1
     ");
 
-    $skuStmt->bind_param(
-        "s",
-        $productCode
-    );
+    $stmt->bind_param('s', $productCode);
+    $stmt->execute();
 
-    $skuStmt->execute();
+    $skuExists = $stmt->get_result()->num_rows > 0;
 
-    $skuResult =
-        $skuStmt->get_result();
+    $stmt->close();
 
-    if ($skuResult->fetch_assoc()) {
-
-        $errors[] =
-            'That SKU already exists.';
+    if ($skuExists) {
+        throw new RuntimeException('Product SKU already exists.');
     }
 
-    $skuStmt->close();
-}
+    /* VARIANTS */
 
+    $sizes = $_POST['size_capacity'] ?? [];
+    $labels = $_POST['variant_label'] ?? [];
+    $prices = $_POST['variant_price'] ?? [];
+    $stocks = $_POST['variant_stock'] ?? [];
+    $thresholds = $_POST['variant_threshold'] ?? [];
 
-/* =========================================================
-   VALIDATE VARIANTS
-========================================================= */
-
-$variants = [];
-
-
-if (
-    !is_array($sizeCapacities) ||
-    count($sizeCapacities) === 0
-) {
-
-    $errors[] =
-        'At least one product size is required.';
-
-} else {
-
-
-    foreach (
-        $sizeCapacities as $index => $size
+    if (
+        !is_array($sizes) ||
+        count($sizes) < 1 ||
+        count($sizes) > 50 ||
+        !is_array($labels) ||
+        !is_array($prices) ||
+        !is_array($stocks) ||
+        !is_array($thresholds)
     ) {
-
-
-        $size = trim(
-            (string) $size
+        throw new RuntimeException(
+            'At least one valid product size is required.'
         );
+    }
 
+    $variants = [];
+    $variantKeys = [];
+    $totalStock = 0;
 
-        $label = trim(
-            (string) (
-                $variantLabels[$index]
-                ?? ''
-            )
-        );
+    foreach ($sizes as $index => $rawSize) {
 
-
-        $price =
-            $variantPrices[$index]
-            ?? null;
-
-
-        $stock =
-            $variantStocks[$index]
-            ?? null;
-
-
-        /* SIZE */
-
-        if ($size === '') {
-
-            $errors[] =
-                'Every size must have a size or capacity.';
-
-            continue;
+        if (!is_string($rawSize)) {
+            throw new RuntimeException('Invalid size.');
         }
 
+        $size = trim($rawSize);
 
-        /* PRICE */
+        $rawLabel = $labels[$index] ?? '';
+
+        if (!is_string($rawLabel)) {
+            throw new RuntimeException('Invalid variant label.');
+        }
+
+        $label = trim($rawLabel);
+
+        $price = $prices[$index] ?? null;
+        $stock = $stocks[$index] ?? null;
+        $threshold = $thresholds[$index] ?? null;
 
         if (
-            $price === null ||
-            $price === '' ||
-            !is_numeric($price) ||
-            (float) $price < 0
+            $size === '' ||
+            mb_strlen($size) > 100 ||
+            mb_strlen($label) > 100 ||
+            !is_scalar($price) ||
+            !preg_match(
+                '/^\d{1,8}(\.\d{1,2})?$/',
+                (string) $price
+            ) ||
+            !is_scalar($stock) ||
+            !ctype_digit((string) $stock) ||
+            !is_scalar($threshold) ||
+            !ctype_digit((string) $threshold) ||
+            (float) $price > 99999999.99 ||
+            (float) $price < 0 ||
+            (int) $stock > 100000000 ||
+            (int) $threshold > 100000000
         ) {
-
-            $errors[] =
-                'Every size must have a valid price.';
-
-            continue;
+            throw new RuntimeException(
+                'Invalid size, price, stock, or threshold.'
+            );
         }
 
+        $key = mb_strtolower($size . '|' . $label);
 
-        /* STOCK */
-
-        if (
-            $stock === null ||
-            $stock === '' ||
-            filter_var(
-                $stock,
-                FILTER_VALIDATE_INT
-            ) === false ||
-            (int) $stock < 0
-        ) {
-
-            $errors[] =
-                'Every size must have a valid stock quantity.';
-
-            continue;
+        if (isset($variantKeys[$key])) {
+            throw new RuntimeException(
+                'Duplicate size and label combination.'
+            );
         }
 
+        $variantKeys[$key] = true;
 
         $variants[] = [
-
             'size' => $size,
+            'label' => $label === '' ? null : $label,
+            'price' => (float) $price,
+            'stock' => (int) $stock,
+            'threshold' => (int) $threshold
+        ];
 
-            'label' =>
-                $label !== ''
-                    ? $label
-                    : null,
+        $totalStock += (int) $stock;
+    }
 
-            'price' =>
-                round(
-                    (float) $price,
-                    2
-                ),
+    if ($totalStock > 4294967295) {
+        throw new RuntimeException('Total stock exceeds the allowed limit.');
+    }
 
-            'stock' =>
-                (int) $stock
+    $basePrice = $variants[0]['price'];
+
+    $finalStatus = $totalStock === 0
+        ? 'out_of_stock'
+        : $status;
+
+    /* SKIN MATCHING */
+
+    $skinTypeIds = validProductIds(
+        $conn,
+        'skin_types',
+        is_array($_POST['skin_type_ids'] ?? null)
+            ? $_POST['skin_type_ids']
+            : []
+    );
+
+    $concernIds = validProductIds(
+        $conn,
+        'skin_concerns',
+        is_array($_POST['concern_ids'] ?? null)
+            ? $_POST['concern_ids']
+            : []
+    );
+
+    $ingredientIds = validProductIds(
+        $conn,
+        'ingredients',
+        is_array($_POST['ingredient_ids'] ?? null)
+            ? $_POST['ingredient_ids']
+            : []
+    );
+
+    /* IMAGE URLS */
+
+    $imageUrls = $_POST['image_urls'] ?? [];
+
+    if (!is_array($imageUrls) || count($imageUrls) > 10) {
+        throw new RuntimeException('Invalid image list.');
+    }
+
+    $images = [];
+
+    foreach ($imageUrls as $url) {
+
+        if (!is_string($url)) {
+            throw new RuntimeException('Invalid image URL.');
+        }
+
+        $url = trim($url);
+
+        if (
+            strlen($url) > 2048 ||
+            !filter_var($url, FILTER_VALIDATE_URL) ||
+            !in_array(
+                strtolower((string) parse_url($url, PHP_URL_SCHEME)),
+                ['http', 'https'],
+                true
+            )
+        ) {
+            throw new RuntimeException('Invalid image URL.');
+        }
+
+        $images[] = [
+            'type' => 'url',
+            'value' => $url
         ];
     }
-}
 
+    /* UPLOADED IMAGES */
 
-/* =========================================================
-   STOP IF VALIDATION FAILED
-========================================================= */
+    $uploads = $_FILES['product_images'] ?? null;
 
-if (!empty($errors)) {
+    if (
+        $uploads &&
+        isset($uploads['error']) &&
+        is_array($uploads['error'])
+    ) {
 
-    $_SESSION['product_error'] =
-        implode(' ', $errors);
+        foreach ($uploads['error'] as $index => $uploadError) {
 
-    header("Location: ./products.php");
-    exit;
-}
+            if ($uploadError === UPLOAD_ERR_NO_FILE) {
+                continue;
+            }
 
+            if ($uploadError !== UPLOAD_ERR_OK) {
+                throw new RuntimeException('Image upload failed.');
+            }
 
-/* =========================================================
-   BASE PRICE
+            $images[] = [
+                'type' => 'file',
+                'value' => $index
+            ];
+        }
+    }
 
-   First size determines catalog price.
-========================================================= */
+    if (count($images) > 10) {
+        throw new RuntimeException(
+            'A maximum of 10 product images is allowed.'
+        );
+    }
 
-$basePrice =
-    $variants[0]['price'];
+    $uploadFolder = __DIR__ . '/../../uploads/products';
 
+    if (
+        $uploads &&
+        !is_dir($uploadFolder) &&
+        !mkdir($uploadFolder, 0755, true) &&
+        !is_dir($uploadFolder)
+    ) {
+        throw new RuntimeException(
+            'Unable to create product image folder.'
+        );
+    }
 
-/* =========================================================
-   TOTAL STOCK
+    $resolvedImages = [];
+    $fileInfo = new finfo(FILEINFO_MIME_TYPE);
 
-   Sum all size stocks.
-========================================================= */
+    foreach ($images as $image) {
 
-$totalStock = 0;
+        if ($image['type'] === 'url') {
+            $resolvedImages[] = $image['value'];
+            continue;
+        }
 
+        $index = $image['value'];
+        $temporaryFile = $uploads['tmp_name'][$index];
+        $fileSize = (int) $uploads['size'][$index];
 
-foreach ($variants as $variant) {
+        if (
+            !is_uploaded_file($temporaryFile) ||
+            $fileSize <= 0 ||
+            $fileSize > 5 * 1024 * 1024
+        ) {
+            throw new RuntimeException(
+                'Each uploaded image must be under 5 MB.'
+            );
+        }
 
-    $totalStock +=
-        $variant['stock'];
-}
+        $mime = $fileInfo->file($temporaryFile);
 
+        $extensions = [
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/webp' => 'webp'
+        ];
 
-/* =========================================================
-   IF NO STOCK, PRODUCT SHOULD BE OUT OF STOCK
-========================================================= */
+        $extension = $extensions[$mime] ?? null;
 
-if ($totalStock === 0) {
+        if (!$extension) {
+            throw new RuntimeException(
+                'Only JPG, PNG, and WebP images are allowed.'
+            );
+        }
 
-    $finalStatus = 'out_of_stock';
+        $filename = bin2hex(random_bytes(16))
+            . '.'
+            . $extension;
 
-} else {
+        $destination = $uploadFolder . '/' . $filename;
 
-    $finalStatus = $status;
-}
+        if (!move_uploaded_file($temporaryFile, $destination)) {
+            throw new RuntimeException(
+                'Unable to save uploaded image.'
+            );
+        }
 
+        $savedFiles[] = $destination;
 
-/* =========================================================
-   DATABASE TRANSACTION
-========================================================= */
+        $resolvedImages[] = 'uploads/products/' . $filename;
+    }
 
-$conn->begin_transaction();
+    /* DATABASE TRANSACTION */
 
+    $conn->begin_transaction();
+    $transactionStarted = true;
 
-try {
+    /* INSERT PRODUCT */
 
+    $mainImage = $resolvedImages[0] ?? null;
 
-    /* =====================================================
-       INSERT PRODUCT
-    ====================================================== */
-
-    $productStmt = $conn->prepare("
-        INSERT INTO products
-        (
+    $stmt = $conn->prepare("
+        INSERT INTO products (
             category_id,
             product_name,
             product_code,
             description,
             price,
             stock_quantity,
+            image,
             status
         )
-        VALUES
-        (
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            ?
-        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ");
 
-
-    $productStmt->bind_param(
-        "isssdis",
+    $stmt->bind_param(
+        'isssdiss',
         $categoryId,
         $productName,
         $productCode,
         $description,
         $basePrice,
         $totalStock,
+        $mainImage,
         $finalStatus
     );
 
+    $stmt->execute();
 
-    $productStmt->execute();
+    $productId = (int) $conn->insert_id;
 
+    $stmt->close();
 
-    $productId =
-        $conn->insert_id;
+    /* INSERT VARIANTS */
 
-
-    $productStmt->close();
-
-
-    /* =====================================================
-       INSERT PRODUCT VARIANTS
-    ====================================================== */
-
-    $variantStmt = $conn->prepare("
-        INSERT INTO product_variants
-        (
+    $stmt = $conn->prepare("
+        INSERT INTO product_variants (
             product_id,
             size_capacity,
             variant_label,
             price,
-            stock_quantity
+            stock_quantity,
+            low_stock_threshold
         )
-        VALUES
-        (
-            ?,
-            ?,
-            ?,
-            ?,
-            ?
-        )
+        VALUES (?, ?, ?, ?, ?, ?)
     ");
-
 
     foreach ($variants as $variant) {
 
+        $size = $variant['size'];
+        $label = $variant['label'];
+        $price = $variant['price'];
+        $stock = $variant['stock'];
+        $threshold = $variant['threshold'];
 
-        $size =
-            $variant['size'];
-
-        $label =
-            $variant['label'];
-
-        $price =
-            $variant['price'];
-
-        $stock =
-            $variant['stock'];
-
-
-        $variantStmt->bind_param(
-            "issdi",
+        $stmt->bind_param(
+            'issdii',
             $productId,
             $size,
             $label,
             $price,
-            $stock
+            $stock,
+            $threshold
         );
 
-
-        $variantStmt->execute();
-
+        $stmt->execute();
     }
 
+    $stmt->close();
 
-    $variantStmt->close();
+    /* SAVE SKIN TYPES */
 
+    $stmt = $conn->prepare("
+        INSERT INTO product_skin_types (
+            product_id,
+            skin_type_id
+        )
+        VALUES (?, ?)
+    ");
 
-    /* =====================================================
-       AUDIT LOG
-    ====================================================== */
+    foreach ($skinTypeIds as $skinTypeId) {
+        $stmt->bind_param(
+            'ii',
+            $productId,
+            $skinTypeId
+        );
 
-    $adminId =
-        (int) $_SESSION['user_id'];
+        $stmt->execute();
+    }
 
+    $stmt->close();
 
-    $action = 'CREATE';
+    /* SAVE SKIN CONCERNS */
 
-    $module = 'Products';
+    $stmt = $conn->prepare("
+        INSERT INTO product_concerns (
+            product_id,
+            concern_id
+        )
+        VALUES (?, ?)
+    ");
 
-    $recordId =
-        (string) $productId;
+    foreach ($concernIds as $concernId) {
+        $stmt->bind_param(
+            'ii',
+            $productId,
+            $concernId
+        );
 
-    $descriptionLog =
-        'Created product "' .
-        $productName .
-        '" (' .
-        $productCode .
-        ').';
+        $stmt->execute();
+    }
 
-    $ipAddress =
-        $_SERVER['REMOTE_ADDR']
-        ?? null;
+    $stmt->close();
 
+    /* SAVE INGREDIENTS */
 
-    $auditStmt = $conn->prepare("
-        INSERT INTO audit_logs
-        (
+    $stmt = $conn->prepare("
+        INSERT INTO product_ingredients (
+            product_id,
+            ingredient_id
+        )
+        VALUES (?, ?)
+    ");
+
+    foreach ($ingredientIds as $ingredientId) {
+        $stmt->bind_param(
+            'ii',
+            $productId,
+            $ingredientId
+        );
+
+        $stmt->execute();
+    }
+
+    $stmt->close();
+
+    /* SAVE IMAGES */
+
+    $stmt = $conn->prepare("
+        INSERT INTO product_images (
+            product_id,
+            image_path,
+            sort_order
+        )
+        VALUES (?, ?, ?)
+    ");
+
+    foreach ($resolvedImages as $index => $imagePath) {
+
+        $sortOrder = (int) $index;
+
+        $stmt->bind_param(
+            'isi',
+            $productId,
+            $imagePath,
+            $sortOrder
+        );
+
+        $stmt->execute();
+    }
+
+    $stmt->close();
+
+    /* SAVE BENEFITS */
+
+    if ($benefitsText !== '') {
+
+        $benefitLines = preg_split('/\R/u', $benefitsText);
+
+        $stmt = $conn->prepare("
+            INSERT INTO product_benefits (
+                product_id,
+                benefit_text,
+                sort_order
+            )
+            VALUES (?, ?, ?)
+        ");
+
+        $sortOrder = 0;
+
+        foreach ($benefitLines as $benefitLine) {
+
+            $benefit = trim($benefitLine);
+
+            if ($benefit === '') {
+                continue;
+            }
+
+            if (mb_strlen($benefit) > 500) {
+                throw new RuntimeException(
+                    'Each benefit must be 500 characters or less.'
+                );
+            }
+
+            $stmt->bind_param(
+                'isi',
+                $productId,
+                $benefit,
+                $sortOrder
+            );
+
+            $stmt->execute();
+
+            $sortOrder++;
+        }
+
+        $stmt->close();
+    }
+
+    /* AUDIT LOG */
+
+    $adminId = (int) $_SESSION['user_id'];
+
+    $auditAction = 'CREATE';
+    $auditModule = 'Products';
+    $recordId = (string) $productId;
+
+    $auditDescription = sprintf(
+        'Created product "%s" (%s).',
+        $productName,
+        $productCode
+    );
+
+    $ipAddress = $_SERVER['REMOTE_ADDR'] ?? null;
+
+    $stmt = $conn->prepare("
+        INSERT INTO audit_logs (
             user_id,
             action,
             module,
@@ -516,64 +719,50 @@ try {
         VALUES (?, ?, ?, ?, ?, ?)
     ");
 
-
-    $auditStmt->bind_param(
-        "isssss",
+    $stmt->bind_param(
+        'isssss',
         $adminId,
-        $action,
-        $module,
+        $auditAction,
+        $auditModule,
         $recordId,
-        $descriptionLog,
+        $auditDescription,
         $ipAddress
     );
 
+    $stmt->execute();
+    $stmt->close();
 
-    $auditStmt->execute();
-
-    $auditStmt->close();
-
-
-    /* =====================================================
-       COMMIT
-    ====================================================== */
+    /* COMMIT */
 
     $conn->commit();
-
+    $transactionStarted = false;
 
     $_SESSION['product_success'] =
         'Product added successfully.';
 
+    unset($_SESSION['csrf_product']);
 
-} catch (Throwable $e) {
+} catch (Throwable $exception) {
 
+    if ($transactionStarted) {
+        $conn->rollback();
+    }
 
-    /* =====================================================
-       ROLLBACK EVERYTHING
-    ====================================================== */
+    foreach ($savedFiles as $path) {
+        if (is_file($path)) {
+            unlink($path);
+        }
+    }
 
-    $conn->rollback();
-
+    error_log(
+        'Add Product Error: ' . $exception->getMessage()
+    );
 
     $_SESSION['product_error'] =
-        'Unable to add the product. Please try again.';
-
-
-    /*
-       DEVELOPMENT ONLY:
-
-       If you need to see the actual database error,
-       temporarily replace the message above with:
-
-       $_SESSION['product_error'] = $e->getMessage();
-
-       Do not keep database errors visible in production.
-    */
+        $exception instanceof RuntimeException
+            ? $exception->getMessage()
+            : 'Unable to add the product. Please try again.';
 }
 
-
-/* =========================================================
-   RETURN TO PRODUCTS
-========================================================= */
-
-header("Location: ./products.php");
+header('Location: ./products.php');
 exit;
